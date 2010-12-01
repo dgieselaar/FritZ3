@@ -31,6 +31,7 @@ package fritz3.style {
 			}
 			if (this.lastNode) {
 				this.lastNode.nextNode = propertyData;
+				propertyData.prevNode = this.lastNode;
 			}
 			this.lastNode = propertyData;
 		}

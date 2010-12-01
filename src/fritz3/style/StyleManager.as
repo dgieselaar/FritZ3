@@ -1,4 +1,7 @@
 package fritz3.style {
+	import fritz3.utils.signals.FastSignal;
+	import org.osflash.signals.IDispatcher;
+	import org.osflash.signals.ISignal;
 	/**
 	 * ...
 	 * @author Dario Gieselaar
@@ -7,6 +10,8 @@ package fritz3.style {
 		
 		protected static var _firstNodeByID:Object = { };
 		protected static var _lastNodeByID:Object = { };
+		
+		protected static var _onChange:IDispatcher = new FastSignal();
 		
 		public function StyleManager ( ) {
 			
@@ -18,6 +23,10 @@ package fritz3.style {
 		
 		public static function getFirstNode ( styleSheetID:String = null ):StyleSheetNode {
 			return _firstNodeByID[stylesheetID];
+		}
+		
+		public static function get onChange ( ):ISignal {
+			return ISignal(_onChange);
 		}
 		
 	}
