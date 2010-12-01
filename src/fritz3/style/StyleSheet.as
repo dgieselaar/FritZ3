@@ -7,6 +7,9 @@ package fritz3.style {
 		
 		function getStyle ( ):void
 		
+		function invalidateCollector ( ):void
+		function invalidateState ( ):void
+		
 		function set stylable ( value:Stylable ):void 
 	}
 

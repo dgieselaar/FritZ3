@@ -1,5 +1,4 @@
 package fritz3.style {
-	import org.osflash.signals.ISignal;
 	/**
 	 * ...
 	 * @author Dario Gieselaar
@@ -14,10 +13,12 @@ package fritz3.style {
 		
 		protected var _properties:Object = { };
 		
-		public var onChange:ISignal;
-		
 		public function StyleSheetNode ( ) {
-			this.onChange = new TurboSignal();
+			
+		}
+		
+		public function invalidate ( ):void {
+			
 		}
 		
 		public function append ( propertyData:PropertyData ):void {
