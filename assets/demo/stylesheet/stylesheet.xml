@@ -6,6 +6,9 @@
 		<property name="height">100</property>
 		<property name="background-color" target="background">0xFF68EB</property>
 		<property name="rounded-corners" target="background">5</property>
+		<property name="background-image">
+			<BackgroundImage/>
+		</property>
 	</rule>
 
 </data>
