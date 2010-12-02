@@ -1,4 +1,5 @@
 package fritz3.display.core  {
+	import fritz3.style.invalidation.InvalidatableStyleSheetCollector;
 	import fritz3.style.StandardStyleSheetCollector;
 	import fritz3.style.Stylable;
 	import fritz3.style.StyleSheetCollector;
@@ -16,6 +17,10 @@ package fritz3.display.core  {
 	public class StylableDisplayComponent extends InvalidatableDisplayComponent implements Stylable {
 		
 		protected var _styleSheetCollector:StyleSheetCollector;
+		
+		protected var _id:String;
+		protected var _className:String;
+		protected var _name:String;
 		
 		public function StylableDisplayComponent ( properties:Object = null )  {
 			super(properties);
@@ -53,10 +58,52 @@ package fritz3.display.core  {
 			_invalidationHelper.invalidateMethod(this.getStyle);
 		}
 		
+		protected function applyID ( ):void {
+			if (_styleSheetCollector is InvalidatableStyleSheetCollector) {
+				InvalidatableStyleSheetCollector(_styleSheetCollector).invalidateCollector();
+			}
+		}
+		
+		protected function applyName ( ):void {
+			if (_styleSheetCollector is InvalidatableStyleSheetCollector) {
+				InvalidatableStyleSheetCollector(_styleSheetCollector).invalidateCollector();
+			}
+		}
+		
+		protected function applyClassName ( ):void {
+			if (_styleSheetCollector is InvalidatableStyleSheetCollector) {
+				InvalidatableStyleSheetCollector(_styleSheetCollector).invalidateCollector();
+			}
+		}
+		
 		public function get styleSheetCollector ( ):StyleSheetCollector { return _styleSheetCollector; }
 		public function set styleSheetCollector ( value:StyleSheetCollector ):void {
 			if (_styleSheetCollector != value) {
 				this.setStyleSheetCollector(value);
+			}
+		}
+		
+		public function get id ( ):String { return _id; }
+		public function set id ( value:String ):void {
+			if(_id != value) {
+				_id = value;
+				this.applyID();
+			}
+		}
+		
+		public function get className ( ):String { return _className; }
+		public function set className ( value:String ):void {
+			if(_className != value) {
+				_className = value;
+				this.applyClassName();
+			}
+		}
+		
+		override public function get name ( ):String { return _name; }
+		override public function set name ( value:String ):void {
+			if(_name != value) {
+				_name = value;
+				this.applyName();
 			}
 		}
 		
