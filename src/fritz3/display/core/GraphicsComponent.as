@@ -7,7 +7,7 @@ package fritz3.display.core {
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public class GraphicsComponent extends InvalidatableDisplayComponent implements BackgroundParent {
+	public class GraphicsComponent extends StylableDisplayComponent implements BackgroundParent {
 		
 		protected var _background:Background;
 		protected var _width:Number = 0;
