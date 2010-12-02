@@ -1,6 +1,7 @@
 package fritz3.style {
 	import fritz3.invalidation.InvalidationHelper;
 	import fritz3.style.invalidation.StyleManagerInvalidationSignal;
+	import fritz3.style.selector.Selector;
 	import org.osflash.signals.IDispatcher;
 	import org.osflash.signals.ISignal;
 	/**
@@ -37,7 +38,6 @@ package fritz3.style {
 		}
 		
 		public static function addRule ( styleRule:StyleRule ):void {
-			
 			_invalidationHelper.invalidateMethod(dispatchChange);
 		}
 		
@@ -46,7 +46,62 @@ package fritz3.style {
 		}
 		
 		public static function parseXML ( xml:XML ):void {
+			
+			const children:XMLList = xml.children();
+			var child:XML;
+			var i:int = 0;
+			const l:int = children.length();
+			var rule:StyleRule;
+			for (; i < l; ++i) {
+				child = children[i];
+				rule = getStyleRuleFromXML(child);
+			}
+			
+			
 			_invalidationHelper.invalidateMethod(dispatchChange);
+		}
+		
+		protected static function getStyleRuleFromXML ( xml:XML ):StyleRule {
+			var rule:StyleRule = new StyleRule();
+			const children:XMLList = xml.children();
+			var i:int = 0;
+			const l:int = children.length();
+			rule.selector = new Selector(xml.@where.toString());
+			var child:XML, propertyName:String, propertyValue:*, target:String;
+			for (; i < l; ++i) {
+				child = children[i];
+				target = null;
+				propertyName = child.@name;
+				if (child.hasSimpleContent()) {
+					propertyValue = getSimpleValue(child.toString());
+				} else {
+					propertyValue = child;
+				}
+			}
+			return rule;
+		}
+		
+		protected static function getSimpleValue ( string:String ):* {
+			var value:* = string;
+			switch(string) {
+				case "NaN":
+				value = NaN;
+				break;
+				
+				case "Number.MAX_VALUE":
+				value = Number.MAX_VALUE;
+				break;
+				
+				case "Number.MIN_VALUE":
+				value = Number.MIN_VALUE;
+				break;
+				
+				case "null":
+				value = null;
+				break;
+			}
+			
+			return value;	
 		}
 		
 		public static function getFirstRule ( styleSheetID:String = null ):StyleRule {
