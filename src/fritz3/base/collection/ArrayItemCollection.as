@@ -6,21 +6,25 @@ package fritz3.base.collection {
 	 */
 	public class ArrayItemCollection implements ItemCollection {
 		
-		private var _items:Array;
-		private var _numItems:int;
+		protected var _items:Array;
+		protected var _numItems:int;
+		protected var _indexes:Dictionary;
 		
 		public function ArrayItemCollection ( ) {
 			_items = [];
+			_indexes = new Dictionary();
 		}
 		
 		final public function add ( item:Object ):Object {
+			_indexes[_numItems] = item;
 			_items[_numItems++] = item;
 			return item;
 		}
 		
 		final public function remove ( item:Object ):Object {
-			_items.splice(_items[item], 1);
+			_items.splice(_indexes[item], 1);
 			_numItems--;
+			delete _indexes[item];
 			return item;
 		}
 		
@@ -28,11 +32,12 @@ package fritz3.base.collection {
 			var afterIndex:Array = _items.splice(index);
 			_items[_items.length] = item;
 			_items = _items.concat(afterIndex);
+			_indexes[item] = index;
 			return item;
 		}
 		
 		final public function removeItemAt ( index:int ):Object {
-			var item:Object = this.getItemAt(index);
+			var item:Object = _items[index];
 			this.remove(item);
 			return item;
 		}
@@ -45,11 +50,12 @@ package fritz3.base.collection {
 			var afterIndex:Array = _items.splice(index);
 			_items[index] = item;
 			_items = _items.concat(afterIndex);
+			_indexes[item] = index;
 			return item;
 		}
 		
 		final public function hasItem ( item:Object ):Object{
-			return _items.indexOf(item) != -1;
+			return _indexes[item] !== undefined;
 		}
 		
 		final public function get numItems ( ):uint {
