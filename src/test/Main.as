@@ -19,7 +19,9 @@
 	import fritz3.display.graphics.BoxBackground;
 	import fritz3.display.graphics.utils.getGradientMatrix;
 	import fritz3.display.layout.Align;
+	import fritz3.document.ApplicationDocument;
 	import fritz3.invalidation.InvalidationManager;
+	import fritz3.style.StyleManager;
 	import fritz3.utils.ObjectPool;
 	import fritz3.utils.signals.fast.FastSignal;
 	
@@ -27,26 +29,25 @@
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public class Main extends Sprite {
-		
-		//[Embed(source = '../assets/scale9gridpattern.png')]
-		//private var BackgroundImage:Class;
+	public class Main extends ApplicationDocument {
+	 
+		[Embed(source = '../../assets/demo/stylesheet/stylesheet.xml', mimeType="application/octet-stream")]
+		private var StyleSheetXML:Class;
 		
 		public function Main():void {
-			if (stage) init();
-			else addEventListener(Event.ADDED_TO_STAGE, init);
 		}
 		
-		private function init(e:Event = null):void {
-			removeEventListener(Event.ADDED_TO_STAGE, init);
-			
-			InvalidationManager.initializeManager(stage);
+		override public function onAdd(  ):void  {
+			super.onAdd();
 			
 			/*var component:InvalidatableDisplayComponent = new InvalidatableDisplayComponent();
 			this.addChild(component);
 			
 			var container:DisplayComponentContainer = new DisplayComponentContainer();
 			this.addChild(container);*/
+			
+			var styleSheetXML:XML = XML(new StyleSheetXML());
+			StyleManager.parseXML(styleSheetXML);
 			
 			var graphicsComponent:GraphicsComponent = new GraphicsComponent( { width: 100, height: 100, x: 5, y: 5 } );
 			var background:BoxBackground = graphicsComponent.background as BoxBackground;
