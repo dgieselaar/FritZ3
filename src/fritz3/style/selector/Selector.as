@@ -14,6 +14,14 @@ package fritz3.style.selector  {
 		
 		public var relationship:String;
 		
+		public var prevNode:Selector;
+		public var nextNode:Selector;
+		
+		public var id:String;
+		public var className:String;
+		public var name:String;
+		public var classObject:Class;
+		
 		public function Selector ( where:String )  {
 			this.setWhere(where);
 		}
