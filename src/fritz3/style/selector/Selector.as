@@ -27,10 +27,10 @@ package fritz3.style.selector  {
 		}
 		
 		protected function setWhere ( where:String ):void {
-			
+			var regExp:RegExp = /(.*?)\s{1,}(>|~|\+)?/;
 		}
 		
-		public function match ( object:Object ):void {
+		public function match ( object:Object ):Boolean {
 			
 		}
 		
