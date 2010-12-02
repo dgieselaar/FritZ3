@@ -19,7 +19,7 @@
 			
 		}
 		
-		public static function initializeManager ( stage:Stage ):void {
+		public static function init ( stage:Stage ):void {
 			if(!_stage) {
 				_stage = stage;
 				_stage.addEventListener(Event.RENDER, onRender);
