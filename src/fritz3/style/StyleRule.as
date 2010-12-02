@@ -1,4 +1,5 @@
 package fritz3.style {
+	import fritz3.style.invalidation.StyleRuleInvalidationSignal;
 	import fritz3.style.selector.Selector;
 	/**
 	 * ...
@@ -13,11 +14,13 @@ package fritz3.style {
 		public var lastNode:PropertyData;
 		
 		public var selector:Selector;
+		public var onChange:StyleRuleInvalidationSignal;
 		
 		protected var _properties:Object = { };
 		
 		public function StyleRule ( ) {
-			
+			this.onChange = new StyleRuleInvalidationSignal();
+			this.onChange.styleRule = this;
 		}
 		
 		public function invalidate ( ):void {

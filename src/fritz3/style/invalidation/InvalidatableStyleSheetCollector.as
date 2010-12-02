@@ -8,7 +8,8 @@ package fritz3.style.invalidation {
 	public interface InvalidatableStyleSheetCollector extends StyleSheetCollector {
 		
 		function invalidateRule ( styleRule:StyleRule ):void
-		
+		function invalidateCollector ( ):void
+		function invalidateState ( ):void
 	}
 
 }

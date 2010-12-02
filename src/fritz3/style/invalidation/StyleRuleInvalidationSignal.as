@@ -1,31 +1,29 @@
-package fritz3.style.invalidation  {
+package fritz3.style.invalidation {
+	import fritz3.style.StyleRule;
+	import org.osflash.signals.IDispatcher;
 	/**
-
-	/**
+	 * ...
 	 * @author Dario Gieselaar
-	 * @review 
-	 * @copyright Frontier Information Technologies BV
-	 * @package fritz3.style.invalidation
-	 * 
-	 * [Description]
-	*/
-	
-	public class StyleManagerInvalidationSignal extends InvalidatableStyleSheetCollectorSignal {
+	 */
+	public class StyleRuleInvalidationSignal extends InvalidatableStyleSheetCollectorSignal {
 		
-		public function StyleManagerInvalidationSignal (  )  {
-			super();
+		public var styleRule:StyleRule;
+		
+		public function StyleRuleInvalidationSignal ( ) {
+			
 		}
 		
 		override public function dispatch ( ...rest ):void  {
 			_dispatching = true;
 			var node:StyleSheetCollectorNode = _firstNode, nextNode:StyleSheetCollectorNode;
+			var rule:StyleRule = this.styleRule;
 			while (node) {
 				if (node.remove) {
 					nextNode = node.nextNode;
 					this.remove(node.styleSheetCollector);
 					node = nextNode;
 				} else {
-					node.styleSheetCollector.invalidateCollector();
+					node.styleSheetCollector.invalidateRule(rule);;
 					node = node.nextNode;
 				}
 			}

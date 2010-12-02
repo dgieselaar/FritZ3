@@ -11,7 +11,7 @@ package fritz3.style {
 		protected var _disabled:Boolean = false;
 		
 		protected var _stylable:Stylable;
-		protected var _styleSheetIDs:Array = [ StyleManager.DEFAULT_STYLESHEET_ID ];
+		protected var _styleSheetIDs:Array;
 		protected var _hasOnChangeListener:Boolean;
 		
 		protected var _invalidatedCollector:Boolean;
