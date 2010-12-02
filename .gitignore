@@ -10,9 +10,6 @@ obj/
 docs/
 
 # source
-src/demo
-src/Main.as
-TestRunner.as
 
 #assets
 assets/demo
