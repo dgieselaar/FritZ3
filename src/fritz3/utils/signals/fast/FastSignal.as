@@ -14,6 +14,7 @@ package fritz3.utils.signals.fast {
 		protected var _lastNode:FastSignalListenerData;
 		protected var _dataByListener:Dictionary;
 		protected var _dispatching:Boolean;
+		// FIXME: will not work when removing a node other than the node being dispatched
 		protected var _nextNode:FastSignalListenerData;
 		
 		protected var _numListeners:int;
