@@ -42,6 +42,19 @@ package fritz3.style {
 		}
 		
 		public function getStyle ( ):void {
+			
+			if (_invalidatedCollector) {
+				// collect style
+			}
+			
+			if (_invalidatedNodes) {
+				// cache nodes
+			}
+			
+			if (_invalidatedState) {
+				// apply style
+			}
+			
 			_invalidatedCollector = _invalidatedState = _invalidatedNodes = false;
 		}
 		
