@@ -12,7 +12,13 @@ package fritz3.style.selector  {
 	
 	public class Selector {
 		
-		public function Selector (  )  {
+		public var relationship:String;
+		
+		public function Selector ( where:String )  {
+			this.setWhere(where);
+		}
+		
+		protected function setWhere ( where:String ):void {
 			
 		}
 		
