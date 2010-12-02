@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<data>
+	
+	<rule where="GraphicsComponent">
+		<property name="width">100</property>
+		<property name="height">100</property>
+		<property name="background-color" target="background">0xFF68EB</property>
+		<property name="rounded-corners" target="background">5</property>
+	</rule>
+
+</data>
