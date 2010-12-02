@@ -29,8 +29,8 @@
 	 */
 	public class Main extends Sprite {
 		
-		[Embed(source = '../assets/scale9gridpattern.png')]
-		private var BackgroundImage:Class;
+		//[Embed(source = '../assets/scale9gridpattern.png')]
+		//private var BackgroundImage:Class;
 		
 		public function Main():void {
 			if (stage) init();
@@ -48,12 +48,12 @@
 			var container:DisplayComponentContainer = new DisplayComponentContainer();
 			this.addChild(container);*/
 			
-			var graphicsComponent:GraphicsComponent = new GraphicsComponent( { width: 100, height: 100 } );
+			var graphicsComponent:GraphicsComponent = new GraphicsComponent( { width: 100, height: 100, x: 5, y: 5 } );
 			var background:BoxBackground = graphicsComponent.background as BoxBackground;
 			background.backgroundColor = 0xFF68EB;
 			background.backgroundAlpha = 1;
+			background.roundedCorners = 5;
 			this.addChild(graphicsComponent);
-			
 			
 			
 			/*var background:BoxBackground = container.background;
