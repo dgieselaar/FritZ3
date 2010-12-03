@@ -1,4 +1,4 @@
-package fritz3.utils {
+package fritz3.utils.object {
 	import flash.utils.Dictionary;
 	/**
 	 * ...
