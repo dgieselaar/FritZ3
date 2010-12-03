@@ -97,6 +97,10 @@
 			return _collection.moveItemTo(item, index);
 		}
 		
+		public function getItemIndex ( item:Object ):int {
+			return _collection.getItemIndex(item);
+		}
+		
 		public function hasItem ( item:Object ):Object{
 			return _collection.hasItem(item);
 		}
