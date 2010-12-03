@@ -17,6 +17,8 @@ package fritz3.style.selector  {
 		public var prevNode:Selector;
 		public var nextNode:Selector;
 		
+		public var where:String;
+		
 		public var id:String;
 		public var className:String;
 		public var name:String;
@@ -27,11 +29,11 @@ package fritz3.style.selector  {
 		}
 		
 		protected function setWhere ( where:String ):void {
-			var regExp:RegExp = /(.*?)\s{1,}(>|~|\+)?/;
+			this.where = where;
 		}
 		
 		public function match ( object:Object ):Boolean {
-			
+			return false;
 		}
 		
 	}

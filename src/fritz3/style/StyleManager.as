@@ -2,6 +2,7 @@ package fritz3.style {
 	import fritz3.invalidation.InvalidationHelper;
 	import fritz3.style.invalidation.StyleManagerInvalidationSignal;
 	import fritz3.style.selector.Selector;
+	import fritz3.style.selector.SelectorList;
 	import org.osflash.signals.IDispatcher;
 	import org.osflash.signals.ISignal;
 	/**
@@ -66,7 +67,7 @@ package fritz3.style {
 			const children:XMLList = xml.children();
 			var i:int = 0;
 			const l:int = children.length();
-			rule.selector = new Selector(xml.@where.toString());
+			rule.selectorList = new SelectorList(xml.@where.toString());
 			var child:XML, propertyName:String, propertyValue:*, target:String;
 			for (; i < l; ++i) {
 				child = children[i];

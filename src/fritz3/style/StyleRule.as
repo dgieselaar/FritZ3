@@ -1,6 +1,7 @@
 package fritz3.style {
 	import fritz3.style.invalidation.StyleRuleInvalidationSignal;
 	import fritz3.style.selector.Selector;
+	import fritz3.style.selector.SelectorList;
 	/**
 	 * ...
 	 * @author Dario Gieselaar
@@ -13,7 +14,7 @@ package fritz3.style {
 		public var firstNode:PropertyData;
 		public var lastNode:PropertyData;
 		
-		public var selector:Selector;
+		public var selectorList:SelectorList;
 		public var onChange:StyleRuleInvalidationSignal;
 		
 		protected var _properties:Object = { };
