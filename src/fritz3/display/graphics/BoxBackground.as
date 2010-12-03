@@ -18,7 +18,7 @@
 	import fritz3.display.graphics.utils.getGradientMatrix;
 	import fritz3.display.layout.Align;
 	import fritz3.invalidation.Invalidatable;
-	import fritz3.utils.ObjectPool;
+	import fritz3.utils.object.ObjectPool;
 	/**
 	 * ...
 	 * @author Dario Gieselaar

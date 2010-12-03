@@ -22,7 +22,6 @@
 	import fritz3.document.ApplicationDocument;
 	import fritz3.invalidation.InvalidationManager;
 	import fritz3.style.StyleManager;
-	import fritz3.utils.ObjectPool;
 	import fritz3.utils.signals.fast.FastSignal;
 	
 	/**

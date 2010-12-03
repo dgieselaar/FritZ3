@@ -1,5 +1,8 @@
 package fritz3.style.selector  {
 	import flash.utils.Dictionary;
+	import fritz3.utils.object.addClassAlias;
+	import fritz3.utils.object.getClass;
+	import fritz3.utils.object.removeClassAlias;
 	/**
 
 	/**
@@ -27,8 +30,8 @@ package fritz3.style.selector  {
 		public var className:String;
 		public var name:String;
 		public var classObjectString:String;
-		
 		public var classObject:Class;
+		public var isUniversal:Boolean;
 		
 		public function Selector ( where:String )  {
 			this.setWhere(where);
@@ -55,8 +58,9 @@ package fritz3.style.selector  {
 			}
 			
 			if (this.classObjectString) {
-				classObject = getClassObject(classObjectString);
+				classObject = getClass(classObjectString);
 			}
+			
 		}
 		
 		public function match ( object:Object ):Boolean {
