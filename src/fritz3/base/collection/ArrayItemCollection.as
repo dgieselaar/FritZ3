@@ -54,6 +54,10 @@ package fritz3.base.collection {
 			return item;
 		}
 		
+		final public function getItemIndex ( item:Object ):int {
+			return _indexes[item] != undefined ? _indexes[item] : -1;
+		}
+		
 		final public function hasItem ( item:Object ):Object{
 			return _indexes[item] !== undefined;
 		}

@@ -12,6 +12,7 @@
 		
 		function getItemAt ( index:int ):Object
 		function moveItemTo ( item:Object, index:uint ):Object
+		function getItemIndex ( item:Object ):int
 		
 		function hasItem ( item:Object ):Object
 		function get numItems ( ):uint
