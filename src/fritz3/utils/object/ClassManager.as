@@ -20,6 +20,10 @@ package fritz3.utils.object {
 			delete _classByAlias[alias];
 		}
 		
+		public static function hasClassAlias ( alias:String ):Boolean {
+			return Boolean(_classByAlias[alias]);
+		}
+		
 		public static function getClass ( alias:String ):Class {
 			var classObject:Class = _classByAlias[alias];
 			if (!classObject) {
