@@ -7,6 +7,7 @@
 	import flash.display.GraphicsGradientFill;
 	import flash.display.Shape;
 	import flash.display.Sprite;
+	import flash.display.Stage;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.filters.DropShadowFilter;
@@ -23,6 +24,7 @@
 	import fritz3.invalidation.InvalidationManager;
 	import fritz3.style.StyleManager;
 	import fritz3.utils.signals.fast.FastSignal;
+	import ru.etcs.utils.getDefinitionNames;
 	
 	/**
 	 * ...
