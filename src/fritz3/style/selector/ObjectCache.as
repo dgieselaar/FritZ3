@@ -112,6 +112,9 @@ package fritz3.style.selector {
 			if (this.properties[propertyName] != undefined) {
 				return this.properties[propertyName];
 			}
+			if (!this.object.hasOwnProperty(propertyName)) {
+				return undefined;
+			}
 			return (this.properties[propertyName] = this.object[propertyName]);
 		}
 		
