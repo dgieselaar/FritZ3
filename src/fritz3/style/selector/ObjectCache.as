@@ -1,4 +1,5 @@
 package fritz3.style.selector {
+	import flash.utils.Dictionary;
 	import fritz3.base.collection.ItemCollection;
 	import fritz3.display.core.Addable;
 	/**
@@ -6,6 +7,9 @@ package fritz3.style.selector {
 	 * @author Dario Gieselaar
 	 */
 	public class ObjectCache {
+		
+		protected static var _objectCache:Dictionary = new Dictionary();
+		protected static var _objectCachePool:Array = [];
 		
 		public var object:Object;
 		
@@ -117,6 +121,31 @@ package fritz3.style.selector {
 			}
 			return (this.properties[propertyName] = this.object[propertyName]);
 		}
+		
+		public static function clearCache ( ):void {
+			for each(var cache:ObjectCache in _objectCache) {
+				poolCacheObject(cache);
+			}
+			_objectCache = new Dictionary();
+		}
+		
+		public static function getCache ( object:Object ):ObjectCache {
+			var cache:ObjectCache = _objectCache[object];
+			if (!cache) {
+				_objectCache[object] = cache = new ObjectCache();
+				cache.setObject(cache);
+			}
+			return cache;
+		}
+		
+		protected static function getCacheObject ( ):ObjectCache {
+			return _objectCachePool.length ? _objectCachePool.shift() : new ObjectCache();
+		}
+		
+		protected static function poolCacheObject ( cache:ObjectCache ):void {
+			cache.invalidate();
+			_objectCachePool[_objectCachePool.length] = cache;
+		}		
 		
 	}
 

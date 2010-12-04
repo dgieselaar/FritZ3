@@ -1,5 +1,4 @@
 package fritz3.style.selector  {
-	import flash.utils.Dictionary;
 	import fritz3.utils.object.addClassAlias;
 	import fritz3.utils.object.getClass;
 	import fritz3.utils.object.removeClassAlias;
@@ -15,10 +14,6 @@ package fritz3.style.selector  {
 	*/
 	
 	public class Selector {
-		
-		// TODO: move this to ObjectCache 
-		protected static var _objectCache:Dictionary = new Dictionary();
-		protected static var _objectCachePool:Array = [];
 		
 		public var relationship:String;
 		
@@ -65,7 +60,7 @@ package fritz3.style.selector  {
 		}
 		
 		public function match ( object:Object ):Boolean {
-			var cache:ObjectCache = getCache(object);
+			var cache:ObjectCache = ObjectCache.getCache(object);
 			if (this.id && cache.id != this.id) {
 				return false;
 			}
@@ -85,31 +80,6 @@ package fritz3.style.selector  {
 			}
 			return true;
 		}
-		
-		public static function clearCache ( ):void {
-			for each(var cache:ObjectCache in _objectCache) {
-				poolCacheObject(cache);
-			}
-			_objectCache = new Dictionary();
-		}
-		
-		protected static function getCache ( object:Object ):ObjectCache {
-			var cache:ObjectCache = _objectCache[object];
-			if (!cache) {
-				_objectCache[object] = cache = new ObjectCache();
-				cache.setObject(cache);
-			}
-			return cache;
-		}
-		
-		protected static function getCacheObject ( ):ObjectCache {
-			return _objectCachePool.length ? _objectCachePool.shift() : new ObjectCache();
-		}
-		
-		protected static function poolCacheObject ( cache:ObjectCache ):void {
-			cache.invalidate();
-			_objectCachePool[_objectCachePool.length] = cache;
-		}		
 	}
 
 }

@@ -83,18 +83,11 @@ package fritz3.style.selector {
 				return false;
 			}
 			
-			
-			if (!node.match(object)) {
-				return false;
-			}
-			
-			node = node.prevNode;
-			
 			var addable:Addable = Addable(object), currentAddable:Addable = addable;
-			var collection:ItemCollection;
+			var collection:ItemCollection, objectCache:ObjectCache = ObjectCache.getCache(object);
 			
 			while (node) {
-				if (!currentAddable || !node.match(currentAddable)) {
+				if (!object || !node.match(object)) {
 					return false;
 				}
 				switch(node.relationship) {
@@ -104,19 +97,30 @@ package fritz3.style.selector {
 					
 					case SelectorRelationship.DESCENDANT:
 					currentAddable = currentAddable.parentComponent;
-					continue;
 					break;
 					
 					case SelectorRelationship.PRECEDING:
+					if (!objectCache.cachedAllSiblings) {
+						objectCache.cacheAllSiblings();
+					}
 					break;
 					
 					case SelectorRelationship.PRECEDING_IMMEDIATELY:
+					if (!objectCache.cachedDirectSiblings) {
+						objectCache.cachedDirectSiblings();
+					}
 					break;
 					
 					case SelectorRelationship.FOLLOWING:
+					if (!objectCache.cachedAllSiblings) {
+						objectCache.cacheAllSiblings();
+					}
 					break;
 					
 					case SelectorRelationship.FOLLOWING_IMMEDIATELY:
+					if (!objectCache.cachedDirectSiblings) {
+						objectCache.cachedDirectSiblings();
+					}
 					break;
 				}
 				node = node.prevNode;
