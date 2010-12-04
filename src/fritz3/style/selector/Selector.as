@@ -16,6 +16,7 @@ package fritz3.style.selector  {
 	
 	public class Selector {
 		
+		// TODO: move this to ObjectCache 
 		protected static var _objectCache:Dictionary = new Dictionary();
 		protected static var _objectCachePool:Array = [];
 		
@@ -64,7 +65,25 @@ package fritz3.style.selector  {
 		}
 		
 		public function match ( object:Object ):Boolean {
-			return false;
+			var cache:ObjectCache = getCache(object);
+			if (this.id && cache.id != this.id) {
+				return false;
+			}
+			if (this.className && cache.className != this.className) {
+				return false;
+			}
+			if (this.name && cache.name != this.name) {
+				return false;
+			}
+			if (this.classObjectString) {
+				if (!this.classObject) {
+					this.classObject = getClass(this.classObjectString);
+				}
+				if (!(object is this.classObject)) {
+					return false;
+				}
+			}
+			return true;
 		}
 		
 		public static function clearCache ( ):void {

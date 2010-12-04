@@ -94,21 +94,33 @@ package fritz3.style.selector {
 			var collection:ItemCollection;
 			
 			while (node) {
-				if (node.relationship == SelectorRelationship.CHILD) {
-					if (!node.match(currentAddable)) {
-						return false;
-					}
-				} else if (node.relationship == SelectorRelationship.DESCENDANT) {
-					while (currentAddable) {
-						if (node.match(currentAddable)) {
-							break;
-						}
-						currentAddable = currentAddable.parentComponent;
-					}
-				}
-				if (!currentAddable) {
+				if (!currentAddable || !node.match(currentAddable)) {
 					return false;
 				}
+				switch(node.relationship) {
+					case SelectorRelationship.CHILD:
+					currentAddable = currentAddable.parentComponent;
+					break;
+					
+					case SelectorRelationship.DESCENDANT:
+					currentAddable = currentAddable.parentComponent;
+					continue;
+					break;
+					
+					case SelectorRelationship.PRECEDING:
+					break;
+					
+					case SelectorRelationship.PRECEDING_IMMEDIATELY:
+					break;
+					
+					case SelectorRelationship.FOLLOWING:
+					break;
+					
+					case SelectorRelationship.FOLLOWING_IMMEDIATELY:
+					break;
+				}
+				node = node.prevNode;
+				currentAddable = currentAddable.parentComponent;
 			}
 			
 			return true;
