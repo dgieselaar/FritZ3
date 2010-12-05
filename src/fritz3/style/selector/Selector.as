@@ -81,9 +81,22 @@ package fritz3.style.selector  {
 				prevNode = node;
 			}
 			
+			var structuralMatches:Array = where.match(/:([^:\[]+)/g), structuralSelector:String;
+			for (i = 0, l = structuralMatches ? structuralMatches.length : 0; i < l; ++i) {
+				structuralSelector = structuralMatches[i];
+				structuralSelector = structuralSelector.substr(1);
+				node = this.getStructuralSelector(structuralSelector);
+				if (prevNode) {
+					prevNode.nextNode = node;
+					node.prevNode = prevNode;
+				} else {
+					this.firstNode = this.lastNode = node;
+				}
+				prevNode = node;
+			}
 		}
 		
-		protected function getAttributeSelector ( selector:String ):AttributeSelector {
+		protected function getAttributeSelector ( selector:String ):SimpleSelector {
 			var attributeSelector:AttributeSelector = new AttributeSelector();
 			var match:Array = selector.match(/^(!)?([A-Za-z0-9\-]+)(([\^\*\$])?(!)?=(")?(.*?)(")?)?$/);
 			if (!match) {
@@ -129,6 +142,48 @@ package fritz3.style.selector  {
 			}
 			attributeSelector.inverted = inverted;
 			return attributeSelector;
+		}
+		
+		protected function getStructuralSelector ( selector:String ):SimpleSelector {
+			var propertyName:String, type:String = selector, inverted:Boolean, match:Array, childIndex:int;
+			if (type.indexOf("!") == 0) {
+				inverted = true;
+				type = type.substr(1);
+			} 
+			
+			if((match = type.match(/(.*?)\((\d+)\)$/))) {
+				type = match[1];
+				childIndex = match[2];
+			}
+			var simpleSelector:SimpleSelector, attributeSelector:AttributeSelector, structuralSelector:StructuralSelector;
+			switch(type) {
+				case StructuralSelectorType.EMPTY:  
+				case StructuralSelectorType.FIRST_CHILD:
+				case StructuralSelectorType.FIRST_OF_TYPE:
+				case StructuralSelectorType.LAST_CHILD:
+				case StructuralSelectorType.LAST_OF_TYPE:
+				case StructuralSelectorType.NTH_CHILD:
+				case StructuralSelectorType.NTH_LAST_CHILD:
+				case StructuralSelectorType.NTH_LAST_OF_TYPE:
+				case StructuralSelectorType.NTH_OF_TYPE:
+				case StructuralSelectorType.ONLY_CHILD:
+				case StructuralSelectorType.ONLY_OF_TYPE:
+				simpleSelector = structuralSelector = new StructuralSelector();
+				structuralSelector.childIndex = childIndex;
+				break;
+				
+				default:
+				simpleSelector = attributeSelector = new AttributeSelector();
+				attributeSelector.propertyName = type;
+				attributeSelector.type = AttributeSelectorType.IS_SET;
+				type = AttributeSelectorType.IS_SET;
+				break;
+			}
+			
+			simpleSelector.type = type;
+			simpleSelector.inverted = inverted;
+			
+			return simpleSelector;
 		}
 		
 		public function match ( object:Object ):Boolean {
