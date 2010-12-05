@@ -86,7 +86,7 @@ package fritz3.style.selector {
 				this.className = object.className;
 			}	
 			if (object.hasOwnProperty("name")) {
-				this.name = object.name
+				this.name = object.name;
 			}
 		}
 		
