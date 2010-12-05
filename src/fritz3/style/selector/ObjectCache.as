@@ -122,11 +122,10 @@ package fritz3.style.selector {
 			return (this.properties[propertyName] = this.object[propertyName]);
 		}
 		
-		public static function clearCache ( ):void {
-			for each(var cache:ObjectCache in _objectCache) {
-				poolCacheObject(cache);
-			}
-			_objectCache = new Dictionary();
+		public static function clearCache ( object:Object ):void {
+			var cache:ObjectCache = _objectCache[object];
+			poolCacheObject(cache);
+			delete _objectCache[object];
 		}
 		
 		public static function getCache ( object:Object ):ObjectCache {
