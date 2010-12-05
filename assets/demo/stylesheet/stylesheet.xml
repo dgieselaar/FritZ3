@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <data>
 	
-	<rule where="GraphicsComponent.className#id">
+	<rule where="GraphicsComponent">
 		<property name="width">100</property>
 		<property name="height">100</property>
 		<property name="background.background-color">0xFF68EB</property>
