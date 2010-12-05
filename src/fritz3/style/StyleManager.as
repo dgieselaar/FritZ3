@@ -39,10 +39,38 @@ package fritz3.style {
 		}
 		
 		public static function addRule ( styleRule:StyleRule ):void {
+			var styleSheetID:String = styleRule.styleSheetID;
+			var lastNode:StyleRule = _lastNodeByID[styleSheetID];
+			if (!lastNode) {
+				_firstNodeByID[styleSheetID] = styleRule;
+			} else {
+				lastNode.nextNode = styleRule;
+				styleRule.prevNode = lastNode;
+			}
+			
+			_lastNodeByID[styleSheetID] = styleRule;
+			
 			_invalidationHelper.invalidateMethod(dispatchChange);
 		}
 		
 		public static function removeRule ( styleRule:StyleRule ):void {
+			var styleSheetID:String = styleRule.styleSheetID;
+			var prevNode:StyleRule = styleRule.prevNode, nextNode:StyleRule = styleRule.nextNode;
+			if (prevNode) {
+				prevNode.nextNode = nextNode;
+			}
+			if (nextNode) {
+				nextNode.prevNode = prevNode;
+			}
+			
+			if (_firstNodeByID[styleSheetID] == styleRule) {
+				_firstNodeByID[styleSheetID] = nextNode;
+			}
+			
+			if (_lastNodeByID[styleSheetID] == styleRule) {
+				_lastNodeByID[styleSheetID] = prevNode;
+			}
+			
 			_invalidationHelper.invalidateMethod(dispatchChange);
 		}
 		
@@ -56,6 +84,8 @@ package fritz3.style {
 			for (; i < l; ++i) {
 				child = children[i];
 				rule = getStyleRuleFromXML(child);
+				rule.styleSheetID = child.@styleSheetID != undefined ? child.@styleSheetID : null;
+				addRule(rule);
 			}
 			
 			
