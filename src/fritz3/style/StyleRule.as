@@ -8,6 +8,8 @@ package fritz3.style {
 	 */
 	public class StyleRule {
 		
+		public var styleSheetID:String;
+		
 		public var prevNode:StyleRule;
 		public var nextNode:StyleRule;
 		
