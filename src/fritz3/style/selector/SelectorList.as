@@ -79,8 +79,12 @@ package fritz3.style.selector {
 			var node:Selector = this.lastNode;
 			var objectToMatch:Object = object;
 			
-			if (node.prevNode && !(object is Addable)) {
-				return false;
+			if (node.prevNode) {
+				if (!(object is Addable)) {
+					return false;
+				}
+			} else {
+				return node.match(object);
 			}
 			
 			var addable:Addable = Addable(object), currentAddable:Addable = addable;
