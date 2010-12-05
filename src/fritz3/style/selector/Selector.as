@@ -93,7 +93,7 @@ package fritz3.style.selector  {
 					this.firstNode = this.lastNode = node;
 				}
 				prevNode = node;
-			}
+			} 
 		}
 		
 		protected function getAttributeSelector ( selector:String ):SimpleSelector {
@@ -168,6 +168,8 @@ package fritz3.style.selector  {
 				case StructuralSelectorType.NTH_OF_TYPE:
 				case StructuralSelectorType.ONLY_CHILD:
 				case StructuralSelectorType.ONLY_OF_TYPE:
+				case StructuralSelectorType.EVEN:
+				case StructuralSelectorType.ODD:
 				simpleSelector = structuralSelector = new StructuralSelector();
 				structuralSelector.childIndex = childIndex;
 				break;
@@ -272,6 +274,10 @@ package fritz3.style.selector  {
 				match = cache.empty;
 				break;
 				
+				case StructuralSelectorType.EVEN:
+				match = cache.even;
+				break;
+				
 				case StructuralSelectorType.FIRST_CHILD:
 				match = cache.firstChild;
 				break;
@@ -285,7 +291,7 @@ package fritz3.style.selector  {
 				break;
 				
 				case StructuralSelectorType.NTH_CHILD:
-				match = cache.childIndex == selector.childIndex;
+				match = cache.childIndex == selector.childIndex-1;
 				break;
 				
 				case StructuralSelectorType.NTH_LAST_CHILD:
@@ -304,6 +310,10 @@ package fritz3.style.selector  {
 					cache.cacheAllSiblings();
 				}
 				match = cache.nthOfType == selector.childIndex;
+				break;
+				
+				case StructuralSelectorType.ODD:
+				match = !cache.even;
 				break;
 				
 				case StructuralSelectorType.ONLY_CHILD:

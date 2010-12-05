@@ -19,6 +19,9 @@ package fritz3.style.selector {
 		
 		public static const EMPTY:String = "empty";
 		
+		public static const EVEN:String = "even";
+		public static const ODD:String = "odd";
+		
 		public function StructuralSelectorType ( ) {
 			
 		}
