@@ -1,13 +1,13 @@
 package fritz3.display.core {
 	import fritz3.display.graphics.Background;
-	import fritz3.display.graphics.BackgroundParent;
 	import fritz3.display.graphics.BoxBackground;
+	import fritz3.display.graphics.Drawable;
 	import fritz3.display.graphics.RectangularBackground;
 	/**
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public class GraphicsComponent extends StylableDisplayComponent implements BackgroundParent {
+	public class GraphicsComponent extends StylableDisplayComponent implements Drawable {
 		
 		protected var _background:Background;
 		protected var _width:Number = 0;
@@ -51,14 +51,14 @@ package fritz3.display.core {
 		
 		protected function setBackground ( background:Background ):void {
 			if (_background) {
-				_background.parent = null;
+				_background.drawable = null;
 			}
 			
 			this.graphics.clear();
 			
 			_background = background;
 			if (_background) {
-				_background.parent = this;
+				_background.drawable = this;
 				if (_background is RectangularBackground) {
 					RectangularBackground(_background).width = _width;
 					RectangularBackground(_background).height = _height;
@@ -66,7 +66,7 @@ package fritz3.display.core {
 			}
 		}
 		
-		public function invalidateBackground ( ):void {
+		public function invalidateGraphics ( ):void {
 			_invalidationHelper.invalidateMethod(this.draw);
 		}
 		
