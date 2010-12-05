@@ -23,7 +23,7 @@ package fritz3.style.invalidation {
 					this.remove(node.styleSheetCollector);
 					node = nextNode;
 				} else {
-					node.styleSheetCollector.invalidateRule(rule);;
+					node.styleSheetCollector.invalidateRule(rule);
 					node = node.nextNode;
 				}
 			}
