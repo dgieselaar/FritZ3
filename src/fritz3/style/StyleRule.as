@@ -27,7 +27,7 @@ package fritz3.style {
 		}
 		
 		public function invalidate ( ):void {
-			
+			this.onChange.dispatch();
 		}
 		
 		public function append ( propertyData:PropertyData ):void {

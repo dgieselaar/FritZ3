@@ -99,11 +99,11 @@ package fritz3.style {
 			const l:int = children.length();
 			rule.selectorList = new SelectorList(xml.@where.toString());
 			var child:XML, propertyName:String, propertyValue:*, target:String;
-			var dotIndex:int;
+			var dotIndex:int, data:PropertyData;
 			for (; i < l; ++i) {
 				child = children[i];
 				target = null;
-				propertyName = child.@name;
+				propertyName = child.@name.toString().replace(/-[a-z]/g, replaceDash);
 				if ((dotIndex = propertyName.indexOf(".")) != -1) {
 					target = propertyName.substr(0, dotIndex);
 					propertyName = propertyName.substr(dotIndex+1);
@@ -113,13 +113,30 @@ package fritz3.style {
 				} else {
 					propertyValue = child;
 				}
+				data = new PropertyData();
+				data.propertyName = propertyName;
+				data.value = propertyValue;
+				data.target = target;
+				rule.append(data);
 			}
 			return rule;
+		}
+		
+		protected static function replaceDash ( match:String, ...args ):String {
+			return match.substr(1,1).toUpperCase();
 		}
 		
 		protected static function getSimpleValue ( string:String ):* {
 			var value:* = string;
 			switch(string) {
+				case "true":
+				value = true;
+				break;
+				
+				case "false":
+				value = false;
+				break;
+				
 				case "NaN":
 				value = NaN;
 				break;
