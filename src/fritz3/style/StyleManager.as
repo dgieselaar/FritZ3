@@ -69,10 +69,15 @@ package fritz3.style {
 			const l:int = children.length();
 			rule.selectorList = new SelectorList(xml.@where.toString());
 			var child:XML, propertyName:String, propertyValue:*, target:String;
+			var dotIndex:int;
 			for (; i < l; ++i) {
 				child = children[i];
 				target = null;
 				propertyName = child.@name;
+				if ((dotIndex = propertyName.indexOf(".")) != -1) {
+					target = propertyName.substr(0, dotIndex);
+					propertyName = propertyName.substr(dotIndex+1);
+				} 
 				if (child.hasSimpleContent()) {
 					propertyValue = getSimpleValue(child.toString());
 				} else {
