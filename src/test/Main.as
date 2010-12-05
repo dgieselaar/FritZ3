@@ -50,7 +50,7 @@
 			var styleSheetXML:XML = XML(new StyleSheetXML());
 			StyleManager.parseXML(styleSheetXML);
 			
-			var graphicsComponent:GraphicsComponent = new GraphicsComponent( { width: 100, height: 100, x: 5, y: 5 } );
+			var graphicsComponent:GraphicsComponent = new GraphicsComponent();
 			var background:BoxBackground = graphicsComponent.background as BoxBackground;
 			background.backgroundColor = 0xFF68EB;
 			background.backgroundAlpha = 1;
