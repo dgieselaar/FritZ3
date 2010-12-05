@@ -17,7 +17,7 @@ package fritz3.style.selector {
 		public var className:String;
 		public var name:String;
 		
-		public var properties:Object;
+		public var properties:Object = { };
 		
 		public var cachedChildProperties:Boolean;
 		public var parentCollection:ItemCollection;
@@ -78,6 +78,7 @@ package fritz3.style.selector {
 		}
 		
 		public function setObject ( object:Object ):void {
+			this.object = object;
 			if (object.hasOwnProperty("id")) {
 				this.id = object.id;
 			}
@@ -135,7 +136,7 @@ package fritz3.style.selector {
 			var cache:ObjectCache = _objectCache[object];
 			if (!cache) {
 				_objectCache[object] = cache = new ObjectCache();
-				cache.setObject(cache);
+				cache.setObject(object);
 			}
 			return cache;
 		}
