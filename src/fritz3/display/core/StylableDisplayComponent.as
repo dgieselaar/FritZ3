@@ -54,6 +54,11 @@ package fritz3.display.core  {
 			_styleSheetCollector.getStyle();
 		}
 		
+		override public function onAdd():void {
+			super.onAdd();
+			this.invalidateStyle();
+		}
+		
 		public function invalidateStyle ( ):void {
 			_invalidationHelper.invalidateMethod(this.getStyle);
 		}
