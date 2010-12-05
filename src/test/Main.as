@@ -51,13 +51,12 @@
 			var styleSheetXML:XML = XML(new StyleSheetXML());
 			StyleManager.parseXML(styleSheetXML);
 			
-			var graphicsComponent:GraphicsComponent = new GraphicsComponent( { id: "graphicsComponent", name: "randomName" } );
-			var background:BoxBackground = graphicsComponent.background as BoxBackground;
-			background.backgroundColor = 0xFF68EB;
-			background.backgroundAlpha = 1;
-			background.roundedCorners = 5;
-			this.addChild(graphicsComponent);
+			var graphicsComponent:GraphicsComponent = new GraphicsComponent();
 			
+			this.add(graphicsComponent);
+			
+			this.add(new GraphicsComponent());
+			this.add(new GraphicsComponent());
 			
 			/*var background:BoxBackground = container.background;
 			

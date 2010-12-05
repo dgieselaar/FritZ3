@@ -1,13 +1,32 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <data>
 	
-	<rule where="GraphicsComponent:active:hover:!false[attribute=fff]:move:first-child">
-		<property name="x">5</property>
-		<property name="y">5</property>
+	<rule where="ApplicationDocument">
+		<property name="background.backgroundColor">0xEFEFEF</property>
+	</rule>
+	
+	<rule where="GraphicsComponent">
 		<property name="width">100</property>
 		<property name="height">100</property>
-		<property name="background.backgroundColor">0xFF68EB</property>
 		<property name="background.roundedCorners">10</property>
+	</rule>
+	
+	<rule where="GraphicsComponent:first-child">
+		<property name="x">5</property>
+		<property name="y">5</property>
+		<property name="background.backgroundColor">0xFF00FF</property>
+	</rule>
+	
+	<rule where="GraphicsComponent:nth-child(2)">
+		<property name="x">110</property>
+		<property name="y">5</property>
+		<property name="background.backgroundColor">0x00FFFF</property>
+	</rule>
+	
+	<rule where="GraphicsComponent:nth-child(3)">
+		<property name="x">215</property>
+		<property name="y">5</property>
+		<property name="background.backgroundColor">0x0000FF</property>
 	</rule>
 
 </data>
