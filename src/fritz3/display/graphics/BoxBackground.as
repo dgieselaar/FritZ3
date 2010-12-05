@@ -25,7 +25,7 @@
 	 */
 	public class BoxBackground implements RectangularBackground {
 		
-		protected var _parent:BackgroundParent;
+		protected var _drawable:Drawable;
 		protected var _parameters:Object;
 		
 		protected var _width:Number;
@@ -96,7 +96,6 @@
 		
 		public function draw ( displayObject:DisplayObject ):void {
 			var buffer:Shape;
-			
 			if (displayObject is Shape) {
 				_graphics = Shape(displayObject).graphics;
 			} else if (displayObject is Sprite) {
@@ -415,6 +414,10 @@
 				height = _height;
 			}
 			
+			if (!(width > 0 && height > 0)) {
+				return;
+			}
+			
 			switch(_fillType) {
 				case FillType.RECTANGLE:
 				if (_roundedCorners || _topLeftCorner || _topRightCorner || _bottomLeftCorner || _bottomRightCorner) {
@@ -434,16 +437,16 @@
 			}
 		}
 		
-		protected function setBackgroundParent ( parent:BackgroundParent ):void {
-			_parent = parent;
-			if (_parent) {
-				_parent.invalidateBackground();
+		protected function setDrawable ( drawable:Drawable ):void {
+			_drawable = drawable;
+			if (_drawable) {
+				_drawable.invalidateGraphics();
 			}
 		}
 		
 		protected function invalidate ( ):void {
-			if (_parent) {
-				_parent.invalidateBackground();
+			if (_drawable) {
+				_drawable.invalidateGraphics();
 			}
 		}
 		
@@ -968,10 +971,10 @@
 			}
 		}
 		
-		public function get parent ( ):BackgroundParent { return _parent; }
-		public function set parent ( value:BackgroundParent ):void {
-			if (_parent != value) {
-				this.setBackgroundParent(value);
+		public function get drawable ( ):Drawable { return _drawable; }
+		public function set drawable ( value:Drawable ):void {
+			if (_drawable != value) {
+				this.setDrawable(value);
 			}
 		}
 	}
