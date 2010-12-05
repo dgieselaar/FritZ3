@@ -1,4 +1,5 @@
 package fritz3.display.core  {
+	import fritz3.display.core.Addable;
 	import fritz3.style.invalidation.InvalidatableStyleSheetCollector;
 	import fritz3.style.StandardStyleSheetCollector;
 	import fritz3.style.Stylable;
@@ -31,7 +32,7 @@ package fritz3.display.core  {
 			this.initializeStyleSheet();
 		}
 		
-		override protected function setInvalidationMethodOrder(  ):void  {
+		override protected function setInvalidationMethodOrder ( ):void  {
 			super.setInvalidationMethodOrder();
 			_invalidationHelper.append(this.getStyle);
 		}
@@ -54,7 +55,7 @@ package fritz3.display.core  {
 			_styleSheetCollector.getStyle();
 		}
 		
-		override public function onAdd():void {
+		override public function onAdd ( ):void {
 			super.onAdd();
 			this.invalidateStyle();
 		}
