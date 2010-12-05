@@ -1,4 +1,5 @@
 package fritz3.style {
+	import fritz3.base.injection.Injectable;
 	import fritz3.invalidation.InvalidationHelper;
 	import fritz3.style.invalidation.InvalidatableStyleSheetCollector;
 	import fritz3.style.selector.ObjectCache;
@@ -8,6 +9,8 @@ package fritz3.style {
 	 * @author Dario Gieselaar
 	 */
 	public class StandardStyleSheetCollector implements InvalidatableStyleSheetCollector {
+		
+		protected static var _propertyDataObjectPool:Array = [];
 		
 		protected var _disabled:Boolean = false;
 		
@@ -20,8 +23,13 @@ package fritz3.style {
 		protected var _invalidatedRules:Boolean;
 		
 		protected var _styleRules:Array;
+		protected var _firstNode:PropertyData;
+		protected var _lastNode:PropertyData;
+		
+		protected var _dataByTarget:Object;
 		
 		public function StandardStyleSheetCollector ( properties:Object = null ) {
+			_dataByTarget = { };
 			for (var id:String in properties) {
 				this[id] = properties[id];
 			}
@@ -83,6 +91,7 @@ package fritz3.style {
 				node = StyleManager.getFirstRule(StyleManager.DEFAULT_STYLESHEET_ID);
 				while (node) {
 					if (node.selectorList.match(stylable)) {
+						node.onChange.add(this);
 						rules[numRules++] = node;
 					}
 					node = node.nextNode;
@@ -93,6 +102,7 @@ package fritz3.style {
 					node = StyleManager.getFirstRule(id);
 					while (node) {
 						if (node.selectorList.match(stylable)) {
+							node.onChange.add(this);
 							rules[numRules++] = node;
 						}
 						node = node.nextNode;
@@ -104,11 +114,57 @@ package fritz3.style {
 		}
 		
 		protected function cacheProperties ( ):void {
+			var rules:Array = _styleRules;
+			var rule:StyleRule;
 			
+			var node:PropertyData = _firstNode, nextNode:PropertyData;
+			while (node) {
+				nextNode = node.nextNode;
+				poolPropertyDataObject(node);
+				node = nextNode;
+			}
+			
+			_dataByTarget = { };
+			
+			
+			var ruleNode:PropertyData, prevNode:PropertyData;
+			_firstNode = _lastNode = null;
+			for (var i:int, l:int = rules ? rules.length : 0; i < l; ++i) {
+				rule = rules[i];
+				ruleNode = rule.firstNode;
+				while (ruleNode) {
+					node = getPropertyData(ruleNode.target, ruleNode.propertyName);
+					if (!node) {
+						node = getPropertyDataObject();
+						node.prevNode = prevNode;
+						if (prevNode) {
+							prevNode.nextNode = node;
+						} else {
+							_firstNode = node;
+						}
+						_lastNode = prevNode = node;
+					}
+					node.propertyName = ruleNode.propertyName;
+					node.target = ruleNode.target;
+					node.value = ruleNode.value;
+					ruleNode = ruleNode.nextNode;
+				}
+			}
 		} 
 		
 		protected function applyStyle ( ):void {
-			
+			var node:PropertyData = _firstNode;
+			var object:Object, target:Object, injectable:Injectable;
+			var stylable:Stylable = _stylable;
+			while (node) {
+				target = node.target == null ? stylable : stylable[node.target];
+				if (target is Injectable) {
+					Injectable(target).setProperty(node.propertyName, node.value);
+				} else {
+					target[node.propertyName] = node.value;
+				}
+				node = node.nextNode;
+			}
 		}
 		
 		public function invalidateRule ( styleRule:StyleRule ):void {
@@ -145,6 +201,20 @@ package fritz3.style {
 		public function invalidateState ( ):void {
 			_invalidatedState = true;
 			this.invalidate();
+		}
+		
+		protected function getPropertyData ( target:Object, propertyName:String ):PropertyData {
+			return _dataByTarget[target] ? _dataByTarget[target][propertyName] : null;
+		}
+		
+		protected static function getPropertyDataObject ( ):PropertyData {
+			return _propertyDataObjectPool.length ? _propertyDataObjectPool.shift() : new PropertyData();
+		}
+		
+		protected static function poolPropertyDataObject ( propertyData:PropertyData ):void {
+			propertyData.nextNode = propertyData.prevNode = null;
+			propertyData.propertyName = propertyData.target = propertyData.value = null;
+			_propertyDataObjectPool[_propertyDataObjectPool.length] = propertyData;
 		}
 		
 		public function get stylable ( ):Stylable { return _stylable; }
