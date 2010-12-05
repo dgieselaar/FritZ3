@@ -6,8 +6,8 @@
 		<property name="y">5</property>
 		<property name="width">100</property>
 		<property name="height">100</property>
-		<property name="background.background-color">0xFF68EB</property>
-		<property name="background.rounded-corners">10</property>
+		<property name="background.backgroundColor">0xFF68EB</property>
+		<property name="background.roundedCorners">10</property>
 	</rule>
 
 </data>

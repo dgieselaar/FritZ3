@@ -22,6 +22,7 @@
 	import fritz3.display.layout.Align;
 	import fritz3.document.ApplicationDocument;
 	import fritz3.invalidation.InvalidationManager;
+	import fritz3.style.StandardStyleSheetCollector;
 	import fritz3.style.StyleManager;
 	import fritz3.utils.signals.fast.FastSignal;
 	import ru.etcs.utils.getDefinitionNames;
@@ -50,7 +51,7 @@
 			var styleSheetXML:XML = XML(new StyleSheetXML());
 			StyleManager.parseXML(styleSheetXML);
 			
-			var graphicsComponent:GraphicsComponent = new GraphicsComponent();
+			var graphicsComponent:GraphicsComponent = new GraphicsComponent( { id: "graphicsComponent", name: "randomName" } );
 			var background:BoxBackground = graphicsComponent.background as BoxBackground;
 			background.backgroundColor = 0xFF68EB;
 			background.backgroundAlpha = 1;
