@@ -1,6 +1,7 @@
 package fritz3.style {
 	import fritz3.invalidation.InvalidationHelper;
 	import fritz3.style.invalidation.InvalidatableStyleSheetCollector;
+	import fritz3.style.selector.ObjectCache;
 	import fritz3.style.Stylable;
 	/**
 	 * ...
@@ -17,6 +18,8 @@ package fritz3.style {
 		protected var _invalidatedCollector:Boolean;
 		protected var _invalidatedState:Boolean;
 		protected var _invalidatedRules:Boolean;
+		
+		protected var _styleRules:Array;
 		
 		public function StandardStyleSheetCollector ( properties:Object = null ) {
 			for (var id:String in properties) {
@@ -61,7 +64,43 @@ package fritz3.style {
 		}
 		
 		protected function collectNodes ( ):void {
+			var node:StyleRule, i:int, l:int;
+			var rules:Array = _styleRules;
+			l = rules ? rules.length : 0;
+			for (i = 0; i < l; ++i) {
+				node = rules[i];
+				node.onChange.remove(this);
+			}
 			
+			_styleRules = rules = [];
+			
+			ObjectCache.getCache(this);
+			
+			var numRules:int = 0;
+			var ids:Array = _styleSheetIDs, id:String;
+			var stylable:Stylable = _stylable;
+			if (!ids) {
+				node = StyleManager.getFirstRule(StyleManager.DEFAULT_STYLESHEET_ID);
+				while (node) {
+					if (node.selectorList.match(stylable)) {
+						rules[numRules++] = node;
+					}
+					node = node.nextNode;
+				}
+			} else {
+				for (i = 0, l = ids.length; i < l; ++i) {
+					id = ids[i];
+					node = StyleManager.getFirstRule(id);
+					while (node) {
+						if (node.selectorList.match(stylable)) {
+							rules[numRules++] = node;
+						}
+						node = node.nextNode;
+					}
+				}
+			}
+			
+			ObjectCache.clearCache(this);
 		}
 		
 		protected function cacheProperties ( ):void {
@@ -99,7 +138,7 @@ package fritz3.style {
 		}
 		
 		public function invalidateCollector ( ):void {
-			_invalidatedCollector = true;
+			_invalidatedCollector = _invalidatedRules = true;
 			this.invalidate();
 		}
 		
