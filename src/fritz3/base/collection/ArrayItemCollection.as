@@ -16,8 +16,9 @@ package fritz3.base.collection {
 		}
 		
 		final public function add ( item:Object ):Object {
-			_indexes[_numItems] = item;
-			_items[_numItems++] = item;
+			_indexes[item] = _numItems;
+			_items[_numItems] = item;
+			_numItems++;
 			return item;
 		}
 		
