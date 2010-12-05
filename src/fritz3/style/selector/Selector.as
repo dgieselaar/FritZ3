@@ -47,15 +47,15 @@ package fritz3.style.selector  {
 			if (match) {
 				this.classObjectString = match[1];
 			}
-			match = where.match(/#([a-z0-9_\-]+)/);
+			match = where.match(/#([A-Za-z0-9_\-]+)/);
 			if (match) {
 				this.id = match[1];
 			}
-			match = where.match(/\.([a-z0-9_\-]+)/);
+			match = where.match(/\.([A-Za-z0-9_\-]+)/);
 			if (match) {
 				this.className = match[1];
 			}
-			match = where.match(/@([a-z0-9_\-]+)/);
+			match = where.match(/@([A-Za-z0-9_\-]+)/);
 			if (match) {
 				this.name = match[1];
 			}
@@ -64,6 +64,71 @@ package fritz3.style.selector  {
 				classObject = getClass(classObjectString);
 			}
 			
+			var node:SimpleSelector, prevNode:SimpleSelector;
+			
+			var attributeMatches:Array = where.match(/\[.*?\]/g);
+			var attributeSelector:String;
+			for (i = 0, l = attributeMatches ? attributeMatches.length : 0; i < l; ++i) {
+				attributeSelector = attributeMatches[i];
+				attributeSelector = attributeSelector.substring(1, attributeSelector.length - 1);
+				node = this.getAttributeSelector(attributeSelector);
+				if (prevNode) {
+					prevNode.nextNode = node;
+					node.prevNode = prevNode;
+				} else {
+					this.firstNode = this.lastNode = node;
+				}
+				prevNode = node;
+			}
+			
+		}
+		
+		protected function getAttributeSelector ( selector:String ):AttributeSelector {
+			var attributeSelector:AttributeSelector = new AttributeSelector();
+			var match:Array = selector.match(/^(!)?([A-Za-z0-9\-]+)(([\^\*\$])?(!)?=(")?(.*?)(")?)?$/);
+			if (!match) {
+				throw new Error("Invalid AttributeSelector defined: " + selector);
+			}
+			
+			var propertyName:String = match[2];
+			
+			var inverted:Boolean;
+			var attributeType:String;
+			if(match[3]) {
+				inverted = match[5] == "!";
+				switch(match[4]) {
+					default:
+					attributeType = AttributeSelectorType.IS;
+					break;
+					
+					case "^":
+					attributeType = AttributeSelectorType.BEGINS_WITH;
+					break;
+					
+					case "$":
+					attributeType = AttributeSelectorType.ENDS_WITH;
+					break;
+					
+					case "*":
+					attributeType = AttributeSelectorType.HAS;
+					break;
+				}
+			} else {
+				attributeType = AttributeSelectorType.IS_DEFINED;
+				inverted = match[1] == "!";
+			}
+			
+			attributeSelector.propertyName = propertyName;
+			attributeSelector.type = attributeType;
+			if (match[7] != undefined) {			
+				var value:* = match[7];
+				if (String(value).match(/^\d+$/) && match[6] != undefined && match[8] != undefined) {
+					value = Number(value);
+				}
+				attributeSelector.value = value;
+			}
+			attributeSelector.inverted = inverted;
+			return attributeSelector;
 		}
 		
 		public function match ( object:Object ):Boolean {
@@ -89,7 +154,7 @@ package fritz3.style.selector  {
 				}
 			}
 			
-			var node:SimpleSelector;
+			var node:SimpleSelector = this.firstNode;
 			while (node) {
 				if (node is AttributeSelector) {
 					if (!this.matchAttributeSelector(AttributeSelector(node), cache)) {
@@ -109,7 +174,7 @@ package fritz3.style.selector  {
 		}
 		
 		protected function matchAttributeSelector ( selector:AttributeSelector, cache:ObjectCache ):Boolean {
-			if (!cache.object.hasOwnProperty(selector.propertyName)) {
+			if (selector.type != AttributeSelectorType.IS_DEFINED && !cache.object.hasOwnProperty(selector.propertyName)) {
 				return false;
 			}
 			var inverted:Boolean = selector.inverted;
@@ -134,7 +199,7 @@ package fritz3.style.selector  {
 				break;
 				
 				case AttributeSelectorType.IS_DEFINED:
-				match = cache.object.hasOwnProperty(selector.value);
+				match = cache.object.hasOwnProperty(selector.propertyName);
 				break;
 				
 				case AttributeSelectorType.IS_SET:
