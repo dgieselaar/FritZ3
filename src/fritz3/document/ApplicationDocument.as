@@ -4,6 +4,7 @@ package fritz3.document  {
 	import flash.utils.getDefinitionByName;
 	import fritz3.display.core.DisplayComponentContainer;
 	import fritz3.invalidation.InvalidationManager;
+	import fritz3.style.invalidation.InvalidatableStyleSheetCollector;
 	import fritz3.style.StyleManager;
 	import fritz3.utils.object.addClassAlias;
 	import fritz3.utils.object.hasClassAlias;
@@ -28,7 +29,7 @@ package fritz3.document  {
 			if (!stage) {
 				this.addEventListener(Event.ADDED_TO_STAGE, this.onStageAdd);
 			} else {
-				this.onAdd();
+				this.initStage();
 			}
 		}
 		
@@ -37,20 +38,34 @@ package fritz3.document  {
 				return;
 			}
 			_initialized = true;
+			this.getClassDefinitions();
+			StyleManager.init();
 			super.initializeComponent();
 		}
 		
 		protected function onStageAdd ( e:Event ):void {
 			this.removeEventListener(Event.ADDED_TO_STAGE, this.onStageAdd);
+			
+		}
+		
+		protected function initStage ( ):void {
+			InvalidationManager.init(stage);
+			this.width = stage.stageWidth, this.height = stage.stageHeight;
+			stage.addEventListener(Event.RESIZE, this.onStageResize);
 			this.onAdd();
 		}
 		
-		override public function onAdd ( ):void  {
+		override public function onAdd():void {
 			super.onAdd();
+			if (_styleSheetCollector) {
+				if (_styleSheetCollector is InvalidatableStyleSheetCollector) {
+					InvalidatableStyleSheetCollector(_styleSheetCollector).invalidateCollector();
+				}
+			}
+		}
+		
+		protected function onStageResize ( e:Event ):void {
 			
-			this.getClassDefinitions();
-			InvalidationManager.init(stage);
-			StyleManager.init();
 		}
 		
 		protected function getClassDefinitions ( ):void {
