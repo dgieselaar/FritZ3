@@ -44,7 +44,7 @@ package fritz3.style.selector  {
 			if (match) {
 				this.id = match[1];
 			}
-			match = where.match(/.([a-z0-9_\-]+)/);
+			match = where.match(/\.([a-z0-9_\-]+)/);
 			if (match) {
 				this.className = match[1];
 			}
