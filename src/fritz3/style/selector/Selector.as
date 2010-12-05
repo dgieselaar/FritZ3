@@ -145,7 +145,59 @@ package fritz3.style.selector  {
 		}
 		
 		protected function matchStructuralSelector ( selector:StructuralSelector, cache:ObjectCache ):Boolean {
-			return false;
+			var inverted:Boolean = selector.inverted;
+			var match:Boolean;
+			switch(selector.type) {
+				case StructuralSelectorType.EMPTY:
+				match = cache.empty;
+				break;
+				
+				case StructuralSelectorType.FIRST_CHILD:
+				match = cache.firstChild;
+				break;
+				
+				case StructuralSelectorType.LAST_CHILD:
+				match = cache.lastChild;
+				break;
+				
+				case StructuralSelectorType.LAST_OF_TYPE:
+				match = cache.lastOfType;
+				break;
+				
+				case StructuralSelectorType.NTH_CHILD:
+				match = cache.childIndex == selector.childIndex;
+				break;
+				
+				case StructuralSelectorType.NTH_LAST_CHILD:
+				match = cache.nthLastChild == selector.childIndex;
+				break;
+				
+				case StructuralSelectorType.NTH_LAST_OF_TYPE:
+				if (!cache.cachedAllSiblings) {
+					cache.cacheAllSiblings();
+				}
+				match = cache.nthLastOfType == selector.childIndex;
+				break;
+				
+				case StructuralSelectorType.NTH_OF_TYPE:
+				if (!cache.cachedAllSiblings) {
+					cache.cacheAllSiblings();
+				}
+				match = cache.nthOfType == selector.childIndex;
+				break;
+				
+				case StructuralSelectorType.ONLY_CHILD:
+				match = cache.onlyChild;
+				break;
+				
+				case StructuralSelectorType.ONLY_OF_TYPE:
+				if (!cache.cachedAllSiblings) {
+					cache.cacheAllSiblings();
+				}
+				match = cache.onlyOfType;
+				break;
+			}
+			return match != inverted;
 		}
 	}
 

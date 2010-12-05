@@ -23,6 +23,7 @@ package fritz3.style.selector {
 		public var parentCollection:ItemCollection;
 		public var onlyChild:Boolean;
 		public var childIndex:int = -1;
+		public var nthLastChild:int = -1;
 		public var even:Boolean;
 		public var parentNumChildren:int;
 		public var lastChild:Boolean;
@@ -55,6 +56,7 @@ package fritz3.style.selector {
 			this.parentCollection = null;
 			this.onlyChild = false;
 			this.childIndex = -1;
+			this.nthLastChild = -1;
 			this.even = false;
 			this.parentNumChildren = -1;
 			this.lastChild = false;
@@ -95,6 +97,7 @@ package fritz3.style.selector {
 					this.parentNumChildren = this.parentCollection.numItems;
 					this.onlyChild = (this.parentNumChildren == 1);
 					this.childIndex = this.parentCollection.getItemIndex(this.object);
+					this.nthLastChild = this.parentNumChildren - this.childIndex;
 					this.even = Boolean(this.childIndex & 1);
 					this.firstChild = (this.childIndex == 0);
 					this.lastChild = (this.childIndex == this.parentNumChildren - 1);
