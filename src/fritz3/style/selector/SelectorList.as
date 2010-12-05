@@ -87,16 +87,23 @@ package fritz3.style.selector {
 			var collection:ItemCollection, objectCache:ObjectCache = ObjectCache.getCache(object);
 			
 			while (node) {
-				if (!object || !node.match(object)) {
+				if (!object || !node) {
 					return false;
 				}
 				switch(node.relationship) {
 					case SelectorRelationship.CHILD:
-					currentAddable = currentAddable.parentComponent;
+					if (!node.match(object)) {
+						return false;
+					}
+					object = currentAddable = currentAddable.parentComponent;
+					node = node.prevNode;
 					break;
 					
 					case SelectorRelationship.DESCENDANT:
-					currentAddable = currentAddable.parentComponent;
+					object = currentAddable = currentAddable.parentComponent;
+					if (node.match(object)) {
+						node = node.prevNode;
+					}
 					break;
 					
 					case SelectorRelationship.PRECEDING:
@@ -107,7 +114,7 @@ package fritz3.style.selector {
 					
 					case SelectorRelationship.PRECEDING_IMMEDIATELY:
 					if (!objectCache.cachedDirectSiblings) {
-						objectCache.cachedDirectSiblings();
+						objectCache.cacheDirectSiblings();
 					}
 					break;
 					
@@ -119,12 +126,10 @@ package fritz3.style.selector {
 					
 					case SelectorRelationship.FOLLOWING_IMMEDIATELY:
 					if (!objectCache.cachedDirectSiblings) {
-						objectCache.cachedDirectSiblings();
+						objectCache.cacheDirectSiblings();
 					}
 					break;
 				}
-				node = node.prevNode;
-				currentAddable = currentAddable.parentComponent;
 			}
 			
 			return true;
