@@ -24,7 +24,7 @@
 		
 		function draw ( displayObject:DisplayObject ):void
 		
-		function set parent ( value:BackgroundParent ):void
+		function set drawable ( value:Drawable ):void
 		
 	}
 	

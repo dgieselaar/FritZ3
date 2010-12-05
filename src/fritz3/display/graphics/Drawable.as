@@ -4,9 +4,9 @@ package fritz3.display.graphics {
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public interface BackgroundParent {
+	public interface Drawable {
 		
-		function invalidateBackground ( ):void 
+		function invalidateGraphics ( ):void 
 		
 	}
 	
