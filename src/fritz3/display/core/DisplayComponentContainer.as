@@ -15,6 +15,7 @@
 	import fritz3.display.layout.InvalidatablePositionable;
 	import fritz3.display.layout.Layout;
 	import fritz3.display.layout.Rearrangable;
+	import fritz3.display.layout.RectangularLayout;
 	import fritz3.invalidation.Invalidatable;
 	import fritz3.utils.signals.MonoSignal;
 	import org.osflash.signals.IDispatcher;
@@ -183,15 +184,23 @@
 		
 		protected function applyWidth ( ):void {
 			this.applyScrollRect();
-			if (_background is RectangularBackground) {
+			this.invalidateDisplay();
+			if (_background && _background is RectangularBackground) {
 				RectangularBackground(_background).width = _width;
+			}
+			if (_layout && _layout is RectangularLayout) {
+				RectangularLayout(_layout).width = _width;
 			}
 		}
 		
 		protected function applyHeight ( ):void {
 			this.applyScrollRect();
+			this.invalidateDisplay();
 			if (_background is RectangularBackground) {
 				RectangularBackground(_background).height = _height;
+			}
+			if (_layout && _layout is RectangularLayout) {
+				RectangularLayout(_layout).height = _height;
 			}
 		}
 		
@@ -267,6 +276,10 @@
 				this.addAddable(Addable(item));
 			}
 			
+			if (item is InvalidatablePositionable) {
+				this.addInvalidatablePositionable(InvalidatablePositionable(item));
+			}
+			
 			if (item is DisplayObject) {
 				this.addDisplayObject(DisplayObject(item));
 			}
@@ -280,6 +293,10 @@
 			
 			if (item is DisplayObject) {
 				this.removeDisplayObject(DisplayObject(item));
+			}
+			
+			if (item is InvalidatablePositionable) {
+				this.removeInvalidatablePositionable(InvalidatablePositionable(item));
 			}
 			
 			if (item is Addable) {
@@ -337,14 +354,6 @@
 			invalidatable.priority = 0;
 		}
 		
-		protected function addDisplayObject ( displayObject:DisplayObject ):void {
-			_displayList.addChild(displayObject);
-		}
-		
-		protected function removeDisplayObject ( displayObject:DisplayObject ):void {
-			_displayList.removeChild(displayObject);
-		}
-		
 		protected function addAddable ( addable:Addable ):void {
 			addable.parentComponent = this;
 			addable.onAdd();
@@ -355,12 +364,33 @@
 			addable.parentComponent = null;
 		}
 		
+		protected function addInvalidatablePositionable ( invalidatablePositionable:InvalidatablePositionable ):void {
+			invalidatablePositionable.onDisplayInvalidation.add(this.onChildDisplayInvalidation);
+		}
+		
+		protected function removeInvalidatablePositionable ( invalidatablePositionable:InvalidatablePositionable ):void {
+			invalidatablePositionable.onDisplayInvalidation.remove(this.onChildDisplayInvalidation);
+		}
+		
+		protected function addDisplayObject ( displayObject:DisplayObject ):void {
+			_displayList.addChild(displayObject);
+		}
+		
+		protected function removeDisplayObject ( displayObject:DisplayObject ):void {
+			_displayList.removeChild(displayObject);
+		}
+		
+		protected function onChildDisplayInvalidation ( child:InvalidatablePositionable ):void {
+			this.invalidateLayout();
+		}
+		
 		public function invalidateGraphics ( ):void {
 			_invalidationHelper.invalidateMethod(this.draw);
 		}
 		
 		public function invalidateLayout ( ):void {
 			_invalidationHelper.invalidateMethod(this.rearrange);
+			_invalidationHelper.invalidateMethod(this.measureDimensions);
 		}
 		
 		public function get displayList ( ):DisplayObjectContainer { return _displayList; }
