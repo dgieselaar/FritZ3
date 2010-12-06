@@ -11,6 +11,8 @@
 	import fritz3.display.graphics.BoxBackground;
 	import fritz3.display.graphics.Drawable;
 	import fritz3.display.graphics.RectangularBackground;
+	import fritz3.display.layout.flexiblebox.FlexibleBoxLayout;
+	import fritz3.display.layout.Layout;
 	import fritz3.display.layout.Rearrangable;
 	import fritz3.invalidation.Invalidatable;
 	/**
@@ -21,9 +23,10 @@
 		
 		protected var _displayList:DisplayObjectContainer;
 		protected var _collection:ItemCollection;
+		protected var _background:Background;
+		protected var _layout:Layout;
 		
 		protected var _backgroundShape:Shape;
-		protected var _background:Background;
 		
 		protected var _useScrollRect:Boolean;
 		protected var _scrollRect:Rectangle;
@@ -55,6 +58,7 @@
 			this.initializeDisplayContainer();
 			this.initializeItemCollection();
 			this.initializeBackground();
+			this.initializeLayout();
 		}
 		
 		override protected function setInvalidationMethodOrder():void {
@@ -78,6 +82,10 @@
 			this.addChildAt(_backgroundShape, 0);
 			var background:BoxBackground = new BoxBackground();
 			this.background = background;
+		}
+		
+		protected function initializeLayout ( ):void {
+			this.layout = new FlexibleBoxLayout();
 		}
 		
 		protected function setDisplayList ( displayList:DisplayObjectContainer ):void {
@@ -118,6 +126,16 @@
 			}
 		}
 		
+		protected function setLayout ( layout:Layout ):void {
+			if (_layout) {
+				_layout.rearrangable = null;
+			}
+			_layout = layout;
+			if (_layout) {
+				_layout.rearrangable = this;
+			}
+		}
+		
 		protected function draw ( ):void {
 			if (_backgroundShape) {
 				_background.draw(_backgroundShape);
@@ -126,7 +144,7 @@
 			}
 		}
 		
-		protected function draw ( ):void {
+		protected function rearrange ( ):void {
 			if (_layout) {
 				// TODO: only supply DisplayObject/Positionable items
 				var items:Array = [];
@@ -433,6 +451,13 @@
 			if (_useScrollRect != value) {
 				_useScrollRect = value;
 				this.applyScrollRect();
+			}
+		}
+		
+		public function get layout ( ):Layout { return _layout; }
+		public function set layout ( value:Layout ):void {
+			if(_layout != value) {
+				this.setLayout(value);
 			}
 		}
 		
