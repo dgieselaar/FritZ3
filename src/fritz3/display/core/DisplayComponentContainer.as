@@ -12,14 +12,17 @@
 	import fritz3.display.graphics.Drawable;
 	import fritz3.display.graphics.RectangularBackground;
 	import fritz3.display.layout.flexiblebox.FlexibleBoxLayout;
+	import fritz3.display.layout.InvalidatablePositionable;
 	import fritz3.display.layout.Layout;
 	import fritz3.display.layout.Rearrangable;
 	import fritz3.invalidation.Invalidatable;
+	import fritz3.utils.signals.MonoSignal;
+	import org.osflash.signals.IDispatcher;
 	/**
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public class DisplayComponentContainer extends StylableDisplayComponent implements ItemCollection, Drawable, Rearrangable {
+	public class DisplayComponentContainer extends PositionableDisplayComponent implements ItemCollection, Drawable, Rearrangable, InvalidatablePositionable {
 		
 		protected var _displayList:DisplayObjectContainer;
 		protected var _collection:ItemCollection;
@@ -36,9 +39,6 @@
 		
 		protected var _measuredWidth:Number = 0;
 		protected var _measuredHeight:Number = 0;
-		
-		//protected var _dispatchedWidth:Number = 0;
-		//protected var _dispatchedHeight:Number = 0;
 		
 		protected var _minWidth:Number = NaN;
 		protected var _maxWidth:Number = NaN;
@@ -61,11 +61,11 @@
 			this.initializeLayout();
 		}
 		
-		override protected function setInvalidationMethodOrder():void {
+		override protected function setInvalidationMethodOrder ( ):void {
 			super.setInvalidationMethodOrder();
-			_invalidationHelper.append(this.rearrange);
-			_invalidationHelper.append(this.measureDimensions);
-			_invalidationHelper.append(this.draw);
+			_invalidationHelper.insertBefore(this.rearrange, this.dispatchDisplayInvalidation);
+			_invalidationHelper.insertAfter(this.measureDimensions, this.rearrange);
+			_invalidationHelper.insertAfter(this.draw, this.rearrange);
 		}
 		
 		protected function initializeDisplayContainer ( ):void {
@@ -146,9 +146,7 @@
 		
 		protected function rearrange ( ):void {
 			if (_layout) {
-				// TODO: only supply DisplayObject/Positionable items
-				var items:Array = [];
-				_layout.rearrange(this, items);
+				_layout.rearrange(this, _collection.getItems());
 			}
 		}
 		
@@ -325,6 +323,10 @@
 		
 		public function get numItems ( ):uint {
 			return _collection.numItems;
+		}
+		
+		public function getItems ( ):Array {
+			return _collection.getItems();
 		}
 		
 		protected function addInvalidatable ( invalidatable:Invalidatable ):void { 
