@@ -135,6 +135,14 @@ package fritz3.display.layout.flexiblebox {
 			}
 		}
 		
+		public function get pack ( ):String { return _pack; }
+		public function set pack ( value:String ):void {
+			if(_pack != value) {
+				_pack = value;
+				this.invalidate();
+			}
+		}
+		
 		public function get padding ( ):Number { return _padding; }
 		public function set padding ( value:Number ):void {
 			if (_padding != value) {
