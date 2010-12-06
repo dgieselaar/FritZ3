@@ -35,7 +35,7 @@ package fritz3.display.layout.flexiblebox {
 		}
 		
 		protected function setRearrangable ( rearrangable:Rearrangable ):void {
-			_rearrangable = rearrange;
+			_rearrangable = rearrangable;
 			if (_rearrangable) {
 				_rearrangable.invalidateLayout();
 			}
