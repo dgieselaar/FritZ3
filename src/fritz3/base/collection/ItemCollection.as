@@ -17,6 +17,8 @@
 		function hasItem ( item:Object ):Object
 		function get numItems ( ):uint
 		
+		function getItems ( ):Array
+		
 	}
 
 }

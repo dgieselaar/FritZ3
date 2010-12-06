@@ -67,6 +67,8 @@ package fritz3.base.collection {
 			return _numItems;
 		}
 		
+		final public function getItems ( ):Array { return _items; }
+		
 	}
 
 }
