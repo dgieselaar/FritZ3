@@ -4,7 +4,6 @@
 	import flash.utils.Dictionary;
 	import fritz3.base.injection.Injectable;
 	import fritz3.binding.Binding;
-	import fritz3.display.layout.Positionable;
 	import fritz3.invalidation.Invalidatable;
 	import fritz3.invalidation.InvalidationHelper;
 	import fritz3.invalidation.InvalidationManager;
