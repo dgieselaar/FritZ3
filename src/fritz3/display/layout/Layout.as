@@ -7,13 +7,9 @@
 	 */
 	public interface Layout {
 		
-		function get items ( ):Array
-		function set items ( value:Array ):void 
+		function rearrange ( container:DisplayObjectContainer, items:Array ):void
 		
-		function get target ( ):DisplayObjectContainer
-		function set target ( value:DisplayObjectContainer ):void
-		
-		function rearrange ( ):void 
+		function set rearrangable ( value:Rearrangable ):void
 		
 	}
 	
