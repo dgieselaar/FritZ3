@@ -24,7 +24,7 @@ package fritz3.utils.signals {
 		
 		public function dispatch ( ...rest ):void {
 			if (Boolean(this.listener)) {
-				this.dispatch(rest);
+				listener.apply(null, rest);
 			}
 		}
 		
