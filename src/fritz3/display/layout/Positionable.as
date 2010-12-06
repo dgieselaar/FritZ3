@@ -18,6 +18,12 @@ package fritz3.display.layout {
 		function get height ( ):Number
 		function set height ( value:Number ):void
 		
+		function get minimumWidth ( ):Number
+		function get maximumWidth ( ):Number
+		
+		function get minimumHeight ( ):Number
+		function get maximumHeight ( ):Number
+		
 		function get top ( ):Number
 		function get left ( ):Number
 		function get bottom ( ):Number
@@ -30,9 +36,6 @@ package fritz3.display.layout {
 		function get marginLeft ( ):Number
 		function get marginBottom ( ):Number
 		function get marginRight ( ):Number
-		
-		function get relativeWidth ( ):Number
-		function get relativeHeight ( ):Number
 		
 		function get registration ( ):String
 		

@@ -41,12 +41,6 @@
 		protected var _measuredWidth:Number = 0;
 		protected var _measuredHeight:Number = 0;
 		
-		protected var _minWidth:Number = NaN;
-		protected var _maxWidth:Number = NaN;
-		
-		protected var _minHeight:Number = NaN;
-		protected var _maxHeight:Number = NaN;
-		
 		protected var _autoWidth:Boolean = true;
 		protected var _autoHeight:Boolean = true;
 		
@@ -161,22 +155,22 @@
 			
 			if (_autoWidth) {
 				var width:Number = _measuredWidth;
-				if (!isNaN(_minWidth)) {
-					width = Math.max(_minWidth, width);
+				if (!isNaN(_minimumWidth)) {
+					width = Math.max(_minimumWidth, width);
 				}
-				if (!isNaN(_maxWidth)) {
-					width = Math.min(_maxWidth, width);
+				if (!isNaN(_maximumWidth)) {
+					width = Math.min(_maximumWidth, width);
 				}
 				this.width = width;
 			}
 			
 			if (_autoHeight) {
 				var height:Number = _measuredHeight;
-				if (!isNaN(_minHeight)) {
-					height = Math.max(_minHeight, width);
+				if (!isNaN(_minimumHeight)) {
+					height = Math.max(_minimumHeight, width);
 				}
-				if (!isNaN(_maxHeight)) {
-					height = Math.min(_maxHeight, height);
+				if (!isNaN(_maximumHeight)) {
+					height = Math.min(_maximumHeight, height);
 				}
 				this.height = height;
 			}
@@ -204,38 +198,38 @@
 			}
 		}
 		
-		protected function applyMinWidth ( ):void {
-			if (!isNaN(_minWidth)) {
-				this.width = Math.max(_minWidth, _width);
+		override protected function applyMinimumWidth ( ):void {
+			if (!isNaN(_minimumWidth)) {
+				this.width = Math.max(_minimumWidth, _width);
 			}
 		}
 		
-		protected function applyMaxWidth ( ):void {
-			if (!isNaN(_maxWidth)) {
-				this.width = Math.min(_maxWidth, _width);
+		override protected function applyMaximumWidth ( ):void {
+			if (!isNaN(_maximumWidth)) {
+				this.width = Math.min(_maximumWidth, _width);
 			}
 		}
 		
-		protected function applyMinHeight ( ):void {
-			if (!isNaN(_minHeight)) {
-				this.height = Math.max(_minHeight, _height);
+		override protected function applyMinimumHeight ( ):void {
+			if (!isNaN(_minimumHeight)) {
+				this.height = Math.max(_minimumHeight, _height);
 			}
 		}
 		
-		protected function applyMaxHeight ( ):void {
-			if (!isNaN(_maxHeight)) {
-				this.height = Math.min(_maxHeight, _height);
+		override protected function applyMaximumHeight ( ):void {
+			if (!isNaN(_maximumHeight)) {
+				this.height = Math.min(_maximumHeight, _height);
 			}
 		}
 		
 		protected function applyAutoWidth ( ):void {
 			if (_autoWidth) {
 				var width:Number = _measuredWidth;
-				if (!isNaN(_minWidth)) {
-					width = Math.max(_minWidth, width);
+				if (!isNaN(_minimumWidth)) {
+					width = Math.max(_minimumWidth, width);
 				}
-				if (!isNaN(_maxWidth)) {
-					width = Math.min(_maxWidth, width);
+				if (!isNaN(_maximumWidth)) {
+					width = Math.min(_maximumWidth, width);
 				}
 				this.width = width;
 			}
@@ -244,11 +238,11 @@
 		protected function applyAutoHeight ( ):void {
 			if (_autoHeight) {
 				var height:Number = _measuredHeight;
-				if (!isNaN(_minHeight)) {
-					height = Math.max(_minHeight, height);
+				if (!isNaN(_minimumHeight)) {
+					height = Math.max(_minimumHeight, height);
 				}
-				if (!isNaN(_maxHeight)) {
-					height = Math.min(_maxHeight, height);
+				if (!isNaN(_maximumHeight)) {
+					height = Math.min(_maximumHeight, height);
 				}
 				this.height = height;
 			}
@@ -427,38 +421,6 @@
 			if (_height != value) {
 				_height = value;
 				this.applyHeight();
-			}
-		}
-		
-		public function get minWidth ( ):Number { return _minWidth; }
-		public function set minWidth ( value:Number ):void {
-			if (_minWidth != value) {
-				_minWidth = value;
-				this.applyMinWidth();
-			}
-		}
-		
-		public function get maxWidth ( ):Number { return _maxWidth; }
-		public function set maxWidth ( value:Number ):void {
-			if (_maxWidth != value) {
-				_maxWidth = value;
-				this.applyMaxWidth();
-			}
-		}
-		
-		public function get minHeight ( ):Number { return _minHeight; }
-		public function set minHeight ( value:Number ):void {
-			if (_minHeight != value) {
-				_minHeight = value;
-				this.applyMinHeight();
-			}
-		}
-		
-		public function get maxHeight ( ):Number { return _maxHeight; }
-		public function set maxHeight ( value:Number ):void {
-			if (_maxHeight != value) {
-				_maxHeight = value;
-				this.applyMaxHeight();
 			}
 		}
 		

@@ -1,4 +1,6 @@
 package fritz3.display.core  {
+	import fritz3.display.layout.flexiblebox.Collapsable;
+	import fritz3.display.layout.flexiblebox.FlexibleBoxElement;
 	import fritz3.display.layout.InvalidatablePositionable;
 	import fritz3.display.layout.Positionable;
 	import fritz3.utils.signals.MonoSignal;
@@ -15,15 +17,17 @@ package fritz3.display.core  {
 	 * [Description]
 	*/
 	
-	public class PositionableDisplayComponent extends StylableDisplayComponent implements InvalidatablePositionable {
+	public class PositionableDisplayComponent extends StylableDisplayComponent implements InvalidatablePositionable, Collapsable, FlexibleBoxElement {
 		
 		protected var _top:Number = NaN;
 		protected var _left:Number = NaN;
 		protected var _bottom:Number = NaN;
 		protected var _right:Number = NaN;
 		
-		protected var _relativeWidth:Number = NaN;
-		protected var _relativeHeight:Number = NaN;
+		protected var _minimumWidth:Number = NaN;
+		protected var _maximumWidth:Number = NaN;
+		protected var _minimumHeight:Number = NaN;
+		protected var _maximumHeight:Number = NaN;
 		
 		protected var _margin:Number = 0;
 		protected var _marginTop:Number = 0;
@@ -35,7 +39,13 @@ package fritz3.display.core  {
 		protected var _horizontalFloat:String;
 		protected var _verticalFloat:String;
 		
+		protected var _collapsed:Boolean;
+		
 		protected var _onDisplayInvalidation:IDispatcher;
+		
+		protected var _boxOrdinalGroup:int = 1;
+		protected var _boxFlex:Number = 0;
+		protected var _boxFlexGroup:int = 1;
 		
 		public function PositionableDisplayComponent ( properties:Object = null )  {
 			super(properties);
@@ -61,6 +71,18 @@ package fritz3.display.core  {
 		
 		public function invalidateDisplay ( ):void {
 			_invalidationHelper.invalidateMethod(this.dispatchDisplayInvalidation);
+		}
+		
+		protected function applyMinimumWidth ( ):void {
+		}
+		
+		protected function applyMaximumWidth ( ):void {
+		}
+		
+		protected function applyMinimumHeight ( ):void {
+		}
+		
+		protected function applyMaximumHeight ( ):void {
 		}
 		
 		public function get top ( ):Number { return _top; }
@@ -91,22 +113,6 @@ package fritz3.display.core  {
 		public function set right ( value:Number ):void {
 			if (_right != value) {
 				_right = value;
-				this.invalidateDisplay();
-			}
-		}
-		
-		public function get relativeWidth ( ):Number { return _relativeWidth; }
-		public function set relativeWidth ( value:Number ):void {
-			if (_relativeWidth != value) {
-				_relativeWidth = value;
-				this.invalidateDisplay();
-			}
-		}
-		
-		public function get relativeHeight ( ):Number { return _relativeHeight; }
-		public function set relativeHeight ( value:Number ):void {
-			if (_relativeHeight != value) {
-				_relativeHeight = value;
 				this.invalidateDisplay();
 			}
 		}
@@ -171,6 +177,70 @@ package fritz3.display.core  {
 		public function set verticalFloat ( value:String ):void {
 			if (_verticalFloat != value) {
 				_verticalFloat = value;
+				this.invalidateDisplay();
+			}
+		}
+		
+		public function get minimumWidth ( ):Number { return _minimumWidth; }
+		public function set minimumWidth ( value:Number ):void {
+			if (_minimumWidth != value) {
+				_minimumWidth = value;
+				this.applyMinimumWidth();
+			}
+		}
+		
+		public function get maximumWidth ( ):Number { return _maximumWidth; }
+		public function set maximumWidth ( value:Number ):void {
+			if (_maximumWidth != value) {
+				_maximumWidth = value;
+				this.applyMaximumWidth();
+			}
+		}
+		
+		public function get minimumHeight ( ):Number { return _minimumHeight; }
+		public function set minimumHeight ( value:Number ):void {
+			if (_minimumHeight != value) {
+				_minimumHeight = value;
+				this.applyMinimumHeight();
+			}
+		}
+		
+		public function get maximumHeight ( ):Number { return _maximumHeight; }
+		public function set maximumHeight ( value:Number ):void {
+			if (_maximumHeight != value) {
+				_maximumHeight = value;
+				this.applyMaximumHeight();
+			}
+		}
+		
+		public function get boxOrdinalGroup ( ):int { return _boxOrdinalGroup; }
+		public function set boxOrdinalGroup ( value:int ):void {
+			if(_boxOrdinalGroup != value) {
+				_boxOrdinalGroup = value;
+				this.invalidateDisplay();
+			}
+		}
+		
+		public function get boxFlex ( ):Number { return _boxFlex; }
+		public function set boxFlex ( value:Number ):void {
+			if(_boxFlex != value) {
+				_boxFlex = value;
+				this.invalidateDisplay();
+			}
+		}
+		
+		public function get boxFlexGroup ( ):int { return _boxFlexGroup; }
+		public function set boxFlexGroup ( value:int ):void {
+			if(_boxFlexGroup != value) {
+				_boxFlexGroup = value;
+				this.invalidateDisplay();
+			}
+		}
+	
+		public function get collapsed ( ):Boolean { return _collapsed; }
+		public function set collapsed ( value:Boolean ):void {
+			if(_collapsed != value) {
+				_collapsed = value;
 				this.invalidateDisplay();
 			}
 		}
