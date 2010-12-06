@@ -7,7 +7,7 @@ package fritz3.display.core {
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public class GraphicsComponent extends StylableDisplayComponent implements Drawable {
+	public class GraphicsComponent extends PositionableDisplayComponent implements Drawable {
 		
 		protected var _background:Background;
 		protected var _width:Number = 0;
@@ -24,7 +24,7 @@ package fritz3.display.core {
 		
 		override protected function setInvalidationMethodOrder():void {
 			super.setInvalidationMethodOrder();
-			_invalidationHelper.append(this.draw);
+			_invalidationHelper.insertBefore(this.draw, this.dispatchDisplayInvalidation);
 		}
 		
 		protected function draw ( ):void {
@@ -35,15 +35,15 @@ package fritz3.display.core {
 			this.background = new BoxBackground();
 		}
 		
-		protected function setWidth ( value:Number ):void {
-			_width = value;
+		protected function applyWidth ( ):void {
+			this.invalidateDisplay();
 			if (_background is RectangularBackground) {
 				RectangularBackground(_background).width = _width;
 			}
 		}
 		
-		protected function setHeight ( value:Number ):void {
-			_height = value;
+		protected function applyHeight ( ):void {
+			this.invalidateDisplay();
 			if (_background is RectangularBackground) {
 				RectangularBackground(_background).height = _height;
 			}
@@ -80,14 +80,16 @@ package fritz3.display.core {
 		override public function get width ( ):Number { return _width; }
 		override public function set width ( value:Number ):void {
 			if (_width != value) {
-				this.setWidth(value);
+				_width = value;
+				this.applyWidth();
 			}
 		}
 		
 		override public function get height ( ):Number { return _height; }
 		override public function set height ( value:Number ):void {
 			if (_height != value) {
-				this.setHeight(value);
+				_height = value;
+				this.applyHeight();
 			}
 		}
 		
