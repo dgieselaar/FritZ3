@@ -11,12 +11,13 @@
 	import fritz3.display.graphics.BoxBackground;
 	import fritz3.display.graphics.Drawable;
 	import fritz3.display.graphics.RectangularBackground;
+	import fritz3.display.layout.Rearrangable;
 	import fritz3.invalidation.Invalidatable;
 	/**
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public class DisplayComponentContainer extends StylableDisplayComponent implements ItemCollection, Drawable {
+	public class DisplayComponentContainer extends StylableDisplayComponent implements ItemCollection, Drawable, Rearrangable {
 		
 		protected var _displayList:DisplayObjectContainer;
 		protected var _collection:ItemCollection;
@@ -58,6 +59,7 @@
 		
 		override protected function setInvalidationMethodOrder():void {
 			super.setInvalidationMethodOrder();
+			_invalidationHelper.append(this.rearrange);
 			_invalidationHelper.append(this.measureDimensions);
 			_invalidationHelper.append(this.draw);
 		}
@@ -121,6 +123,14 @@
 				_background.draw(_backgroundShape);
 			} else {
 				_background.draw(this);
+			}
+		}
+		
+		protected function draw ( ):void {
+			if (_layout) {
+				// TODO: only supply DisplayObject/Positionable items
+				var items:Array = [];
+				_layout.rearrange(this, items);
 			}
 		}
 		
@@ -327,6 +337,10 @@
 		
 		public function invalidateGraphics ( ):void {
 			_invalidationHelper.invalidateMethod(this.draw);
+		}
+		
+		public function invalidateLayout ( ):void {
+			_invalidationHelper.invalidateMethod(this.rearrange);
 		}
 		
 		public function get displayList ( ):DisplayObjectContainer { return _displayList; }
