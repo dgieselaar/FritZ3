@@ -5,15 +5,17 @@
 		<property name="background.backgroundColor">0xEFEFEF</property>
 		<property name="auto-height">false</property>
 		<property name="auto-width">false</property>
-		<property name="layout.align">stretch</property>
-		<property name="layout.pack">justify</property>
-		<property name="layout.direction">reverse</property>
+		<property name="layout.align">end</property>
+		<property name="layout.pack">end</property>
+		<property name="layout.direction">normal</property>
+		<property name="layout.padding">10</property>
 	</rule>
 	
 	<rule where="GraphicsComponent">
 		<property name="background.roundedCorners">10</property>
-		<property name="margin-right">10</property>
+		<property name="margin-left">10</property>
 		<property name="width">100</property>
+		<property name="height">100</property>
 	</rule>
 	
 	<rule where="GraphicsComponent:first-child">
@@ -34,7 +36,9 @@
 	</rule>
 	
 	<rule where="GraphicsComponent:last-child">
-		<property name="margin-right">0</property>
+		<property name="background.borderPosition">inner</property>
+		<property name="background.border">1</property>
+		<property name="background.borderColor">#FF68EB</property>
 	</rule>
 
 </data>
