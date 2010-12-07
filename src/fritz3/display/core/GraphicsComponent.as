@@ -13,6 +13,9 @@ package fritz3.display.core {
 		protected var _width:Number = 0;
 		protected var _height:Number = 0;
 		
+		protected var _dispatchedWidth:Number = 0;
+		protected var _dispatchedHeight:Number = 0;
+		
 		public function GraphicsComponent ( properties:Object = null ) {
 			super(properties);
 		}
@@ -36,14 +39,18 @@ package fritz3.display.core {
 		}
 		
 		protected function applyWidth ( ):void {
-			this.invalidateDisplay();
+			if (_width != _dispatchedWidth) {
+				this.invalidateDisplay();
+			}
 			if (_background is RectangularBackground) {
 				RectangularBackground(_background).width = _width;
 			}
 		}
 		
 		protected function applyHeight ( ):void {
-			this.invalidateDisplay();
+			if (_height != _dispatchedHeight) {
+				this.invalidateDisplay();
+			}
 			if (_background is RectangularBackground) {
 				RectangularBackground(_background).height = _height;
 			}
@@ -64,6 +71,11 @@ package fritz3.display.core {
 					RectangularBackground(_background).height = _height;
 				}
 			}
+		}
+		
+		override protected function dispatchDisplayInvalidation():void {
+			super.dispatchDisplayInvalidation();
+			_dispatchedWidth = _width, _dispatchedHeight = _height;
 		}
 		
 		public function invalidateGraphics ( ):void {
