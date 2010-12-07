@@ -45,12 +45,12 @@
 			var styleSheetXML:XML = XML(new StyleSheetXML());
 			StyleManager.parseXML(styleSheetXML);
 			
-			var graphicsComponent:GraphicsComponent = new GraphicsComponent();
+			var graphicsComponent:GraphicsComponent = new GraphicsComponent( { id: "1" } );
 			
 			this.add(graphicsComponent);
 			
-			this.add(new GraphicsComponent());
-			this.add(new GraphicsComponent());
+			this.add(new GraphicsComponent( { id: "2" } ));
+			this.add(new GraphicsComponent( { id: "3" } ));
 			
 			
 			

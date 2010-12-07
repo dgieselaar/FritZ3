@@ -3,30 +3,38 @@
 	
 	<rule where="ApplicationDocument">
 		<property name="background.backgroundColor">0xEFEFEF</property>
+		<property name="auto-height">false</property>
+		<property name="auto-width">false</property>
+		<property name="layout.align">stretch</property>
+		<property name="layout.pack">justify</property>
+		<property name="layout.direction">reverse</property>
 	</rule>
 	
 	<rule where="GraphicsComponent">
-		<property name="width">100</property>
-		<property name="height">100</property>
 		<property name="background.roundedCorners">10</property>
+		<property name="margin-right">10</property>
+		<property name="width">100</property>
 	</rule>
 	
 	<rule where="GraphicsComponent:first-child">
-		<property name="x">5</property>
-		<property name="y">5</property>
 		<property name="background.backgroundColor">0xFF00FF</property>
+		<property name="alpha">1</property>
+		<property name="width">300</property>
+		<!--property name="box-flex">2</property-->
 	</rule>
 	
 	<rule where="GraphicsComponent:nth-child(2)">
-		<property name="x">110</property>
-		<property name="y">5</property>
-		<property name="background.backgroundColor">0x00FFFF</property>
+		<property name="background.backgroundColor">0xFF00FF</property>
+		<property name="alpha">0.66</property>
 	</rule>
 	
 	<rule where="GraphicsComponent:nth-child(3)">
-		<property name="x">215</property>
-		<property name="y">5</property>
-		<property name="background.backgroundColor">0x0000FF</property>
+		<property name="background.backgroundColor">0xFF00FF</property>
+		<property name="alpha">0.33</property>
+	</rule>
+	
+	<rule where="GraphicsComponent:last-child">
+		<property name="margin-right">0</property>
 	</rule>
 
 </data>
