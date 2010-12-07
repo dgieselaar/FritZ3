@@ -15,6 +15,7 @@ package fritz3.display.layout {
 		public static const END:String = "end";
 		public static const BASELINE:String = "baseline";
 		public static const STRETCH:String = "stretch";
+		public static const JUSTIFY:String = "justify";
 		
 		public function Align ( ) {
 			
