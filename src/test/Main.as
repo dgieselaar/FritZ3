@@ -51,6 +51,9 @@
 			
 			this.add(new GraphicsComponent( { id: "2" } ));
 			this.add(new GraphicsComponent( { id: "3" } ));
+			this.add(new GraphicsComponent( { id: "4" } ));
+			this.add(new GraphicsComponent( { id: "5" } ));
+			
 			
 			
 			
