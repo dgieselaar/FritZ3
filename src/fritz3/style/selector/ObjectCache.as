@@ -16,6 +16,7 @@ package fritz3.style.selector {
 		public var id:String;
 		public var className:String;
 		public var name:String;
+		public var classObject:Class;
 		
 		public var properties:Object = { };
 		
@@ -50,6 +51,7 @@ package fritz3.style.selector {
 		public function invalidate ( ):void {
 			this.object = null;
 			this.id = this.className = this.name = null;
+			this.classObject = null;
 			this.properties = { };
 			
 			this.cachedChildProperties = false;
@@ -104,15 +106,56 @@ package fritz3.style.selector {
 					this.lastChild = (this.childIndex == this.parentNumChildren - 1);
 				}
 			}
+			if (this.object is ItemCollection) {
+				if (ItemCollection(this.object).numItems == 0) {
+					this.empty = true;
+				}
+			}
 		}
 		
 		public function cacheDirectSiblings ( ):void {
-			this.prevSibling = this.parentCollection.getItemAt(this.childIndex - 1);
-			this.nextSibling = this.parentCollection.getItemAt(this.childIndex + 1);
+			if (this.parentCollection) {
+				if (this.parentCollection.numItems < this.childIndex) {
+					this.prevSibling = this.parentCollection.getItemAt(this.childIndex - 1);
+				}
+				if (this.parentCollection.numItems > this.childIndex) {
+					this.nextSibling = this.parentCollection.getItemAt(this.childIndex + 1);
+				}
+			}
 			this.cachedDirectSiblings = true;
 		}
 		
 		public function cacheAllSiblings ( ):void {
+			if (this.parentCollection) {
+				var i:int, l:int;
+				var sibling:Object;
+				this.onlyOfType = true;
+				this.firstOfType = true;
+				this.previousSiblings = [];
+				this.nthOfType = 1;
+				this.classObject = this.object.constructor;
+				for (i = 0, l = this.childIndex-1; i < l; ++i) {
+					sibling = this.parentCollection.getItemAt(i);
+					if (sibling is this.classObject) {
+						this.firstOfType = false;
+						this.nthOfType++;
+						this.onlyOfType = false;
+					}
+					this.previousSiblings[this.previousSiblings.length] = sibling;
+				}
+				
+				this.nextSiblings = [];
+				this.nthLastOfType = 1;
+				for (i = this.childIndex+1, l = this.parentCollection.numItems; i < l; ++i) {
+					sibling = this.parentCollection.getItemAt(i);
+					if (sibling is this.classObject) {
+						this.lastOfType = false;
+						this.nthLastOfType++;
+						this.onlyOfType = false;
+					}
+					this.nextSiblings[this.nextSiblings.length] = sibling;
+				}
+			}
 			this.cachedAllSiblings = true;
 		}
 		
