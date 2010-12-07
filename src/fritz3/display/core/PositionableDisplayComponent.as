@@ -19,15 +19,15 @@ package fritz3.display.core  {
 	
 	public class PositionableDisplayComponent extends StylableDisplayComponent implements InvalidatablePositionable, Collapsable, FlexibleBoxElement {
 		
-		protected var _top:Number = NaN;
-		protected var _left:Number = NaN;
-		protected var _bottom:Number = NaN;
-		protected var _right:Number = NaN;
-		
 		protected var _minimumWidth:Number = NaN;
 		protected var _maximumWidth:Number = NaN;
 		protected var _minimumHeight:Number = NaN;
 		protected var _maximumHeight:Number = NaN;
+		
+		protected var _top:Number = NaN;
+		protected var _left:Number = NaN;
+		protected var _bottom:Number = NaN;
+		protected var _right:Number = NaN;
 		
 		protected var _margin:Number = 0;
 		protected var _marginTop:Number = 0;
