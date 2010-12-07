@@ -144,11 +144,9 @@ package fritz3.display.layout.flexiblebox {
 				flexGroup = flexGroups[flexGroupID];
 				flexTotal = flexTotalByGroup[flexGroupID];
 				flexGroup.sort(this.sortByMaximumWidth);
-				trace("processing flexgroup");
 				for (i = 0, l = flexGroup.length; i < l; ++i) {
 					boxElement = flexGroup[i];
 					childWidth = (boxElement.boxFlex / flexTotal) * spaceToDistribute;
-					trace(childWidth, boxElement.boxFlex, flexTotal, spaceToDistribute);
 					if (!isNaN(boxElement.minimumWidth)) {
 						childWidth = Math.max(childWidth, boxElement.minimumWidth);
 					}
@@ -168,11 +166,11 @@ package fritz3.display.layout.flexiblebox {
 			var gap:Number;
 			switch(pack) {
 				case Align.START:
-				x = reverse ? _width - _paddingRight : _paddingLeft;
+				x = _paddingLeft;
 				break;
 				
 				case Align.END:
-				x = spaceToDistribute + _paddingLeft;
+				x = _paddingLeft + spaceToDistribute;
 				break;
 				
 				case Align.CENTER:
@@ -180,10 +178,11 @@ package fritz3.display.layout.flexiblebox {
 				break;
 				
 				case Align.JUSTIFY:
-				x = reverse ? _width - _paddingRight : _paddingLeft;
+				x = _paddingLeft;
 				gap = spaceToDistribute / (toPosition.length - 1);
 				break;
 			}
+			
 			for each(group in groups) {
 				if (reverse) {
 					group.reverse();
@@ -198,11 +197,11 @@ package fritz3.display.layout.flexiblebox {
 						break;
 						
 						case Align.END:
-						y = -availableHeight - child.height + _paddingTop;
+						y = availableHeight - child.height + _paddingTop;
 						break;
 						
 						case Align.CENTER:
-						y = availableHeight - child.height / 2 + _paddingTop;
+						y = availableHeight/2 - child.height / 2 + _paddingTop;
 						break;
 						
 						case Align.STRETCH:
@@ -213,13 +212,8 @@ package fritz3.display.layout.flexiblebox {
 					
 					if (child is Positionable) {
 						positionable = Positionable(child);
-						if (!reverse) {
-							x += positionable.marginLeft;
-							childWidth += positionable.marginRight;
-						} else {
-							x -= positionable.marginRight;
-							childWidth += positionable.marginLeft;
-						}
+						x += positionable.marginLeft;
+						childWidth += positionable.marginRight;
 						y += positionable.marginTop;
 						if (align == Align.STRETCH) {
 							childHeight -= (positionable.marginTop + positionable.marginBottom);
@@ -228,21 +222,11 @@ package fritz3.display.layout.flexiblebox {
 					child.y = y;
 					child.height = childHeight;
 					if (pack == Align.JUSTIFY) {
-						if (!reverse) {
-							child.x = x;
-							x += childWidth + gap;
-						} else {
-							x -= childWidth;
-							child.x = x;
-							x -= gap;
-						}
+						child.x = x;
+						x += childWidth + gap; 
 					} else {
 						child.x = x;
-						if (!reverse) {
-							x += childWidth;
-						} else {
-							x -= childWidth;
-						}
+						x += childWidth;
 					}
 					
 				}
