@@ -130,6 +130,11 @@ package fritz3.display.layout.flexiblebox {
 				child = toPosition[i];
 				if (!isFlexible[child]) {
 					minWidth += child.width;
+				} else {
+					boxElement = FlexibleBoxElement(child);
+					if (!isNaN(boxElement.minimumWidth)) {
+						minWidth += boxElement.minimumWidth;
+					}
 				}
 				if (child is Positionable) {
 					positionable = Positionable(child);
@@ -137,7 +142,7 @@ package fritz3.display.layout.flexiblebox {
 				}
 			}
 			
-			var spaceToDistribute:Number = availableWidth - minWidth;
+			var spaceToDistribute:Number = Math.max(0, availableWidth - minWidth);
 			var childWidth:Number, childHeight:Number, flexTotal:Number;
 			
 			flexloop:for (var flexGroupID:Object in flexGroups) {
@@ -155,6 +160,7 @@ package fritz3.display.layout.flexiblebox {
 					}
 					boxElement.width = childWidth;
 					spaceToDistribute -= childWidth;
+					spaceToDistribute = Math.max(spaceToDistribute, 0);
 					flexTotal -= boxElement.boxFlex;
 				}
 			}
