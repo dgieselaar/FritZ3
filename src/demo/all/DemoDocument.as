@@ -19,7 +19,10 @@ package demo.all {
 	public class DemoDocument extends ApplicationDocument {
 	 
 		[Embed(source = '../../../assets/demo/stylesheet/demo-all.xml', mimeType="application/octet-stream")]
-		private var StyleSheetXML:Class;
+		protected static const StyleSheetXML:Class;
+		
+		[Embed("../../../assets/demo/stylesheet/defaultcss.txt", mimeType="application/octet-stream")]
+		protected static const DefaultCSS:Class;
 		
 		protected var _panelHolder:DisplayComponentContainer;
 		protected var _demoPanel:DemoPanel;
@@ -76,12 +79,13 @@ package demo.all {
 			this.addComponent();
 			this.addComponent();
 			this.addComponent();
+			this.addComponent();
+			this.addComponent();
+			this.addComponent();
+			this.addComponent();
 			
-			var defaultStyle:String = ".demo_holder { \nlayout.align: stretch; \nbackground.background-color: 0xBBBBBB; \nauto-width: false; \nauto-height: false; \n}";
-			defaultStyle += "\n\n\GraphicsComponent {\nbox-flex: 1;\nbackground.background-color: 0x666666;\nmargin: 10;\n}";
-			defaultStyle += "\n\n\GraphicsComponent:last-child {\nbox-flex: 2;\n}";
-			//defaultStyle += "\n\n<rule where='GraphicsComponent'>\n\t<property name='width'>100</property>\n\t<property name='marginRight'>10</property>\n\t<property name='background.backgroundColor'>0x00FFFF</property>\n</rule>";
-			//defaultStyle += "\n\n<rule where='GraphicsComponent:last-child'>\n\t<property name='marginRight'>0</property>\n</rule>";
+			var defaultStyle:String = Object(new DefaultCSS()).toString();
+			defaultStyle = defaultStyle.replace(/\r\n/gm, "\r");
 			_demoPanel.styleSheetXMLInput.text = defaultStyle;
 			
 			this.parseStyleSheet();
