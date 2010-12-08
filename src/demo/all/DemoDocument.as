@@ -3,7 +3,6 @@ package demo.all {
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
 	import flash.events.TextEvent;
-	import flash.events.UncaughtErrorEvent;
 	import flash.filters.GlowFilter;
 	import fritz3.base.collection.ArrayItemCollection;
 	import fritz3.display.core.DisplayComponentContainer;
@@ -163,6 +162,7 @@ package demo.all {
 		
 		protected function onIDChange ( e:KeyboardEvent ):void {
 			_selectedComponent.id = _demoPanel.idInputField.text;
+			trace(_selectedComponent.id);
 		}
 		
 		protected function onClassNameChange ( e:KeyboardEvent ):void {

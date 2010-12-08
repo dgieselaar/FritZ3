@@ -17,19 +17,8 @@
 		<property name="box-flex">1</property>
 	</rule>
 	
-	<rule where="GraphicsComponent:nth-last-child(2)">
-		<property name="box-flex-group">2</property>
-		<property name="minimum-width">40</property>
-		<property name="background.background-color">0xBBBBBB</property>
-	</rule>
-	
-	<rule where="GraphicsComponent:last-child">
-		<property name="box-flex-group">2</property>
-		<property name="minimum-width">40</property>
-		<property name="background.background-color">0xBBBBBB</property>
-		<property name="background.border-position">inside</property>
-		<property name="background.border">1</property>
-		<property name="background.border-color">#000000</property>
+	<rule where="#3">
+		<property name="alpha">0.5</property>
 	</rule>
 
 </data>

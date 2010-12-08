@@ -17,6 +17,8 @@
 	public class InvalidatableDisplayComponent extends Sprite implements Invalidatable, Injectable, Addable {
 		
 		protected var _invalidationHelper:InvalidationHelper;
+		protected var _priority:int;
+		
 		protected var _parameters:Object;
 		
 		protected var _properties:Object = { };
@@ -89,6 +91,11 @@
 			}
 		}
 		
+		protected function setPriority ( value:int ):void {
+			_priority = value;
+			_invalidationHelper.priority = value;
+		}
+		
 		protected function setParentComponent ( parentComponent:Addable ):void {
 			_parentComponent = parentComponent;
 		}
@@ -110,9 +117,11 @@
 			propertyBindings.splice(index, 1);
 		}
 		
-		public function get priority ( ):int { return _invalidationHelper.priority; }
+		public function get priority ( ):int { return _priority; }
 		public function set priority ( value:int ):void{
-			_invalidationHelper.priority = value;
+			if (_priority != value) {
+				this.setPriority(value);
+			}
 		}
 		
 		public function get properties ( ):Object { return _properties; }

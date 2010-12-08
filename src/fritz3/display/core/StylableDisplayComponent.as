@@ -15,7 +15,7 @@ package fritz3.display.core  {
 	 * [Description]
 	*/
 	
-	public class StylableDisplayComponent extends InvalidatableDisplayComponent implements Stylable {
+	public class StylableDisplayComponent extends InvalidatableDisplayComponent implements Stylable, InvalidatableDisplayChild {
 		
 		protected var _styleSheetCollector:StyleSheetCollector;
 		
@@ -80,6 +80,12 @@ package fritz3.display.core  {
 		}
 		
 		protected function applyClassName ( ):void {
+			if (_styleSheetCollector is InvalidatableStyleSheetCollector) {
+				InvalidatableStyleSheetCollector(_styleSheetCollector).invalidateCollector();
+			}
+		}
+		
+		public function invalidateChildState ( ):void{
 			if (_styleSheetCollector is InvalidatableStyleSheetCollector) {
 				InvalidatableStyleSheetCollector(_styleSheetCollector).invalidateCollector();
 			}
