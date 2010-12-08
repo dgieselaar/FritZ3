@@ -7,12 +7,15 @@ package fritz3.style.selector {
 	 */
 	public class SelectorList {
 		
+		public var where:String;
+		
 		public var firstNode:Selector;
 		public var lastNode:Selector;
 		
 		public var numSelectors:int;
 		
 		public function SelectorList ( where:String ) {
+			this.where = where;
 			var match:Array = where.match(/((.*?)\s+)|((.*?)(\s+[>+~]))|([^\s]+$)/g);
 			if (!match) {
 				throw new Error("Invalid Selector supplied in style rule: " + where);
