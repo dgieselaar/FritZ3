@@ -108,6 +108,9 @@ package fritz3.style.selector {
 					
 					case SelectorRelationship.DESCENDANT:
 					object = currentAddable = currentAddable.parentComponent;
+					if (!object) {
+						return false;
+					}
 					if (node.match(object)) {
 						node = node.prevNode;
 					}
