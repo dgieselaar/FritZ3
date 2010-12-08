@@ -3,6 +3,7 @@ package demo.all {
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
 	import flash.events.TextEvent;
+	import flash.events.UncaughtErrorEvent;
 	import flash.filters.GlowFilter;
 	import fritz3.base.collection.ArrayItemCollection;
 	import fritz3.display.core.DisplayComponentContainer;
@@ -33,6 +34,12 @@ package demo.all {
 		
 		override public function onAdd():void {
 			super.onAdd();
+			
+			/*this.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onUncaughtError);
+			
+			function onUncaughtError ( event:UncaughtErrorEvent ):void {
+				event.preventDefault();
+			}*/
 			
 			_panelHolder = new DisplayComponentContainer( { className: "panel_holder" } );
 			this.add(_panelHolder);
@@ -70,10 +77,12 @@ package demo.all {
 			this.addComponent();
 			this.addComponent();
 			
-			var defaultXML:String = "<rule where='.demo_holder'>\n\t<property name='layout.align'>stretch</property>\n\t<property name='background.backgroundColor'>0xBBBBBB</property>\n\t<property name='auto-width'>false</property>\n\t<property name='auto-height'>false</property>\n</rule>";
-			defaultXML += "\n\n<rule where='GraphicsComponent'>\n\t<property name='width'>100</property>\n\t<property name='marginRight'>10</property>\n\t<property name='background.backgroundColor'>0x00FFFF</property>\n</rule>";
-			defaultXML += "\n\n<rule where='GraphicsComponent:last-child'>\n\t<property name='marginRight'>0</property>\n</rule>";
-			_demoPanel.styleSheetXMLInput.text = defaultXML;
+			var defaultStyle:String = ".demo_holder { \nlayout.align: stretch; \nbackground.background-color: 0xBBBBBB; \nauto-width: false; \nauto-height: false; \n}";
+			defaultStyle += "\n\n\GraphicsComponent {\nbox-flex: 1;\nbackground.background-color: 0x666666;\nmargin: 10;\n}";
+			defaultStyle += "\n\n\GraphicsComponent:last-child {\nbox-flex: 2\n}";
+			//defaultStyle += "\n\n<rule where='GraphicsComponent'>\n\t<property name='width'>100</property>\n\t<property name='marginRight'>10</property>\n\t<property name='background.backgroundColor'>0x00FFFF</property>\n</rule>";
+			//defaultStyle += "\n\n<rule where='GraphicsComponent:last-child'>\n\t<property name='marginRight'>0</property>\n</rule>";
+			_demoPanel.styleSheetXMLInput.text = defaultStyle;
 			
 			this.parseStyleSheet();
 		}
@@ -140,9 +149,8 @@ package demo.all {
 		}
 		
 		protected function onStyleChange ( e:KeyboardEvent ):void {
-			var xml:XMLList;
 			try {
-				xml = XMLList(_demoPanel.styleSheetXMLInput.text);
+				var xml:XML = this.getXMLFromCSS(_demoPanel.styleSheetXMLInput.text);
 				this.parseStyleSheet();
  			} catch ( error:Error ) {
 				
@@ -171,13 +179,45 @@ package demo.all {
 			}
 			
 			var defaultXML:XML = XML(new StyleSheetXML());
-			var customXML:XMLList = XMLList(_demoPanel.styleSheetXMLInput.text);
-			var child:XML;
-			for (var i:int, l:int = customXML.length(); i < l; ++i) {
-				defaultXML.appendChild(customXML[i]);
+			StyleManager.parseXML(defaultXML);
+			
+			var customCSS:String = _demoPanel.styleSheetXMLInput.text;
+			var customXML:XML = this.getXMLFromCSS(_demoPanel.styleSheetXMLInput.text)
+			StyleManager.parseXML(customXML);
+			
+		}
+		
+		protected function getXMLFromCSS ( css:String ):XML {
+			var xml:XML = <style/>;
+			var match:Array = css.match(/(.*?){(.*?)}/gms);
+			if (!match) {
+				throw new Error("Error parsing css");
 			}
 			
-			StyleManager.parseXML(defaultXML);
+			var matchedString:String, childMatch:Array, propertyMatch:Array, keyValueMatch:Array, name:String, value:String;
+			var where:String, node:XML;
+			var i:int, l:int, j:int, m:int;
+			for (i= 0, l = match.length; i < l; ++i) {
+				matchedString = match[i];
+				childMatch = matchedString.match(/\s*(.*?)\s*{\s+(.*?)\s*}/ms);
+				if (childMatch) {
+					node = new XML("<rule where='" + childMatch[1] + "'/>");
+					if (childMatch[2]) {
+						propertyMatch = String(childMatch[2]).match(/\s*(.*?):\s*(.*?);\s*/gms);
+						if (propertyMatch) {
+							m = propertyMatch.length;
+							for (j = 0; j < m; ++j) {
+								keyValueMatch = String(propertyMatch[j]).match(/\s*(.*?):\s*(.*?);\s*/ms);
+								name = keyValueMatch[1];
+								value = keyValueMatch[2];
+								node.appendChild(new XML("<property name='"+name+"'>"+value+"</property>"));
+							}
+						}
+					}
+					xml.appendChild(node);
+				}
+			}
+			return xml;
 		}
 		
 	}
