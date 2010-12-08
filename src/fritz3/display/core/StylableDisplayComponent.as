@@ -57,6 +57,9 @@ package fritz3.display.core  {
 		
 		override public function onAdd ( ):void {
 			super.onAdd();
+			if (_styleSheetCollector && _styleSheetCollector is InvalidatableStyleSheetCollector) {
+				InvalidatableStyleSheetCollector(_styleSheetCollector).invalidateCollector();
+			}
 			this.invalidateStyle();
 		}
 		
@@ -112,6 +115,10 @@ package fritz3.display.core  {
 				this.applyName();
 			}
 		}
+		
+		/*override public function toString():String {
+			return "[object " + (super.toString().match(/\[object (.*?)\]/)[1]) + " { id: "+_id+", className: "+_className+", name: "+_name+" } ]";
+		}*/
 		
 	}
 
