@@ -1,0 +1,37 @@
+.demo_holder { 
+layout.align: stretch; 
+background.background-color: 0xBBBBBB; 
+auto-width: false; 
+auto-height: false; 
+}
+
+GraphicsComponent {
+box-flex: 1;
+background.background-color: 0x666666;
+margin: 4;
+}
+
+GraphicsComponent:first-child {
+margin-left: 0;
+}
+
+GraphicsComponent:last-child {
+box-flex: 2;
+margin-right: 0;
+}
+
+GraphicsComponent:odd {
+alpha: 0.5;
+box-flex: 2;
+}
+
+GraphicsComponent:nth-last-child(3) {
+background.backgroundColor: 0xFFFF00;
+alpha: 1;
+background.border: 1;
+background.borderColor: 0x000000;
+background.borderAlpha: 1;
+background.borderPosition: center;
+margin-bottom: 20;
+margin-top: 20;
+}
