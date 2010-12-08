@@ -23,9 +23,13 @@ package fritz3.base.collection {
 		}
 		
 		final public function remove ( item:Object ):Object {
-			_items.splice(_indexes[item], 1);
+			var index:int = _indexes[item];
+			_items.splice(index, 1);
 			_numItems--;
 			delete _indexes[item];
+			for (var i:int = index, l:int = _numItems; i < l; ++i) {
+				_indexes[_items[i]]--;
+			}
 			return item;
 		}
 		
