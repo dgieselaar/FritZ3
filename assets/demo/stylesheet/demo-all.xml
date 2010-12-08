@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<data>
+	<rule where="ApplicationDocument">
+		<property name="auto-height">false</property>
+		<property name="auto-width">false</property>
+		<property name="layout.align">stretch</property>
+	</rule>
+
+	<rule where=".panel_holder">
+		<property name="width">250</property>
+		<property name="auto-width">false</property>
+		<property name="background.background-color">0xEFEFEF</property>
+	</rule>
+	
+</data>

@@ -39,7 +39,7 @@
 		public function Main():void {
 		}
 		
-		override public function onAdd(  ):void  {
+		override public function onAdd ( ):void  {
 			super.onAdd();
 			
 			var styleSheetXML:XML = XML(new StyleSheetXML());
