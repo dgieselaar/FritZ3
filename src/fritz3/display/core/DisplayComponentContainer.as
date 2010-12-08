@@ -45,7 +45,7 @@
 		protected var _autoHeight:Boolean = true;
 		
 		public function DisplayComponentContainer ( parameters:Object = null ) {
-			super();
+			super(parameters);
 		}
 		
 		override protected function initializeDependencies ( ):void {
@@ -161,7 +161,13 @@
 				if (!isNaN(_maximumWidth)) {
 					width = Math.min(_maximumWidth, width);
 				}
-				this.width = width;
+				if (width != _width) {
+					_width = width;
+					this.applyScrollRect();
+					if (_background is RectangularBackground) {
+						RectangularBackground(_background).width = _width;
+					}
+				}
 			}
 			
 			if (_autoHeight) {
@@ -172,7 +178,13 @@
 				if (!isNaN(_maximumHeight)) {
 					height = Math.min(_maximumHeight, height);
 				}
-				this.height = height;
+				if (height != _height) {
+					_height = height;
+					this.applyScrollRect();
+					if (_background is RectangularBackground) {
+						RectangularBackground(_background).height = _height;
+					}
+				}
 			}
 		}
 		
@@ -280,6 +292,8 @@
 			
 			_collection.add(item);
 			
+			this.invalidateLayout();
+			
 			return item;
 		}
 		
@@ -303,17 +317,23 @@
 			
 			_collection.remove(item);
 			
+			this.invalidateLayout();
+			
 			return item;
 		}
 		
 		public function addItemAt ( item:Object, index:uint ):Object{
 			this.add(item);
-			return this.moveItemTo(item, index);
+			item  = this.moveItemTo(item, index);
+			this.invalidateLayout();
+			return item;
 		}
 		
 		public function removeItemAt ( index:int ):Object{
 			var item:Object = this.getItemAt(index);
-			return this.remove(item);
+			item = this.remove(item);
+			this.invalidateLayout();
+			return item;
 		}
 		
 		public function getItemAt ( index:int ):Object{
@@ -321,7 +341,9 @@
 		}
 		
 		public function moveItemTo ( item:Object, index:uint ):Object{
-			return _collection.moveItemTo(item, index);
+			var item:Object = _collection.moveItemTo(item, index);
+			this.invalidateLayout();
+			return item;
 		}
 		
 		public function getItemIndex ( item:Object ):int {
