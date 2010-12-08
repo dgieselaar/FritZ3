@@ -17,6 +17,8 @@
 	import fritz3.display.layout.Rearrangable;
 	import fritz3.display.layout.RectangularLayout;
 	import fritz3.invalidation.Invalidatable;
+	import fritz3.invalidation.InvalidationHelper;
+	import fritz3.invalidation.InvalidationPriorityTreshold;
 	import fritz3.utils.signals.MonoSignal;
 	import org.osflash.signals.IDispatcher;
 	/**
@@ -25,6 +27,7 @@
 	 */
 	public class DisplayComponentContainer extends PositionableDisplayComponent implements ItemCollection, Drawable, Rearrangable, InvalidatablePositionable {
 		
+		protected var _childInvalidationHelper:InvalidationHelper;
 		protected var _displayList:DisplayObjectContainer;
 		protected var _collection:ItemCollection;
 		protected var _background:Background;
@@ -61,6 +64,12 @@
 			_invalidationHelper.insertBefore(this.rearrange, this.dispatchDisplayInvalidation);
 			_invalidationHelper.insertAfter(this.measureDimensions, this.rearrange);
 			_invalidationHelper.insertAfter(this.draw, this.rearrange);
+			_childInvalidationHelper.append(this.invalidateChildStates);
+		}
+		
+		override protected function initializeInvalidation():void {
+			super.initializeInvalidation();
+			_childInvalidationHelper = new InvalidationHelper();
 		}
 		
 		protected function initializeDisplayContainer ( ):void {
@@ -188,6 +197,17 @@
 			}
 		}
 		
+		protected function invalidateChildStates ( ):void {
+			var items:Array = _collection.getItems();
+			var item:InvalidatableDisplayChild;
+			for (var i:int, l:int = items.length; i < l; ++i) {
+				item = items[i] as InvalidatableDisplayChild;
+				if (item) {
+					item.invalidateChildState();
+				}
+			}
+		}
+		
 		protected function applyWidth ( ):void {
 			this.applyScrollRect();
 			this.invalidateDisplay();
@@ -271,6 +291,11 @@
 			}
 			this.displayList.scrollRect = _scrollRect;
 		}
+		
+		override protected function setPriority ( value:int ):void {
+			super.setPriority(value);
+			_invalidationHelper.priority = InvalidationPriorityTreshold.CHILD_DISPLAY_INVALIDATION - value;
+		}
 				
 		public function add ( item:Object ):Object {
 			
@@ -292,6 +317,7 @@
 			
 			_collection.add(item);
 			
+			this.invalidateChildren();
 			this.invalidateLayout();
 			
 			return item;
@@ -317,6 +343,7 @@
 			
 			_collection.remove(item);
 			
+			this.invalidateChildren();
 			this.invalidateLayout();
 			
 			return item;
@@ -324,15 +351,13 @@
 		
 		public function addItemAt ( item:Object, index:uint ):Object{
 			this.add(item);
-			item  = this.moveItemTo(item, index);
-			this.invalidateLayout();
+			item = this.moveItemTo(item, index);
 			return item;
 		}
 		
 		public function removeItemAt ( index:int ):Object{
 			var item:Object = this.getItemAt(index);
 			item = this.remove(item);
-			this.invalidateLayout();
 			return item;
 		}
 		
@@ -342,6 +367,7 @@
 		
 		public function moveItemTo ( item:Object, index:uint ):Object{
 			var item:Object = _collection.moveItemTo(item, index);
+			this.invalidateChildren();
 			this.invalidateLayout();
 			return item;
 		}
@@ -394,6 +420,10 @@
 		
 		protected function removeDisplayObject ( displayObject:DisplayObject ):void {
 			_displayList.removeChild(displayObject);
+		}
+		
+		protected function invalidateChildren ( ):void {
+			_childInvalidationHelper.invalidateMethod(this.invalidateChildStates);
 		}
 		
 		protected function onChildDisplayInvalidation ( child:InvalidatablePositionable ):void {
