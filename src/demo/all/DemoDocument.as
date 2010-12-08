@@ -79,7 +79,7 @@ package demo.all {
 			
 			var defaultStyle:String = ".demo_holder { \nlayout.align: stretch; \nbackground.background-color: 0xBBBBBB; \nauto-width: false; \nauto-height: false; \n}";
 			defaultStyle += "\n\n\GraphicsComponent {\nbox-flex: 1;\nbackground.background-color: 0x666666;\nmargin: 10;\n}";
-			defaultStyle += "\n\n\GraphicsComponent:last-child {\nbox-flex: 2\n}";
+			defaultStyle += "\n\n\GraphicsComponent:last-child {\nbox-flex: 2;\n}";
 			//defaultStyle += "\n\n<rule where='GraphicsComponent'>\n\t<property name='width'>100</property>\n\t<property name='marginRight'>10</property>\n\t<property name='background.backgroundColor'>0x00FFFF</property>\n</rule>";
 			//defaultStyle += "\n\n<rule where='GraphicsComponent:last-child'>\n\t<property name='marginRight'>0</property>\n</rule>";
 			_demoPanel.styleSheetXMLInput.text = defaultStyle;
