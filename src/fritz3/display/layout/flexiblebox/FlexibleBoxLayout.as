@@ -234,7 +234,6 @@ package fritz3.display.layout.flexiblebox {
 						child.x = x;
 						x += childWidth;
 					}
-					
 				}
 			}
 		}
