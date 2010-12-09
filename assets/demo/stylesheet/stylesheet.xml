@@ -17,6 +17,10 @@
 		<property name="box-flex">1</property>
 	</rule>
 	
+	<rule where="ApplicationDocument > GraphicsComponent">
+		<property name="alpha">0</property>
+	</rule>
+	
 	<rule where="#3">
 		<property name="alpha">0.5</property>
 	</rule>
