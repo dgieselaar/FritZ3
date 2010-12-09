@@ -6,6 +6,7 @@
 	import flash.display.Graphics;
 	import flash.display.GraphicsGradientFill;
 	import flash.display.LineScaleMode;
+	import flash.display.Loader;
 	import flash.display.Shape;
 	import flash.display.Sprite;
 	import flash.geom.ColorTransform;
@@ -23,7 +24,7 @@
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public class BoxBackground implements RectangularBackground {
+	public class BoxBackground implements RectangularBackground, Injectable {
 		
 		protected var _drawable:Drawable;
 		protected var _parameters:Object;
@@ -68,6 +69,9 @@
 		protected var _backgroundImageScaleGrid:Rectangle;
 		protected var _backgroundImageColor:Object;
 		protected var _backgroundImageAntiAliasing:Boolean = false;
+		
+		protected var _backgroundImageURL:String;
+		protected var _backgroundImageLoader:Loader;
 		
 		protected var _graphics:Graphics;
 		
@@ -680,6 +684,14 @@
 				}
 			}
 			
+		}
+		
+		public function setProperty ( propertyName:String, value:*, parameters:Object = null ):void {
+			switch(propertyName) {
+				default:
+				this[propertyName] = value;
+				break;
+			}
 		}
 		
 		public function get width ( ):Number { return _width; }
