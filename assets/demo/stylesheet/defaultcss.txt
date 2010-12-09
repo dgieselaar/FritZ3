@@ -12,10 +12,10 @@ margin: 4;
 
 GraphicsComponent:first-child {
 margin-left: 0;
+minimum-width: 200;
 }
 
 GraphicsComponent:last-child {
-box-flex: 2;
 margin-right: 0;
 }
 

@@ -84,10 +84,10 @@ package demo.all {
 			this.addComponent();
 			this.addComponent();
 			this.addComponent();
-			this.addComponent();
-			this.addComponent();
-			this.addComponent();
-			this.addComponent();
+			//this.addComponent();
+			//this.addComponent();
+			//this.addComponent();
+			//this.addComponent();
 		}
 		
 		protected function addComponent ( ):GraphicsComponent {
