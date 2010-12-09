@@ -1,5 +1,6 @@
 package fritz3.style {
 	import fritz3.invalidation.InvalidationHelper;
+	import fritz3.invalidation.InvalidationPriorityTreshold;
 	import fritz3.style.invalidation.StyleManagerInvalidationSignal;
 	import fritz3.style.selector.ObjectCache;
 	import fritz3.style.selector.Selector;
@@ -28,7 +29,7 @@ package fritz3.style {
 			_onChange = new StyleManagerInvalidationSignal();
 			_invalidationHelper = new InvalidationHelper();
 			_invalidationHelper.append(dispatchChange);
-			_invalidationHelper.priority = int.MAX_VALUE;
+			_invalidationHelper.priority = InvalidationPriorityTreshold.DISPLAY_INVALIDATION + 1;;
 		}
 		
 		public static function reset ( ):void {
