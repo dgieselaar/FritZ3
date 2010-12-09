@@ -70,6 +70,7 @@
 		override protected function initializeInvalidation():void {
 			super.initializeInvalidation();
 			_childInvalidationHelper = new InvalidationHelper();
+			this.setPriority(InvalidationPriorityTreshold.DISPLAY_INVALIDATION);
 		}
 		
 		protected function initializeDisplayContainer ( ):void {
@@ -294,7 +295,7 @@
 		
 		override protected function setPriority ( value:int ):void {
 			super.setPriority(value);
-			_invalidationHelper.priority = InvalidationPriorityTreshold.CHILD_DISPLAY_INVALIDATION - value;
+			_childInvalidationHelper.priority = InvalidationPriorityTreshold.CHILD_DISPLAY_INVALIDATION - value;
 		}
 				
 		public function add ( item:Object ):Object {
