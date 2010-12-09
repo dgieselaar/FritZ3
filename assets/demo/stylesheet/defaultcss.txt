@@ -6,7 +6,6 @@ auto-height: false;
 }
 
 GraphicsComponent {
-box-flex: 1;
 background.background-color: 0x666666;
 margin: 4;
 }
@@ -18,6 +17,11 @@ margin-left: 0;
 GraphicsComponent:last-child {
 box-flex: 2;
 margin-right: 0;
+}
+
+GraphicsComponent:even {
+alpha: 1;
+box-flex: 1;
 }
 
 GraphicsComponent:odd {
