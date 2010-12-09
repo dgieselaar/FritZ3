@@ -74,15 +74,19 @@ package fritz3.display.core  {
 		}
 		
 		protected function applyMinimumWidth ( ):void {
+			this.invalidateDisplay();
 		}
 		
 		protected function applyMaximumWidth ( ):void {
+			this.invalidateDisplay();
 		}
 		
 		protected function applyMinimumHeight ( ):void {
+			this.invalidateDisplay();
 		}
 		
 		protected function applyMaximumHeight ( ):void {
+			this.invalidateDisplay();
 		}
 		
 		public function get top ( ):Number { return _top; }
