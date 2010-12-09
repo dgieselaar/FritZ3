@@ -111,6 +111,7 @@ package fritz3.style.selector {
 					this.empty = true;
 				}
 			}
+			this.cachedChildProperties = true;
 		}
 		
 		public function cacheDirectSiblings ( ):void {
