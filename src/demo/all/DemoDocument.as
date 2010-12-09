@@ -75,19 +75,19 @@ package demo.all {
 				_demoHolder.removeItemAt(0);
 			}
 			
-			this.addComponent();
-			this.addComponent();
-			this.addComponent();
-			this.addComponent();
-			this.addComponent();
-			this.addComponent();
-			this.addComponent();
-			
 			var defaultStyle:String = Object(new DefaultCSS()).toString();
 			defaultStyle = defaultStyle.replace(/\r\n/gm, "\r");
 			_demoPanel.styleSheetXMLInput.text = defaultStyle;
 			
 			this.parseStyleSheet();
+			
+			this.addComponent();
+			this.addComponent();
+			this.addComponent();
+			this.addComponent();
+			this.addComponent();
+			this.addComponent();
+			this.addComponent();
 		}
 		
 		protected function addComponent ( ):GraphicsComponent {
@@ -162,7 +162,6 @@ package demo.all {
 		
 		protected function onIDChange ( e:KeyboardEvent ):void {
 			_selectedComponent.id = _demoPanel.idInputField.text;
-			trace(_selectedComponent.id);
 		}
 		
 		protected function onClassNameChange ( e:KeyboardEvent ):void {
