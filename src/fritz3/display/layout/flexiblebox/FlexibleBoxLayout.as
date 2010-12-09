@@ -154,6 +154,7 @@ package fritz3.display.layout.flexiblebox {
 					childWidth = (boxElement.boxFlex / flexTotal) * spaceToDistribute;
 					if (!isNaN(boxElement.minimumWidth)) {
 						childWidth = Math.max(childWidth, boxElement.minimumWidth);
+						spaceToDistribute += boxElement.minimumWidth;
 					}
 					if (!isNaN(boxElement.maximumWidth)) {
 						childWidth = Math.min(childWidth, boxElement.maximumWidth);
@@ -243,7 +244,6 @@ package fritz3.display.layout.flexiblebox {
 		}
 		
 		protected var _childBounds:Rectangle = new Rectangle();
-		
 		final protected function positionChild ( child:DisplayObject, x:Number, y:Number ):Rectangle {
 			var registration:String = Registration.TOP_LEFT;
 			var width:Number = child.width, height:Number = child.height;
