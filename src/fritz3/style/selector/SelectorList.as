@@ -63,19 +63,17 @@ package fritz3.style.selector {
 				} else {
 					node = new Selector(selector);
 					if (prevNode) {
-						node.prevNode = node;
+						node.prevNode = prevNode;
 						prevNode.nextNode = node;
 					} else {
 						this.firstNode = node;
 					}
 					node.relationship = relationship;
 					this.numSelectors++;
+					prevNode = node;
 				}
-				prevNode = node;
 			}
 			this.lastNode = node;
-			
-			node = this.firstNode;
 		}
 		
 		public function match ( object:Object ):Boolean {
@@ -83,35 +81,40 @@ package fritz3.style.selector {
 			var objectToMatch:Object = object;
 			
 			if (node.prevNode) {
-				if (!(object is Addable)) {
+				if (!(objectToMatch is Addable)) {
 					return false;
 				}
 			} else {
-				return node.match(object);
+				return node.match(objectToMatch);
 			}
 			
-			var addable:Addable = Addable(object), currentAddable:Addable = addable;
-			var collection:ItemCollection, objectCache:ObjectCache = ObjectCache.getCache(object);
+			var addable:Addable = Addable(objectToMatch), currentAddable:Addable = addable;
+			var collection:ItemCollection, objectCache:ObjectCache = ObjectCache.getCache(objectToMatch);
 			
+			var relationship:String, match:Boolean;
 			while (node) {
-				if (!object || !node) {
+				if (!objectToMatch) {
 					return false;
 				}
+				match = node.match(objectToMatch);
 				switch(node.relationship) {
+					default:
+					return match;
+					break;
+					
 					case SelectorRelationship.CHILD:
-					if (!node.match(object)) {
+					if (!match) {
 						return false;
+					} else {
+						node = node.prevNode;
+						objectToMatch = currentAddable = currentAddable.parentComponent;
 					}
-					object = currentAddable = currentAddable.parentComponent;
-					node = node.prevNode;
 					break;
 					
 					case SelectorRelationship.DESCENDANT:
-					object = currentAddable = currentAddable.parentComponent;
-					if (!object) {
-						return false;
-					}
-					if (node.match(object)) {
+					if (!match) {
+						objectToMatch = currentAddable = currentAddable.parentComponent;
+					} else {
 						node = node.prevNode;
 					}
 					break;
