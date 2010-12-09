@@ -1,6 +1,7 @@
 package fritz3.style {
 	import fritz3.invalidation.InvalidationHelper;
 	import fritz3.style.invalidation.StyleManagerInvalidationSignal;
+	import fritz3.style.selector.ObjectCache;
 	import fritz3.style.selector.Selector;
 	import fritz3.style.selector.SelectorList;
 	import org.osflash.signals.IDispatcher;
@@ -32,10 +33,15 @@ package fritz3.style {
 		
 		public static function reset ( ):void {
 			_invalidationHelper.invalidateMethod(dispatchChange);
+			_invalidationHelper.invalidateMethod(clearObjectCache);
 		}
 		
 		protected static function dispatchChange ( ):void {
 			_onChange.dispatch();
+		}
+		
+		protected static function clearObjectCache ( ):void {
+			ObjectCache.clearCache();
 		}
 		
 		public static function addRule ( styleRule:StyleRule ):void {
@@ -158,6 +164,7 @@ package fritz3.style {
 		}
 		
 		public static function getFirstRule ( styleSheetID:String = null ):StyleRule {
+			_invalidationHelper.invalidateMethod(clearObjectCache);
 			return _firstNodeByID[styleSheetID];
 		}
 		
