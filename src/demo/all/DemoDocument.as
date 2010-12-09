@@ -84,8 +84,8 @@ package demo.all {
 			this.addComponent();
 			this.addComponent();
 			this.addComponent();
-			//this.addComponent();
-			//this.addComponent();
+			this.addComponent();
+			this.addComponent();
 			//this.addComponent();
 			//this.addComponent();
 		}
@@ -206,7 +206,7 @@ package demo.all {
 				if (childMatch) {
 					node = new XML("<rule where='" + childMatch[1] + "'/>");
 					if (childMatch[2]) {
-						propertyMatch = String(childMatch[2]).match(/\s*(.*?):\s*(.*?);\s*/gms);
+						propertyMatch = String(childMatch[2]).match(/\s*(.*?):\s*([^}\r]*?);\s*/gms);
 						if (propertyMatch) {
 							m = propertyMatch.length;
 							for (j = 0; j < m; ++j) {
