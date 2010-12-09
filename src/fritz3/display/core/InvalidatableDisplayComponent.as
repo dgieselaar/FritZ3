@@ -104,11 +104,11 @@
 			_invalidationHelper.executeInvalidatedMethods();
 		}
 		
-		public function bindToProperty ( binding:Binding ):void {
+		protected function bindToProperty ( binding:Binding ):void {
 			((_propertyBindings[binding.propertyName] ||= []) as Array).push(binding);
 		}
 		
-		public function unbindFromProperty ( binding:Binding ):void {
+		protected function unbindFromProperty ( binding:Binding ):void {
 			var propertyBindings:Array = _propertyBindings[binding.propertyName];
 			var index:int;
 			if (!propertyBindings || (index = _propertyBindings.indexOf(binding)) == -1) {
