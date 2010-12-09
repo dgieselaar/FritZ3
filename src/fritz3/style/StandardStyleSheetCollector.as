@@ -82,8 +82,6 @@ package fritz3.style {
 			
 			_styleRules = rules = [];
 			
-			ObjectCache.getCache(_stylable);
-			
 			var numRules:int = 0;
 			var ids:Array = _styleSheetIDs, id:String;
 			var stylable:Stylable = _stylable;
@@ -109,8 +107,6 @@ package fritz3.style {
 					}
 				}
 			}
-			
-			ObjectCache.clearCache(_stylable);
 		}
 		
 		protected function cacheProperties ( ):void {
