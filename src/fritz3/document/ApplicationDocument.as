@@ -1,5 +1,7 @@
 package fritz3.document  {
 	import flash.display.Sprite;
+	import flash.display.StageAlign;
+	import flash.display.StageScaleMode;
 	import flash.events.Event;
 	import flash.utils.getDefinitionByName;
 	import fritz3.display.core.DisplayComponentContainer;
@@ -50,6 +52,8 @@ package fritz3.document  {
 		
 		protected function initStage ( ):void {
 			InvalidationManager.init(stage);
+			stage.align = StageAlign.TOP_LEFT;
+			stage.scaleMode = StageScaleMode.NO_SCALE;
 			this.width = stage.stageWidth, this.height = stage.stageHeight;
 			stage.addEventListener(Event.RESIZE, this.onStageResize);
 			this.onAdd();
