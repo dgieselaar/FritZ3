@@ -223,7 +223,7 @@ package fritz3.display.layout.flexiblebox {
 						childWidth += positionable.marginRight;
 						y += positionable.marginTop;
 						if (align == Align.STRETCH) {
-							childHeight -= (positionable.marginTop + positionable.marginBottom);
+							childHeight = availableHeight - (positionable.marginTop + positionable.marginBottom);
 						}
 					}
 					child.y = y;
@@ -240,7 +240,174 @@ package fritz3.display.layout.flexiblebox {
 		}
 		
 		protected function layoutVertically ( container:DisplayObjectContainer, items:Array ):void {
+			var positionable:Positionable, child:DisplayObject, boxElement:FlexibleBoxElement;
+			var availableWidth:Number = _width - _paddingLeft - _paddingRight;
+			var availableHeight:Number = _height - _paddingTop - _paddingBottom;
+			var toPosition:Array = [], flexible:Array = [];
+			var groups:Array = [], flexGroups:Array = [];
+			var group:Array, flexGroup:Array;
+			var ordinalGroup:int;
+			var x:Number, y:Number, width:Number, height:Number;
+			var isFlexible:Dictionary = new Dictionary();
+			var flexTotalByGroup:Object = { };
+			for (var i:int, l:int = items.length; i < l; ++i) {
+				child = items[i] as DisplayObject;
+				if (child is Collapsable && Collapsable(child).collapsed) {
+					child.x = child.y = 0;
+					continue;
+				}
+				
+				if (child is Positionable) {
+					positionable = Positionable(child);
+					if ((positionable.top || positionable.bottom) && (positionable.left || positionable.bottom)) {
+						if (positionable.top) {
+							y = positionable.top;
+						} else {
+							y = availableHeight - positionable.bottom;
+						}
+						if (positionable.left) {
+							x = positionable.left;
+						} else {
+							x = availableWidth - positionable.right;
+						}
+						this.positionChild(child, x, y);
+						continue;
+					}
+				}
+				
+				if (child is FlexibleBoxElement) {
+					boxElement = FlexibleBoxElement(child);
+					if (boxElement.boxFlex) {
+						flexible.push(boxElement);
+						isFlexible[child] = true;
+						if (flexTotalByGroup[boxElement.boxFlexGroup] == null) {
+							flexTotalByGroup[boxElement.boxFlexGroup] = 0;
+						}
+						flexTotalByGroup[boxElement.boxFlexGroup] += boxElement.boxFlex;
+						flexGroup = (flexGroups[boxElement.boxFlexGroup] ||= []);
+						flexGroup[flexGroup.length] = boxElement;
+					}
+					ordinalGroup = boxElement.boxOrdinalGroup;
+				} else {
+					ordinalGroup = 1;
+				}
+				toPosition[toPosition.length] = child;
+				group = (groups[ordinalGroup] ||= []);
+				group[group.length] = child;
+			}
 			
+			var minHeight:Number = 0;
+			for (i = 0, l = toPosition.length; i < l; ++i) {
+				child = toPosition[i];
+				if (!isFlexible[child]) {
+					minHeight += child.height;
+				} else {
+					boxElement = FlexibleBoxElement(child);
+					if (!isNaN(boxElement.minimumHeight)) {
+						minHeight += boxElement.minimumHeight;
+					}
+				}
+				if (child is Positionable) {
+					positionable = Positionable(child);
+					minHeight += (positionable.marginTop + positionable.marginBottom);
+				}
+			}
+			
+			var spaceToDistribute:Number = Math.max(0, availableHeight - minHeight);
+			var childWidth:Number, childHeight:Number, flexTotal:Number;
+			
+			flexloop:for (var flexGroupID:Object in flexGroups) {
+				flexGroup = flexGroups[flexGroupID];
+				flexTotal = flexTotalByGroup[flexGroupID];
+				flexGroup.sort(this.sortByMaximumHeight);
+				for (i = 0, l = flexGroup.length; i < l; ++i) {
+					boxElement = flexGroup[i];
+					childHeight = (boxElement.boxFlex / flexTotal) * spaceToDistribute;
+					if (!isNaN(boxElement.minimumHeight)) {
+						childHeight = Math.max(childHeight, boxElement.minimumHeight);
+						spaceToDistribute += boxElement.minimumHeight;
+					}
+					if (!isNaN(boxElement.maximumHeight)) {
+						childHeight = Math.min(childHeight, boxElement.maximumHeight);
+					}
+					boxElement.height = childHeight;
+					spaceToDistribute -= childHeight;
+					spaceToDistribute = Math.max(spaceToDistribute, 0);
+					flexTotal -= boxElement.boxFlex;
+				}
+			}
+			
+			var reverse:Boolean = _direction == Direction.REVERSE;
+			var align:String = _align;
+			var pack:String = _pack;
+			x = 0, y = 0;
+			var gap:Number;
+			switch(pack) {
+				case Align.START:
+				y = _paddingTop;
+				break;
+				
+				case Align.END:
+				y = _paddingTop + spaceToDistribute;
+				break;
+				
+				case Align.CENTER:
+				y = spaceToDistribute / 2 + _paddingTop;
+				break;
+				
+				case Align.JUSTIFY:
+				y = _paddingTop;
+				gap = spaceToDistribute / (toPosition.length - 1);
+				break;
+			}
+			
+			for each(group in groups) {
+				if (reverse) {
+					group.reverse();
+				}
+				for (i = 0, l = group.length; i < l; ++i) {
+					child = group[i]; 
+					childWidth = child.width;
+					childHeight = child.height;
+					switch(align) {
+						case Align.START:
+						x = _paddingLeft;
+						break;
+						
+						case Align.END:
+						x = availableWidth - child.width + _paddingLeft;
+						break;
+						
+						case Align.CENTER:
+						x = availableWidth/2 - child.width / 2 + _paddingLeft;
+						break;
+						
+						case Align.STRETCH:
+						x = _paddingLeft;
+						childWidth = availableWidth;
+						break;
+					}
+					
+					if (child is Positionable) {
+						positionable = Positionable(child);
+						x += positionable.marginLeft;
+						childHeight += positionable.marginBottom;
+						y += positionable.marginTop;
+						if (align == Align.STRETCH) {
+							childWidth = availableWidth - (positionable.marginLeft + positionable.marginRight);
+						}
+					}
+					child.x = x;
+					child.width = childWidth;
+					if (pack == Align.JUSTIFY) {
+						child.y = y;
+						y += childHeight + gap; 
+					} else {
+						child.y = y;
+						y += childHeight;
+					}
+				}
+			}
 		}
 		
 		protected var _childBounds:Rectangle = new Rectangle();
@@ -313,6 +480,26 @@ package fritz3.display.layout.flexiblebox {
 			if (maximumWidthA > maximumWidthB) {
 				result = -1;
 			} else if (maximumWidthA == maximumWidthB) {
+				result = 0;
+			} else {
+				result = 1;
+			}
+			return result;
+		}
+		
+		protected function sortByMaximumHeight ( childA:FlexibleBoxElement, childB:FlexibleBoxElement ):int {
+			var maximumHeightA:Number = childA.maximumWidth;
+			var maximumHeightB:Number = childB.maximumWidth;
+			if (isNaN(maximumHeightA)) {
+				maximumHeightA = Number.MIN_VALUE;
+			}
+			if (isNaN(maximumHeightA)) {
+				maximumHeightB = Number.MIN_VALUE;
+			}
+			var result:int;
+			if (maximumHeightA > maximumHeightB) {
+				result = -1;
+			} else if (maximumHeightA == maximumHeightB) {
 				result = 0;
 			} else {
 				result = 1;
