@@ -51,12 +51,14 @@
 			_priorities.sort(Array.NUMERIC | Array.DESCENDING);
 			var priority:int, node:InvalidationData, nextNode:InvalidationData;
 			var methodNode:InvalidatableMethod, nextMethodNode:InvalidatableMethod;
+			var hasExecutedNodes:Boolean;
 			for each(priority in _priorities) {
 				node = _firstNodeByPriority[priority];
 				while (node) {
 					methodNode = node.firstMethod;
 					while (methodNode) {
 						if (methodNode.invalidated) {
+							hasExecutedNodes = true;
 							methodNode.execute();
 						}
 						methodNode = methodNode.nextNode;
@@ -68,6 +70,10 @@
 				}
 				delete _firstNodeByPriority[priority];
 				delete _lastNodeByPriority[priority];
+			}
+			
+			if (hasExecutedNodes) {
+				executeWithoutThreading();
 			}
 		}
 		
