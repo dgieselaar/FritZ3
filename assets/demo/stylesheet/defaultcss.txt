@@ -1,41 +1,68 @@
 .demo_holder { 
-layout.align: stretch; 
+layout.orient: horizontal;
+layout.align: center;
+layout.pack: center;
+layout.padding-left: 10;
+layout.padding-right: 10;
 background.background-color: 0xBBBBBB; 
-auto-width: false; 
-auto-height: false; 
+auto-width: false;
+auto-height: false;
 }
 
 GraphicsComponent {
-background.background-color: 0x666666;
-margin: 4;
+alpha: 1;
+width: 0;
+height: 0;
+minimum-width: NaN;
+maximum-width: NaN;
+minimum-height: NaN;
+maximum-height: NaN;
+box-flex: 0;
+box-flex-group: 1;
+box-ordinal-group: 1;
+background.background-color: null;
+background.background-alpha: 1;
+background.border: 0;
+background.border-color: null;
+margin-top: 0;
+margin-left: 0;
+margin-right: 0;
+margin-bottom: 0;
 }
 
-GraphicsComponent:first-child {
-margin-left: 0;
-minimum-width: 200;
+GraphicsComponent {
+width: 75;
+height: 75;
+background.background-color: 0x999999;
+margin-right: 1;
 }
 
 GraphicsComponent:last-child {
 margin-right: 0;
 }
 
-GraphicsComponent:even {
-alpha: 1;
-box-flex: 1;
+GraphicsComponent:first-child {
+background.background-color: 0xE3F3E3;
+box-ordinal-group: 2;
 }
 
-GraphicsComponent:odd {
-alpha: 0.5;
+GraphicsComponent:nth-child(2) {
 box-flex: 2;
 }
 
+GraphicsComponent:even {
+height: 120;
+}
+
 GraphicsComponent:nth-last-child(3) {
-background.backgroundColor: 0xFFFF00;
-alpha: 1;
 background.border: 1;
-background.borderColor: 0x000000;
-background.borderAlpha: 1;
-background.borderPosition: center;
-margin-bottom: 20;
-margin-top: 20;
+background.borderColor: 0x007EB3;
+background.backgroundColor: 0x00B4FF;
+margin-left: 10;
+}
+
+GraphicsComponent:nth-child(4) {
+margin-left: 10;
+margin-right: 10;
+background.background-color: 0xCC3333;
 }
