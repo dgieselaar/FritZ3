@@ -29,7 +29,7 @@ package fritz3.style {
 			_onChange = new StyleManagerInvalidationSignal();
 			_invalidationHelper = new InvalidationHelper();
 			_invalidationHelper.append(dispatchChange);
-			_invalidationHelper.priority = InvalidationPriorityTreshold.DISPLAY_INVALIDATION + 1;;
+			_invalidationHelper.priority = InvalidationPriorityTreshold.DISPLAY_INVALIDATION + 1;
 		}
 		
 		public static function reset ( ):void {
