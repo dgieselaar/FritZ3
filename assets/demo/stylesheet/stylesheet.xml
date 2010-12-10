@@ -5,8 +5,8 @@
 		<property name="background.backgroundColor">0xEFEFEF</property>
 		<property name="auto-height">false</property>
 		<property name="auto-width">false</property>
-		<property name="layout.align">stretch</property>
-		<property name="layout.pack">justify</property>
+		<property name="layout.align">center</property>
+		<property name="layout.pack">center</property>
 		<property name="layout.direction">normal</property>
 		<property name="layout.padding">10</property>
 	</rule>
@@ -14,15 +14,9 @@
 	<rule where="GraphicsComponent">
 		<property name="background.backgroundColor">0xFF00FF</property>
 		<property name="background.roundedCorners">10</property>
-		<property name="box-flex">1</property>
-	</rule>
-	
-	<rule where="ApplicationDocument > GraphicsComponent">
-		<property name="alpha">0.1</property>
-	</rule>
-	
-	<rule where="#3">
-		<property name="alpha">0.5</property>
+		<property name="background.background-image">url("http://a3.twimg.com/profile_images/1181990527/ProfilePhoto_normal.png")</property>
+		<property name="width">200</property>
+		<property name="height">200</property>
 	</rule>
 
 </data>
