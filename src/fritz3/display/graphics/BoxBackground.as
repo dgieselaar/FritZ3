@@ -16,9 +16,14 @@
 	import fritz3.base.injection.Injectable;
 	import fritz3.binding.AccessType;
 	import fritz3.binding.Binding;
+	import fritz3.display.core.DisplayValueType;
 	import fritz3.display.graphics.utils.getGradientMatrix;
 	import fritz3.display.layout.Align;
 	import fritz3.invalidation.Invalidatable;
+	import fritz3.utils.assets.AssetLoader;
+	import fritz3.utils.assets.image.ImageAssetLoader;
+	import fritz3.utils.assets.image.ImageAssetManager;
+	import fritz3.utils.object.getClass;
 	import fritz3.utils.object.ObjectPool;
 	/**
 	 * ...
@@ -64,14 +69,17 @@
 		protected var _backgroundImageVerticalFloat:String = Align.TOP;
 		protected var _backgroundImageOffsetX:Number = 0;
 		protected var _backgroundImageOffsetY:Number = 0;
-		protected var _backgroundImageRepeatX:Boolean;
-		protected var _backgroundImageRepeatY:Boolean;
+		protected var _backgroundImageOffsetXValueType:String = DisplayValueType.ABSOLUTE;
+		protected var _backgroundImageOffsetYValueType:String = DisplayValueType.ABSOLUTE;
+		
+		protected var _backgroundImageRepeatX:String;
+		protected var _backgroundImageRepeatY:String;
 		protected var _backgroundImageScaleGrid:Rectangle;
 		protected var _backgroundImageColor:Object;
 		protected var _backgroundImageAntiAliasing:Boolean = false;
 		
 		protected var _backgroundImageURL:String;
-		protected var _backgroundImageLoader:Loader;
+		protected var _backgroundImageLoader:ImageAssetLoader;
 		
 		protected var _graphics:Graphics;
 		
@@ -82,7 +90,6 @@
 		
 		public function BoxBackground ( parameters:Object = null ) {
 			_parameters = parameters;
-			//this.createBindings();
 			this.setDefaultProperties();
 			this.applyParameters();
 		}
@@ -356,8 +363,8 @@
 			m.translate(p.x, p.y);
 			graphics.beginBitmapFill(_backgroundBitmapData, m, true, _backgroundImageAntiAliasing);
 			
-			var width:Number = _backgroundImageRepeatX ? _width : _backgroundBitmapData.width;
-			var height:Number = _backgroundImageRepeatY ? _height : _backgroundBitmapData.height;
+			var width:Number = _backgroundImageRepeatX != BackgroundImageRepeat.NO_REPEAT ? _width : _backgroundBitmapData.width;
+			var height:Number = _backgroundImageRepeatY != BackgroundImageRepeat.NO_REPEAT ? _height : _backgroundBitmapData.height;
 			if(_backgroundImageRepeatX && _backgroundImageRepeatY) {
 				this.drawOutline(p.x, p.y, width, height);
 			} else {
@@ -691,7 +698,80 @@
 				default:
 				this[propertyName] = value;
 				break;
+				
+				case "background":
+				this.parseBackground(value);
+				break;
+				
+				case "backgroundImage":
+				this.parseBackgroundImage(value);
+				break;
 			}
+		}
+		
+		protected function parseBackground ( value:String ):void {
+			
+		}
+		
+		protected function parseBackgroundImage ( value:String ):void {
+			var match:Array = value.match(/^(url|resource|none|null)\("?(.*?)"?\)$/);
+			if (!match) {
+				this.backgroundImage = null;
+			}
+			
+			value = match[2];
+			
+			if (match[1] == "url") {
+				this.backgroundImageURL = value;
+			} else if (match[1] == "resource") {
+				this.backgroundImage = new (getClass(value));
+			} else {
+				this.backgroundImage = null;
+			}
+		}
+		
+		protected function setBackgroundImage ( displayObject:DisplayObject ):void {
+			_backgroundImage = displayObject;
+			this.backgroundImageURL = null;
+			this.invalidate();
+			this.invalidateBackgroundImage();
+		}
+		
+		protected function setBackgroundImageURL ( url:String ):void {
+			if (_backgroundImageLoader) {
+				this.removeLoader(_backgroundImageLoader);
+				_backgroundImageLoader = null;
+			}
+			
+			_backgroundImageURL = url;
+			if (url) {
+				if (ImageAssetManager.hasImage(url)) {
+					this.backgroundImage = ImageAssetManager.getImage(url);
+					_backgroundImageURL = url;
+				} else {
+					_backgroundImageLoader = ImageAssetManager.loadImage(url);
+					_backgroundImageLoader.onComplete.add(this.onBackgroundImageLoadComplete);
+					_backgroundImageLoader.onError.add(this.onBackgroundImageLoadError);
+				}
+			}
+		}
+		
+		protected function removeLoader ( assetLoader:AssetLoader ):void {
+			assetLoader.onComplete.remove(this.onBackgroundImageLoadComplete);
+			assetLoader.onError.remove(this.onBackgroundImageLoadError);
+		}
+		
+		protected function onBackgroundImageLoadComplete ( assetLoader:AssetLoader ):void {
+			this.backgroundImage = DisplayObject(assetLoader.data);
+			_backgroundImageURL = assetLoader.request.url;
+			
+			this.removeLoader(assetLoader);
+			_backgroundImageLoader = null;
+		}
+		
+		protected function onBackgroundImageLoadError ( assetLoader:AssetLoader ):void {
+			this.removeLoader(assetLoader);
+			_backgroundImageLoader = null;
 		}
 		
 		public function get width ( ):Number { return _width; }
@@ -894,9 +974,7 @@
 		public function get backgroundImage ( ):DisplayObject { return _backgroundImage; }
 		public function set backgroundImage ( value:DisplayObject ):void {
 			if (_backgroundImage != value) {
-				_backgroundImage = value;
-				this.invalidate();
-				this.invalidateBackgroundImage();
+				this.setBackgroundImage(value);
 			}
 		}
 		
@@ -940,16 +1018,32 @@
 			}
 		}
 		
-		public function get backgroundImageRepeatX ( ):Boolean { return _backgroundImageRepeatX; }
-		public function set backgroundImageRepeatX ( value:Boolean ):void {
+		public function get backgroundImageOffsetXValueType ( ):String { return _backgroundImageOffsetXValueType; }
+		public function set backgroundImageOffsetXValueType ( value:String ):void {
+			if (_backgroundImageOffsetXValueType != value) {
+				_backgroundImageOffsetXValueType = value;
+				this.invalidate();
+			}
+		}
+		
+		public function get backgroundImageOffsetYValueType ( ):String { return _backgroundImageOffsetYValueType; }
+		public function set backgroundImageOffsetYValueType ( value:String ):void {
+			if (_backgroundImageOffsetYValueType != value) {
+				_backgroundImageOffsetYValueType = value;
+				this.invalidate();
+			}
+		}
+		
+		public function get backgroundImageRepeatX ( ):String { return _backgroundImageRepeatX; }
+		public function set backgroundImageRepeatX ( value:String ):void {
 			if (_backgroundImageRepeatX != value) {
 				_backgroundImageRepeatX = value;
 				this.invalidate();
 			}
 		}
 		
-		public function get backgroundImageRepeatY ( ):Boolean { return _backgroundImageRepeatY; }
-		public function set backgroundImageRepeatY ( value:Boolean ):void {
+		public function get backgroundImageRepeatY ( ):String { return _backgroundImageRepeatY; }
+		public function set backgroundImageRepeatY ( value:String ):void {
 			if (_backgroundImageRepeatY != value) {
 				_backgroundImageRepeatY = value;
 				this.invalidate();
@@ -980,6 +1074,13 @@
 				_backgroundImageAntiAliasing = value;
 				this.invalidate();
 				this.invalidateBackgroundImage();
+			}
+		}
+		
+		public function get backgroundImageURL ( ):String { return _backgroundImageURL; }
+		public function set backgroundImageURL ( value:String ):void {
+			if (_backgroundImageURL != value) {
+				this.setBackgroundImageURL(value);
 			}
 		}
 		
