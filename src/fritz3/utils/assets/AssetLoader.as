@@ -1,23 +1,27 @@
 package fritz3.utils.assets {
+	import flash.display.DisplayObject;
 	import flash.display.Loader;
+	import flash.events.Event;
+	import flash.events.HTTPStatusEvent;
 	import flash.events.IOErrorEvent;
+	import flash.events.ProgressEvent;
 	import flash.events.SecurityErrorEvent;
 	import flash.net.URLRequest;
 	import org.osflash.signals.IDispatcher;
 	import org.osflash.signals.ISignal;
+	import org.osflash.signals.Signal;
 	/**
 	 * ...
 	 * @author Dario Gieselaar
 	 */
 	public class AssetLoader {
 		
-		protected var _onError:IDispatcher;
-		protected var _onComplete:IDispatcher;
-		protected var _onProgress:IDispatcher;
+		protected var _onError:IDispatcher = new Signal();
+		protected var _onComplete:IDispatcher = new Signal();
+		protected var _onProgress:IDispatcher = new Signal();
 		
-		protected var _loader:Loader;
 		protected var _request:URLRequest;
-		protected var _asset:Object;
+		protected var _data:Object;
 		
 		public function AssetLoader ( ) {
 			
@@ -25,19 +29,19 @@ package fritz3.utils.assets {
 		
 		public function load ( request:URLRequest ):void {
 			_request = request;
-			_loader = new Loader();
-			_loader.addEventListener(IOErrorEvent.IO_ERROR, this.onIOError);
-			_loader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, this.onSecurityError);
-			
-			// TODO: add other listeners
 		}
 		
-		protected function onIOError ( e:IOErrorEvent ):void {
-			
+		
+		protected function dispatchComplete ( ):void {
+			_onComplete.dispatch(this);
 		}
 		
-		protected function onSecurityError ( e:SecurityErrorEvent ):void {
-			
+		protected function dispatchError ( ):void {
+			_onError.dispatch(this);
+		}
+		
+		protected function dispatchProgress ( ):void {
+			_onProgress.dispatch(this);
 		}
 		
 		public function get onError ( ):ISignal { return ISignal(_onError); }
@@ -45,7 +49,7 @@ package fritz3.utils.assets {
 		public function get onProgress ( ):ISignal { return ISignal(_onProgress); }
 		
 		public function get request ( ):URLRequest { return _request; }
-		public function get asset ( ):Object { return _asset; }
+		public function get data ( ):Object { return _data; }
 		
 	}
 
