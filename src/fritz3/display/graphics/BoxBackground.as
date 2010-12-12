@@ -65,12 +65,21 @@
 		
 		protected var _backgroundImage:DisplayObject;
 		protected var _backgroundImageAlpha:Number = 1;
+		
 		protected var _backgroundImageHorizontalFloat:String = Align.LEFT;
 		protected var _backgroundImageVerticalFloat:String = Align.TOP;
+		
 		protected var _backgroundImageOffsetX:Number = 0;
 		protected var _backgroundImageOffsetY:Number = 0;
-		protected var _backgroundImageOffsetXValueType:String = DisplayValueType.ABSOLUTE;
-		protected var _backgroundImageOffsetYValueType:String = DisplayValueType.ABSOLUTE;
+		protected var _backgroundImageOffsetXValueType:String = DisplayValueType.PIXEL;
+		protected var _backgroundImageOffsetYValueType:String = DisplayValueType.PIXEL;
+		
+		protected var _backgroundImageWidth:Number = 0;
+		protected var _backgroundImageHeight:Number = 0;
+		protected var _backgroundImageWidthValueType:String = DisplayValueType.AUTO;
+		protected var _backgroundImageHeightValueType:String = DisplayValueType.AUTO;
+		
+		protected var _backgroundImageScaleMode:String = BackgroundImageScaleMode.NONE;
 		
 		protected var _backgroundImageRepeatX:String;
 		protected var _backgroundImageRepeatY:String;
@@ -329,7 +338,6 @@
 		
 		protected function drawBackgroundImage ( ):void {
 			
-			_backgroundImageInvalidated = false;
 			
 			if (_backgroundBitmapData) {
 				_backgroundBitmapData.dispose();
@@ -340,7 +348,11 @@
 				return;
 			}
 			
-			this.getBackgroundImageBitmap();
+			if (_backgroundImageInvalidated) {
+				this.getBackgroundImageBitmap();
+			}
+			
+			_backgroundImageInvalidated = false;
 			
 			if (_backgroundBitmapData) {
 				this.drawBackgroundBitmap();
@@ -358,8 +370,8 @@
 			
 			_backgroundBitmapData.colorTransform(_backgroundBitmapData.rect, ct);
 			
-			var p:Point = this.getBackgroundPosition();
-			var m:Matrix = new Matrix();
+			var rect:Rectangle = this.getBackgroundDimensions();
+			/*var m:Matrix = new Matrix();
 			m.translate(p.x, p.y);
 			graphics.beginBitmapFill(_backgroundBitmapData, m, true, _backgroundImageAntiAliasing);
 			
@@ -370,51 +382,113 @@
 			} else {
 				graphics.drawRect(p.x, p.y, width, height);
 			}
-			graphics.endFill();
+			graphics.endFill();*/
 			
 		}
 		
-		protected function getBackgroundPosition ( ):Point {
-			var p:Point = new Point();
-			if (_backgroundImageRepeatX) {
-				p.x = 0;
-			} else {
-				switch(_backgroundImageHorizontalFloat) {
-					default: case Align.LEFT:
-					p.x = 0;
+		protected function getBackgroundDimensions ( ):Rectangle {
+			var width:Number, height:Number, scale:Number;
+			var imageWidth:Number = _backgroundBitmapData.width, imageHeight:Number = _backgroundBitmapData.height;
+			if (_backgroundImageScaleMode == BackgroundImageScaleMode.CONTAIN) {
+				scale = _width / imageWidth > _height / imageHeight ? _width / imageWidth : _height / imageHeight;
+				width = imageWidth * scale, height = imageHeight * scale;
+			} else if (_backgroundImageScaleMode == BackgroundImageScaleMode.COVER) {
+				scale = _width / imageWidth < _height / imageHeight ? _width / imageWidth : _height / imageHeight;
+				width = imageWidth * scale, height = imageHeight * scale;
+			} else {			
+				switch(_backgroundImageWidthValueType) {
+					default:
+					case DisplayValueType.AUTO:
+					width = _backgroundBitmapData.width;
 					break;
 					
-					case Align.RIGHT:
-					p.x = _width - _backgroundBitmapData.width;
+					case DisplayValueType.PIXEL:
+					width = _backgroundImageWidth;
 					break;
 					
-					case Align.CENTER:
-					p.x = _width / 2 - _backgroundBitmapData.width / 2;
+					case DisplayValueType.PERCENTAGE:
+					width = (_backgroundImageWidth / 100) * _width;
 					break;
 				}
-				p.x += _backgroundImageOffsetX;
-			}
-			
-			if (_backgroundImageRepeatY) {
-				p.y = 0;
-			} else {
-				switch(_backgroundImageVerticalFloat) {
-					default: case Align.TOP:
-					p.y = 0;
+				
+				switch(_backgroundImageHeightValueType) {
+					default:
+					case DisplayValueType.AUTO:
+					height = _backgroundBitmapData.height;
 					break;
 					
-					case Align.BOTTOM:
-					p.y = _height - _backgroundBitmapData.height;
+					case DisplayValueType.PIXEL:
+					height = _backgroundImageHeight;
 					break;
 					
-					case Align.CENTER:
-					p.y = _height / 2 - _backgroundBitmapData.height / 2;
+					case DisplayValueType.PIXEL:
+					height = (_backgroundImageHeight / 100) * _height;
 					break;
 				}
-				p.y += _backgroundImageOffsetY;
+
+			}			
+			var spaceToDistribute:Number;
+			
+			var offsetX:Number = 0;
+			spaceToDistribute = Math.max(0, _width - width);
+			switch(_backgroundImageOffsetXValueType) {
+				default:
+				case DisplayValueType.PIXEL:
+				offsetX = _backgroundImageOffsetX;
+				break;
+				
+				case DisplayValueType.PERCENTAGE:
+				offsetX = (_backgroundImageOffsetY / 100) * spaceToDistribute;
+				break;
 			}
 			
-			return p;
+			var offsetY:Number = 0;
+			spaceToDistribute = Math.max(0, _height - height);
+			switch(_backgroundImageOffsetYValueType) {
+				default:
+				case DisplayValueType.PIXEL:
+				offsetY = _backgroundImageOffsetY;
+				break;
+				
+				case DisplayValueType.PERCENTAGE:
+				offsetY = (_backgroundImageOffsetY / 100) * spaceToDistribute;
+				break;
+			}
+			
+			var x:Number = 0;
+			switch(_backgroundImageHorizontalFloat) {
+				default:
+				case Align.LEFT:
+				x = 0 + offsetX;
+				break;
+				
+				case Align.CENTER:
+				x = _width / 2 - width / 2 + offsetX;
+				break;
+				
+				case Align.RIGHT:
+				x = _width - width - offsetX;
+				break;
+			}
+			
+			var y:Number = 0;
+			switch(_backgroundImageVerticalFloat) {
+				default:
+				case Align.TOP:
+				y = 0 + offsetY;
+				break;
+				
+				case Align.CENTER:
+				y = _height / 2 - height / 2 + offsetY;
+				break;
+				
+				case Align.BOTTOM:
+				y = _height - height - offsetY;
+				break;
+			}
+			
+			trace(x, y, width, height);
+			return new Rectangle(x, y, width, height);
 		}
 		
 		protected function drawOutline ( x:Number = 0, y:Number = 0, width:Number = NaN, height:Number = NaN ):void {
@@ -476,11 +550,7 @@
 		protected function processBackgroundImageBitmap ( ):void {
 			var bitmap:Bitmap = Bitmap(_backgroundImage);
 			var bitmapData:BitmapData = bitmap.bitmapData;
-			if (!_backgroundImageScaleGrid) {
-				_backgroundBitmapData = bitmapData.clone();
-			} else {
-				_backgroundBitmapData = this.getScaledBitmapData(bitmapData);
-			}
+			_backgroundBitmapData = bitmapData.clone();
 		}
 		
 		protected function getScaledBitmapData ( source:BitmapData ):BitmapData {
@@ -706,6 +776,14 @@
 				case "backgroundImage":
 				this.parseBackgroundImage(value);
 				break;
+				
+				case "backgroundPosition":
+				this.parseBackgroundPosition(value);
+				break;
+				
+				case "backgroundSize":
+				this.parseBackgroundSize(value);
+				break;
 			}
 		}
 		
@@ -728,6 +806,68 @@
 			} else {
 				this.backgroundImage = null;
 			}
+		}
+		
+		protected function parseBackgroundSize ( value:String ):void {
+				
+		}
+		
+		protected function parseBackgroundPosition ( value:String ):void {
+			var horizontalFloat:String = Align.CENTER, verticalFloat:String = Align.CENTER;
+			var offsetX:Number = 0, offsetY:Number = 0;
+			var offsetXValueType:String = DisplayValueType.PERCENTAGE;
+			var offsetYValueType:String = DisplayValueType.PERCENTAGE;
+			
+			var match:Array = value.match(/(top|bottom|right|left|center)|(\d+(px|%)?)/g);
+			var value:String;
+			var keywordRegExp:RegExp = /(top|bottom|right|left|center)/;
+			var valueRegExp:RegExp = /(\d+)(px|%)?/;
+			var childMatch:Array;
+			var verticalFloatSet:Boolean;
+			if (match) {
+				var index:int = 0;
+				var val:Number, valueType:String;
+				var type:String;
+				
+				/*while (match[index] != undefined) {
+					value = match[index];
+					index++;
+					if ((childMatch = value.match(keywordRegExp))) {
+						if (verticalFloatSet || childMatch[1] == "left" || childMatch[1] == "right") {
+							type = "horizontal";
+							horizontalFloat = childMatch[1];
+						} else {
+							type = "vertical";
+							verticalFloat = childMatch[1];
+							verticalFloatSet = true;
+						}
+					} else if ((childMatch = value.match(valueRegExp))) {
+						val = childMatch[1];
+						switch(childMatch[2]) {
+							default:
+							case "px":
+							valueType = DisplayValueType.PIXEL;
+							break;
+							
+							case "%":
+							valueType = DisplayValueType.PERCENTAGE;
+							break;
+						}
+						if (type == "horizontal") {
+							offsetX = val;
+							offsetXValueType = valueType;
+							type = "vertical";
+						} else {
+							offsetY = val;
+							offsetYValueType = valueType;
+							type = "horizontal";
+						}
+					}
+					
+				}*/
+			}
+			
+			trace(offsetX, offsetXValueType, offsetY, offsetYValueType);
 		}
 		
 		protected function setBackgroundImage ( displayObject:DisplayObject ):void {
@@ -1055,7 +1195,6 @@
 			if (_backgroundImageScaleGrid != value) {
 				_backgroundImageScaleGrid = value;
 				this.invalidate();
-				this.invalidateBackgroundImage();
 			}
 		}
 		
@@ -1064,7 +1203,6 @@
 			if(_backgroundImageColor != value) {
 				_backgroundImageColor = value;
 				this.invalidate();
-				this.invalidateBackgroundImage();
 			}
 		}
 		
@@ -1088,6 +1226,46 @@
 		public function set drawable ( value:Drawable ):void {
 			if (_drawable != value) {
 				this.setDrawable(value);
+			}
+		}
+		
+		public function get backgroundImageWidth ( ):Number { return _backgroundImageWidth; }
+		public function set backgroundImageWidth ( value:Number ):void {
+			if (_backgroundImageWidth != value) {
+				_backgroundImageWidth = value;
+				this.invalidate();
+			}
+		}
+		
+		public function get backgroundImageHeight ( ):Number { return _backgroundImageHeight; }
+		public function set backgroundImageHeight ( value:Number ):void {
+			if (_backgroundImageHeight != value) {
+				_backgroundImageHeight = value;
+				this.invalidate();
+			}
+		}
+		
+		public function get backgroundImageWidthValueType ( ):String { return _backgroundImageWidthValueType; }
+		public function set backgroundImageWidthValueType ( value:String ):void {
+			if (_backgroundImageWidthValueType != value) {
+				_backgroundImageWidthValueType = value;
+				this.invalidate();
+			}
+		}
+		
+		public function get backgroundImageHeightValueType ( ):String { return _backgroundImageHeightValueType; }
+		public function set backgroundImageHeightValueType ( value:String ):void {
+			if (_backgroundImageHeightValueType != value) {
+				_backgroundImageHeightValueType = value;
+				this.invalidate();
+			}
+		}
+		
+		public function get backgroundImageScaleMode ( ):String { return _backgroundImageScaleMode; }
+		public function set backgroundImageScaleMode ( value:String ):void {
+			if (_backgroundImageScaleMode != value) {
+				_backgroundImageScaleMode = value;
+				this.invalidate();
 			}
 		}
 	}
