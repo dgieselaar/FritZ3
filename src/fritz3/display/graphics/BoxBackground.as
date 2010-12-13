@@ -17,9 +17,12 @@
 	import fritz3.binding.AccessType;
 	import fritz3.binding.Binding;
 	import fritz3.display.core.DisplayValueType;
+	import fritz3.display.graphics.parser.BackgroundPositionData;
+	import fritz3.display.graphics.parser.BackgroundPositionParser;
 	import fritz3.display.graphics.utils.getGradientMatrix;
 	import fritz3.display.layout.Align;
 	import fritz3.invalidation.Invalidatable;
+	import fritz3.style.PropertyParser;
 	import fritz3.utils.assets.AssetLoader;
 	import fritz3.utils.assets.image.ImageAssetLoader;
 	import fritz3.utils.assets.image.ImageAssetManager;
@@ -33,6 +36,8 @@
 		
 		protected var _drawable:Drawable;
 		protected var _parameters:Object;
+		
+		protected var _parsers:Object = { };
 		
 		protected var _width:Number;
 		protected var _height:Number;
@@ -99,8 +104,28 @@
 		
 		public function BoxBackground ( parameters:Object = null ) {
 			_parameters = parameters;
+			this.setParsers()
 			this.setDefaultProperties();
 			this.applyParameters();
+		}
+		
+		protected function setParsers ( ):void {
+			this.addParser("backgroundPosition", BackgroundPositionParser.parser);
+		}
+		
+		protected function addParser ( propertyName:String, parser:PropertyParser ):void {
+			if (_parsers[propertyName]) {
+				this.removeParser(propertyName, PropertyParser(_parsers[propertyName]));
+			}
+			_parsers[propertyName] = parser;
+		}
+		
+		protected function removeParser ( propertyName:String, parser:PropertyParser ):void {
+			delete _parsers[propertyName];
+		}
+		
+		protected function getParser ( propertyName:String ):PropertyParser {
+			return _parsers[propertyName];
 		}
 		
 		protected function setDefaultProperties ( ):void {
@@ -813,92 +838,17 @@
 		}
 		
 		protected function parseBackgroundPosition ( value:String ):void {
-			var horizontalFloat:String = Align.CENTER, verticalFloat:String = Align.CENTER;
-			var offsetX:Number = 0, offsetY:Number = 0;
-			var offsetXValueType:String = DisplayValueType.PERCENTAGE;
-			var offsetYValueType:String = DisplayValueType.PERCENTAGE;
-			
-			// TODO: move to BackgroundPositionParser class with caching
-			
-			var match:Array = value.match(/(^((center|(left|right)|(top|bottom))\s*)?((\d+)(%|px)?)?$)|(^(((center|left|right)\s*)?((\d+)(%|px)?)?)\s*(((center|top|bottom)\s*)?((\d+)(%|px)?)?)$)/);
-			var value:String;
-			var keywordRegExp:RegExp = /(top|bottom|right|left|center)/;
-			var valueRegExp:RegExp = /(\d+)(px|%)?/;
-			var childMatch:Array;
-			var val:Number, valueType:String;
-			var type:String;
-			if (match && match[1]) {
-				type = match[5] ? "vertical" : "horizontal";
-				val = match[7];
-				switch(match[8]) {
-					default:
-					case "px":
-					valueType = DisplayValueType.PIXEL;
-					break;
-					
-					case "%":
-					valueType = DisplayValueType.PERCENTAGE;
-					break;
-				}
-				switch(type) {
-					case "horizontal":
-					horizontalFloat = match[3];
-					offsetX = val;
-					offsetXValueType = valueType;
-					break;
-					
-					case "vertical":
-					verticalFloat = match[3];
-					offsetY = val;
-					offsetYValueType = valueType;
-					break;
-				}
-			} else if (match && match[9]) {
-				if (match[10]) {
-					if (match[12]) {
-						horizontalFloat = match[12];
-					}
-					if (match[14]) {
-						offsetX = match[14];
-					}
-					switch(match[15]) {
-						default:
-						case "px":
-						offsetXValueType = DisplayValueType.PIXEL;
-						break;
-						
-						case "%":
-						offsetXValueType = DisplayValueType.PERCENTAGE;
-						break;
-					}
-				}
-				if (match[16]) {
-					if (match[18]) {
-						verticalFloat = match[18];
-					}
-					if (match[20]) {
-						offsetY = match[20];
-					}
-					switch(match[21]) {
-						default:
-						case "px":
-						offsetYValueType = DisplayValueType.PIXEL;
-						break;
-						
-						case "%":
-						offsetYValueType = DisplayValueType.PERCENTAGE;
-						break;
-					}
-				}
+			var parser:PropertyParser = this.getParser("backgroundPosition");
+			if (parser) {
+				var data:BackgroundPositionData = BackgroundPositionData(parser.parseValue(value));
+				this.backgroundImageHorizontalFloat = data.horizontalFloat;
+				this.backgroundImageOffsetX = data.offsetX;
+				this.backgroundImageOffsetXValueType = data.offsetXValueType;
+				
+				this.backgroundImageVerticalFloat = data.verticalFloat;
+				this.backgroundImageOffsetY = data.offsetY;
+				this.backgroundImageOffsetYValueType = data.offsetYValueType;
 			}
-			
-			this.backgroundImageHorizontalFloat = horizontalFloat;
-			this.backgroundImageOffsetX = offsetX;
-			this.backgroundImageOffsetXValueType = offsetXValueType;
-			
-			this.backgroundImageVerticalFloat = verticalFloat;
-			this.backgroundImageOffsetY = offsetY;
-			this.backgroundImageOffsetYValueType = offsetYValueType;
 		}
 		
 		protected function setBackgroundImage ( displayObject:DisplayObject ):void {
