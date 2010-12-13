@@ -390,15 +390,16 @@
 		
 		protected function drawBackgroundBitmap ( ):void {
 			var graphics:Graphics = _graphics;
-			var ct:ColorTransform = new ColorTransform();
-			if (_backgroundImageColor) {
-				ct.color = uint(_backgroundImageColor);
-			}
-			ct.alphaMultiplier = _backgroundImageAlpha;
-			
-			_backgroundBitmapData.colorTransform(_backgroundBitmapData.rect, ct);
 			
 			var rect:Rectangle = this.getBackgroundDimensions();
+			var data:BitmapData = this.processBitmapData(rect);
+			var m:Matrix = new Matrix();
+			m.translate(rect.x, rect.y);
+			graphics.beginBitmapFill(_backgroundBitmapData, m, true, _backgroundImageAntiAliasing);
+			this.drawOutline(rect.x, rect.y, rect.width, rect.height);
+			graphics.endFill();
+			
+			
 			/*var m:Matrix = new Matrix();
 			m.translate(p.x, p.y);
 			graphics.beginBitmapFill(_backgroundBitmapData, m, true, _backgroundImageAntiAliasing);
@@ -413,6 +414,19 @@
 			graphics.endFill();*/
 			
 		}
+		
+		protected function processBitmapData ( rect:Rectangle ):BitmapData {
+			var ct:ColorTransform = new ColorTransform();
+			if (_backgroundImageColor) {
+				ct.color = uint(_backgroundImageColor);
+			}
+			ct.alphaMultiplier = _backgroundImageAlpha;
+			_backgroundBitmapData.colorTransform(rect, ct);
+			
+			return _backgroundBitmapData;
+		}
+		
+		protected var _dimensions:Rectangle = new Rectangle();
 		
 		protected function getBackgroundDimensions ( ):Rectangle {
 			var width:Number, height:Number, scale:Number;
@@ -449,7 +463,7 @@
 					height = _backgroundImageHeight;
 					break;
 					
-					case DisplayValueType.PIXEL:
+					case DisplayValueType.PERCENTAGE:
 					height = (_backgroundImageHeight / 100) * _height;
 					break;
 				}
@@ -515,8 +529,8 @@
 				break;
 			}
 			
-			trace(x, y, width, height);
-			return new Rectangle(x, y, width, height);
+			_dimensions.x = x, _dimensions.y = y, _dimensions.width = width, _dimensions.height = height;
+			return _dimensions;
 		}
 		
 		protected function drawOutline ( x:Number = 0, y:Number = 0, width:Number = NaN, height:Number = NaN ):void {
@@ -533,8 +547,13 @@
 			
 			switch(_fillType) {
 				case FillType.RECTANGLE:
-				if (_roundedCorners || _topLeftCorner || _topRightCorner || _bottomLeftCorner || _bottomRightCorner) {
-					_graphics.drawRoundRectComplex(x, y, width, height, _topLeftCorner, _topRightCorner, _bottomLeftCorner, _bottomRightCorner);
+				var roundedCorners:Number = _roundedCorners;
+				var topLeftCorner:Number = Math.max(0, _topLeftCorner - Math.max(x,y));
+				var topRightCorner:Number = Math.max(0, _topRightCorner - Math.max(_width - (x+width), y));
+				var bottomLeftCorner:Number = Math.max(0, _bottomLeftCorner - Math.max(x,_height - (y+height)));
+				var bottomRightCorner:Number = Math.max(0, _bottomLeftCorner - Math.max(_width - (x + width), _height - (y + height)));
+				if (roundedCorners || topLeftCorner || topRightCorner || bottomLeftCorner || bottomRightCorner) {
+					_graphics.drawRoundRectComplex(x, y, width, height, topLeftCorner, topRightCorner, bottomLeftCorner, bottomRightCorner);
 				} else {
 					_graphics.drawRect(x, y, width, height);
 				}
