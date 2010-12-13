@@ -17,8 +17,10 @@
 	import fritz3.binding.AccessType;
 	import fritz3.binding.Binding;
 	import fritz3.display.core.DisplayValueType;
-	import fritz3.display.graphics.parser.BackgroundPositionData;
-	import fritz3.display.graphics.parser.BackgroundPositionParser;
+	import fritz3.display.graphics.parser.position.BackgroundPositionData;
+	import fritz3.display.graphics.parser.position.BackgroundPositionParser;
+	import fritz3.display.graphics.parser.size.BackgroundSizeData;
+	import fritz3.display.graphics.parser.size.BackgroundSizeParser;
 	import fritz3.display.graphics.utils.getGradientMatrix;
 	import fritz3.display.layout.Align;
 	import fritz3.invalidation.Invalidatable;
@@ -111,6 +113,7 @@
 		
 		protected function setParsers ( ):void {
 			this.addParser("backgroundPosition", BackgroundPositionParser.parser);
+			this.addParser("backgroundSize", BackgroundSizeParser.parser);
 		}
 		
 		protected function addParser ( propertyName:String, parser:PropertyParser ):void {
@@ -833,10 +836,6 @@
 			}
 		}
 		
-		protected function parseBackgroundSize ( value:String ):void {
-				
-		}
-		
 		protected function parseBackgroundPosition ( value:String ):void {
 			var parser:PropertyParser = this.getParser("backgroundPosition");
 			if (parser) {
@@ -848,6 +847,19 @@
 				this.backgroundImageVerticalFloat = data.verticalFloat;
 				this.backgroundImageOffsetY = data.offsetY;
 				this.backgroundImageOffsetYValueType = data.offsetYValueType;
+			}
+		}
+		
+		protected function parseBackgroundSize ( value:String ):void {
+			var parser:PropertyParser = this.getParser("backgroundSize");
+			if (parser) {
+				var data:BackgroundSizeData = BackgroundSizeData(parser.parseValue(value));
+				
+				this.backgroundImageWidth = data.backgroundImageWidth;
+				this.backgroundImageWidthValueType = data.backgroundImageWidthValueType;
+				
+				this.backgroundImageHeight = data.backgroundImageHeight;
+				this.backgroundImageHeightValueType = data.backgroundImageHeightValueType;
 			}
 		}
 		
