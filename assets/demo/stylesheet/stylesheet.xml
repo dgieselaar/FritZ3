@@ -12,11 +12,11 @@
 	</rule>
 	
 	<rule where="GraphicsComponent">
-		<property name="background.backgroundColor">0xFF00FF</property>
+		<property name="background.backgroundColor">0xCECECE</property>
 		<property name="background.roundedCorners">10</property>
 		<property name="background.background-image">url("http://a3.twimg.com/profile_images/1181990527/ProfilePhoto_normal.png")</property>
 		<property name="background.background-position">center center</property>
-		<property name="background.background-size">40% auto</property>
+		<property name="background.background-size">auto 100%</property>
 		<property name="width">250</property>
 		<property name="height">200</property>
 	</rule>
