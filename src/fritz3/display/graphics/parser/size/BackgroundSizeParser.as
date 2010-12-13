@@ -41,14 +41,20 @@ package fritz3.display.graphics.parser.size  {
 				if (match[8] || match[9]) {
 					scaleMode = match[8] || match[9];
 				} else {
-					width = match[3];
-					if (match[4]) {
-						widthValueType = match[4];
+					if (match[2] != "auto") {
+						width = match[3];
+						if (match[4]) {
+							widthValueType = match[4];
+						}
 					}
 					if (match[5]) {
-						height = match[6];
-						if (match[7]) { 
-							heightValueType = match[7];
+						if(match[5] != "auto") {
+							height = match[6];
+							if (match[7]) { 
+								heightValueType = match[7];
+							} else {
+								heightValueType = DisplayValueType.PIXEL;
+							}
 						}
 					} 
 				}
