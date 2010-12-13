@@ -8,8 +8,8 @@ package fritz3.style.selector {
 	 */
 	public class ObjectCache {
 		
-		protected static var _objectCache:Dictionary = new Dictionary();
-		protected static var _objectCachePool:Array = [];
+		protected static var _objectCache:Dictionary;
+		protected static var _objectCachePool:Array;
 		
 		public var object:Object;
 		
@@ -43,6 +43,11 @@ package fritz3.style.selector {
 		public var onlyOfType:Boolean;
 		public var nthOfType:int;
 		public var nthLastOfType:int;
+		
+		{
+			_objectCache = new Dictionary();
+			_objectCachePool = [];
+		}
 		
 		public function ObjectCache ( ) {
 			

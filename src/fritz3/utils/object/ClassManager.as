@@ -7,7 +7,11 @@ package fritz3.utils.object {
 	 */
 	internal class ClassManager {
 		
-		protected static var _classByAlias:Object = { };;
+		protected static var _classByAlias:Object;
+		
+		{
+			_classByAlias = { };
+		}
 		
 		public function ClassManager ( ) {
 		}

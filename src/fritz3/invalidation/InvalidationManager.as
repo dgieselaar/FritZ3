@@ -7,13 +7,19 @@
 	 */
 	public class InvalidationManager {
 		
-		private static var _priorities:Array = [];
-		private static var _firstNodeByPriority:Object = { };
-		private static var _lastNodeByPriority:Object = { };
+		private static var _priorities:Array;
+		private static var _firstNodeByPriority:Object;
+		private static var _lastNodeByPriority:Object;
 		private static var _stage:Stage;
 		
-		private static var _minFrameRate:Number = NaN;
+		private static var _minFrameRate:Number;
 		private static var _atNode:InvalidationHelper;
+		
+		{
+			_priorities = [];
+			_firstNodeByPriority = { };
+			_lastNodeByPriority = { };
+		}
 		
 		public function InvalidationManager ( ) {
 			

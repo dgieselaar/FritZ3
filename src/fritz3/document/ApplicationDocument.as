@@ -41,7 +41,6 @@ package fritz3.document  {
 			}
 			_initialized = true;
 			this.getClassDefinitions();
-			StyleManager.init();
 			super.initializeComponent();
 		}
 		

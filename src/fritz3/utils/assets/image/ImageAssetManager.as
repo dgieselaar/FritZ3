@@ -11,8 +11,13 @@ package fritz3.utils.assets.image {
 	 */
 	public class ImageAssetManager {
 		
-		protected static var _imagesByURL:Object = { };
-		protected static var _loadersByURL:Object = { };
+		protected static var _imagesByURL:Object;
+		protected static var _loadersByURL:Object;
+		
+		{ 
+			_imagesByURL = { };
+			_loadersByURL = { };
+		}
 		
 		public function ImageAssetManager ( ) {
 			

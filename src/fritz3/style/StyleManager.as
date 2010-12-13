@@ -15,21 +15,23 @@ package fritz3.style {
 		
 		public static const DEFAULT_STYLESHEET_ID:String = null;
 		
-		protected static var _firstNodeByID:Object = { };
-		protected static var _lastNodeByID:Object = { };
+		protected static var _firstNodeByID:Object;
+		protected static var _lastNodeByID:Object;
 		
 		protected static var _onChange:StyleManagerInvalidationSignal;
 		protected static var _invalidationHelper:InvalidationHelper;
 		
-		public function StyleManager ( ) {
-			
-		}
-		
-		public static function init ( ):void {
+		{
+			_firstNodeByID = { };
+			_lastNodeByID = { };
 			_onChange = new StyleManagerInvalidationSignal();
 			_invalidationHelper = new InvalidationHelper();
 			_invalidationHelper.append(dispatchChange);
 			_invalidationHelper.priority = InvalidationPriorityTreshold.DISPLAY_INVALIDATION + 1;
+		}
+		
+		public function StyleManager ( ) {
+			
 		}
 		
 		public static function reset ( ):void {
