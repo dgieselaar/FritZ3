@@ -5,8 +5,8 @@ package fritz3.display.core {
 	 */
 	public class DisplayValueType {
 		
-		public static const PIXEL:String = "pixel";
-		public static const PERCENTAGE:String = "percentage";
+		public static const PIXEL:String = "px";
+		public static const PERCENTAGE:String = "%";
 		public static const AUTO:String = "auto";
 		
 		public function DisplayValueType ( ) {
