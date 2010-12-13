@@ -818,56 +818,87 @@
 			var offsetXValueType:String = DisplayValueType.PERCENTAGE;
 			var offsetYValueType:String = DisplayValueType.PERCENTAGE;
 			
-			var match:Array = value.match(/(top|bottom|right|left|center)|(\d+(px|%)?)/g);
+			// TODO: move to BackgroundPositionParser class with caching
+			
+			var match:Array = value.match(/(^((center|(left|right)|(top|bottom))\s*)?((\d+)(%|px)?)?$)|(^(((center|left|right)\s*)?((\d+)(%|px)?)?)\s*(((center|top|bottom)\s*)?((\d+)(%|px)?)?)$)/);
 			var value:String;
 			var keywordRegExp:RegExp = /(top|bottom|right|left|center)/;
 			var valueRegExp:RegExp = /(\d+)(px|%)?/;
 			var childMatch:Array;
-			var verticalFloatSet:Boolean;
-			if (match) {
-				var index:int = 0;
-				var val:Number, valueType:String;
-				var type:String;
-				
-				/*while (match[index] != undefined) {
-					value = match[index];
-					index++;
-					if ((childMatch = value.match(keywordRegExp))) {
-						if (verticalFloatSet || childMatch[1] == "left" || childMatch[1] == "right") {
-							type = "horizontal";
-							horizontalFloat = childMatch[1];
-						} else {
-							type = "vertical";
-							verticalFloat = childMatch[1];
-							verticalFloatSet = true;
-						}
-					} else if ((childMatch = value.match(valueRegExp))) {
-						val = childMatch[1];
-						switch(childMatch[2]) {
-							default:
-							case "px":
-							valueType = DisplayValueType.PIXEL;
-							break;
-							
-							case "%":
-							valueType = DisplayValueType.PERCENTAGE;
-							break;
-						}
-						if (type == "horizontal") {
-							offsetX = val;
-							offsetXValueType = valueType;
-							type = "vertical";
-						} else {
-							offsetY = val;
-							offsetYValueType = valueType;
-							type = "horizontal";
-						}
-					}
+			var val:Number, valueType:String;
+			var type:String;
+			if (match && match[1]) {
+				type = match[5] ? "vertical" : "horizontal";
+				val = match[7];
+				switch(match[8]) {
+					default:
+					case "px":
+					valueType = DisplayValueType.PIXEL;
+					break;
 					
-				}*/
+					case "%":
+					valueType = DisplayValueType.PERCENTAGE;
+					break;
+				}
+				switch(type) {
+					case "horizontal":
+					horizontalFloat = match[3];
+					offsetX = val;
+					offsetXValueType = valueType;
+					break;
+					
+					case "vertical":
+					verticalFloat = match[3];
+					offsetY = val;
+					offsetYValueType = valueType;
+					break;
+				}
+			} else if (match && match[9]) {
+				if (match[10]) {
+					if (match[12]) {
+						horizontalFloat = match[12];
+					}
+					if (match[14]) {
+						offsetX = match[14];
+					}
+					switch(match[15]) {
+						default:
+						case "px":
+						offsetXValueType = DisplayValueType.PIXEL;
+						break;
+						
+						case "%":
+						offsetXValueType = DisplayValueType.PERCENTAGE;
+						break;
+					}
+				}
+				if (match[16]) {
+					if (match[18]) {
+						verticalFloat = match[18];
+					}
+					if (match[20]) {
+						offsetY = match[20];
+					}
+					switch(match[21]) {
+						default:
+						case "px":
+						offsetYValueType = DisplayValueType.PIXEL;
+						break;
+						
+						case "%":
+						offsetYValueType = DisplayValueType.PERCENTAGE;
+						break;
+					}
+				}
 			}
 			
-			trace(offsetX, offsetXValueType, offsetY, offsetYValueType);
+			this.backgroundImageHorizontalFloat = horizontalFloat;
+			this.backgroundImageOffsetX = offsetX;
+			this.backgroundImageOffsetXValueType = offsetXValueType;
+			
+			this.backgroundImageVerticalFloat = verticalFloat;
+			this.backgroundImageOffsetY = offsetY;
+			this.backgroundImageOffsetYValueType = offsetYValueType;
 		}
 		
 		protected function setBackgroundImage ( displayObject:DisplayObject ):void {
