@@ -16,8 +16,8 @@
 		<property name="background.roundedCorners">10</property>
 		<property name="background.background-image">url("http://a2.twimg.com/profile_images/1184828794/foto_normal.png")</property>
 		<property name="background.background-position">center center</property>
-		<property name="background.background-size">100% 95</property>
-		<property name="background.background-repeat">round</property>
+		<property name="background.background-size">100% 100%</property>
+		<property name="background.background-repeat">round space</property>
 		<property name="width">250</property>
 		<property name="height">200</property>
 	</rule>
