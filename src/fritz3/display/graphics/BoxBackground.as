@@ -533,7 +533,16 @@
 					break;
 				}
 
-			}			
+			}
+			
+			if (_backgroundImageRepeatX == BackgroundImageRepeat.ROUND && _backgroundImageScaleMode == BackgroundImageScaleMode.NONE) {
+				width = Math.round(width / imageWidth) * imageWidth;
+			}
+			
+			if (_backgroundImageRepeatY == BackgroundImageRepeat.ROUND && _backgroundImageScaleMode == BackgroundImageScaleMode.NONE) {
+				height = Math.round(height / imageHeight) * imageHeight;
+			}
+			
 			var spaceToDistribute:Number;
 			
 			var offsetX:Number = 0;
@@ -593,8 +602,6 @@
 				y = _height - height - offsetY;
 				break;
 			}
-			
-			trace(x, y, width, height, _backgroundImageScaleMode);
 			
 			_dimensions.x = x, _dimensions.y = y, _dimensions.width = width, _dimensions.height = height;
 			return _dimensions;
