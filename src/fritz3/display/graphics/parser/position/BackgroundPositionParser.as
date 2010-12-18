@@ -66,6 +66,8 @@ package fritz3.display.graphics.parser.position  {
 				if (match[10]) {
 					if (match[12]) {
 						horizontalFloat = match[12];
+					} else {
+						horizontalFloat = Align.LEFT;
 					}
 					if (match[14]) {
 						offsetX = match[14];
@@ -77,6 +79,8 @@ package fritz3.display.graphics.parser.position  {
 				if (match[16]) {
 					if (match[18]) {
 						verticalFloat = match[18];
+					} else {
+						verticalFloat = Align.TOP;
 					}
 					if (match[20]) {
 						offsetY = match[20];
