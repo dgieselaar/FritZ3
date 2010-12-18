@@ -19,6 +19,8 @@
 	import fritz3.display.core.DisplayValueType;
 	import fritz3.display.graphics.parser.position.BackgroundPositionData;
 	import fritz3.display.graphics.parser.position.BackgroundPositionParser;
+	import fritz3.display.graphics.parser.repeat.BackgroundRepeatData;
+	import fritz3.display.graphics.parser.repeat.BackgroundRepeatParser;
 	import fritz3.display.graphics.parser.size.BackgroundSizeData;
 	import fritz3.display.graphics.parser.size.BackgroundSizeParser;
 	import fritz3.display.graphics.utils.getGradientMatrix;
@@ -114,6 +116,7 @@
 		protected function setParsers ( ):void {
 			this.addParser("backgroundPosition", BackgroundPositionParser.parser);
 			this.addParser("backgroundSize", BackgroundSizeParser.parser);
+			this.addParser("backgroundRepeat", BackgroundRepeatParser.parser);
 		}
 		
 		protected function addParser ( propertyName:String, parser:PropertyParser ):void {
@@ -395,7 +398,11 @@
 			var data:BitmapData = this.processBitmapData(rect);
 			var m:Matrix = new Matrix();
 			m.translate(rect.x, rect.y);
-			graphics.beginBitmapFill(_backgroundBitmapData, m, true, _backgroundImageAntiAliasing);
+			graphics.beginBitmapFill(data, m, true, _backgroundImageAntiAliasing);
+			rect.x = Math.max(0, rect.x);
+			rect.y = Math.max(0, rect.y);
+			rect.width = Math.min(_width, rect.width + rect.x) - rect.x;
+			rect.height = Math.min(_height, rect.height + rect.y) - rect.y;
 			this.drawOutline(rect.x, rect.y, rect.width, rect.height);
 			graphics.endFill();
 			
@@ -416,21 +423,79 @@
 		}
 		
 		protected function processBitmapData ( rect:Rectangle ):BitmapData {
+			var data:BitmapData;
+			var scaleX:Number = 1, scaleY:Number = 1, spaceX:Number = 0, spaceY:Number = 0;
+			
+			var imageWidth:Number = _backgroundImage.width, imageHeight:Number = _backgroundImage.height;
+			
+			var numX:int = Math.floor(rect.width / imageWidth);
+			var numY:int = Math.floor(rect.height / imageHeight);
+			
+			switch(_backgroundImageRepeatX) {
+				default:
+				case BackgroundImageRepeat.NO_REPEAT:
+				scaleX = rect.width / imageWidth;
+				break;
+				
+				case BackgroundImageRepeat.REPEAT:
+				scaleX = 1;
+				break;
+				
+				case BackgroundImageRepeat.SPACE:
+				scaleX = 1;
+				spaceX = (rect.width - (numX * imageWidth)) / (numX - 1);
+				break;
+				
+				case BackgroundImageRepeat.ROUND:
+				scaleX = rect.width / numX / imageWidth;
+				break;
+			}
+			
+			switch(_backgroundImageRepeatY) {
+				default:
+				case BackgroundImageRepeat.NO_REPEAT:
+				scaleY = rect.height / imageHeight;
+				break;
+				
+				case BackgroundImageRepeat.REPEAT:
+				scaleY = 1;
+				break;
+				
+				case BackgroundImageRepeat.SPACE:
+				scaleY = 1;
+				spaceY = (rect.height - (numY * imageHeight)) / (numY - 1);
+				break;
+				
+				case BackgroundImageRepeat.ROUND:
+				scaleY = rect.height / numY / imageHeight;
+				break;
+			}
+			
 			var ct:ColorTransform = new ColorTransform();
 			if (_backgroundImageColor) {
 				ct.color = uint(_backgroundImageColor);
 			}
 			ct.alphaMultiplier = _backgroundImageAlpha;
-			_backgroundBitmapData.colorTransform(rect, ct);
 			
-			return _backgroundBitmapData;
+			if (scaleX != 1 || scaleY != 1 || spaceX || spaceY) {
+				trace(spaceX);
+				data = new BitmapData(imageWidth * scaleX + spaceX, imageHeight * scaleY + spaceY, true, 0x00FFFFFF);
+				var m:Matrix = new Matrix();
+				m.scale(scaleX, scaleY);
+				data.draw(_backgroundBitmapData, m, ct, null, null, _backgroundImageAntiAliasing);
+			} else {
+				data = _backgroundBitmapData;
+				data.colorTransform(rect, ct);
+			}
+			
+			return data;
 		}
 		
 		protected var _dimensions:Rectangle = new Rectangle();
 		
 		protected function getBackgroundDimensions ( ):Rectangle {
 			var width:Number, height:Number, scale:Number;
-			var imageWidth:Number = _backgroundBitmapData.width, imageHeight:Number = _backgroundBitmapData.height;
+			var imageWidth:Number = _backgroundImage.width, imageHeight:Number = _backgroundImage.height;
 			if (_backgroundImageScaleMode == BackgroundImageScaleMode.CONTAIN) {
 				scale = _width / imageWidth > _height / imageHeight ? _width / imageWidth : _height / imageHeight;
 				width = imageWidth * scale, height = imageHeight * scale;
@@ -441,7 +506,7 @@
 				switch(_backgroundImageWidthValueType) {
 					default:
 					case DisplayValueType.AUTO:
-					width = _backgroundBitmapData.width;
+					width = imageWidth;
 					break;
 					
 					case DisplayValueType.PIXEL:
@@ -456,7 +521,7 @@
 				switch(_backgroundImageHeightValueType) {
 					default:
 					case DisplayValueType.AUTO:
-					height = _backgroundBitmapData.height;
+					height = imageHeight;
 					break;
 					
 					case DisplayValueType.PIXEL:
@@ -528,6 +593,8 @@
 				y = _height - height - offsetY;
 				break;
 			}
+			
+			trace(x, y, width, height, _backgroundImageScaleMode);
 			
 			_dimensions.x = x, _dimensions.y = y, _dimensions.width = width, _dimensions.height = height;
 			return _dimensions;
@@ -831,6 +898,10 @@
 				case "backgroundSize":
 				this.parseBackgroundSize(value);
 				break;
+				
+				case "backgroundRepeat":
+				this.parseBackgroundRepeat(value);
+				break;
 			}
 		}
 		
@@ -874,11 +945,21 @@
 			if (parser) {
 				var data:BackgroundSizeData = BackgroundSizeData(parser.parseValue(value));
 				
+				this.backgroundImageScaleMode = data.backgroundImageScaleMode;
 				this.backgroundImageWidth = data.backgroundImageWidth;
 				this.backgroundImageWidthValueType = data.backgroundImageWidthValueType;
 				
 				this.backgroundImageHeight = data.backgroundImageHeight;
 				this.backgroundImageHeightValueType = data.backgroundImageHeightValueType;
+			}
+		}
+		
+		protected function parseBackgroundRepeat ( value:String ):void {
+			var parser:PropertyParser = this.getParser("backgroundRepeat");
+			if (parser) {
+				var data:BackgroundRepeatData = BackgroundRepeatData(parser.parseValue(value));
+				this.backgroundImageRepeatX = data.repeatX;
+				this.backgroundImageRepeatY = data.repeatY;
 			}
 		}
 		
