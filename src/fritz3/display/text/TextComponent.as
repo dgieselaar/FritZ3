@@ -43,6 +43,8 @@ package fritz3.display.text {
 		protected var _paddingBottom:Number = 0;
 		protected var _paddingRight:Number = 0;
 		
+		protected var _textStyleType:String = TextStyleType.TEXTFORMAT;
+		
 		protected var _antiAliasType:String = AntiAliasType.NORMAL;
 		protected var _condenseWhite:Boolean = false;
 		protected var _css:String;
@@ -88,7 +90,7 @@ package fritz3.display.text {
 		}
 		
 		protected function initializeLayout ( ):void {
-			
+			this.layout = new TextLayout();
 		}
 		
 		protected function initializeBackground ( ):void {
@@ -101,7 +103,8 @@ package fritz3.display.text {
 		
 		override protected function setInvalidationMethodOrder ( ):void {
 			super.setInvalidationMethodOrder();
-			_invalidationHelper.insertBefore(this.setTextFieldDimensions, this.dispatchDisplayInvalidation);
+			_invalidationHelper.insertBefore(this.parseStyle, this.dispatchDisplayInvalidation);
+			_invalidationHelper.insertBefore(this.formatTextField, this.dispatchDisplayInvalidation);
 			_invalidationHelper.insertBefore(this.rearrange, this.dispatchDisplayInvalidation);
 			_invalidationHelper.insertBefore(this.measureDimensions, this.dispatchDisplayInvalidation);
 			_invalidationHelper.insertBefore(this.draw, this.dispatchDisplayInvalidation);
@@ -112,22 +115,6 @@ package fritz3.display.text {
 			this.antiAliasType = AntiAliasType.ADVANCED;
 			this.embedFonts = true;
 			this.multiline = true;
-		}
-		
-		protected function setTextFieldDimensions ( ):void {
-			
-		}
-		
-		protected function rearrange ( ):void {
-			_layout.rearrange(this, _textFieldArray);
-		}
-		
-		protected function measureDimensions ( ):void {
-			
-		}
-		
-		protected function draw ( ):void {
-			_background.draw(this);
 		}
 		
 		protected function setBackground ( background:Background ):void {
@@ -175,8 +162,35 @@ package fritz3.display.text {
 			_textFieldArray = [ textField ];
 		}
 		
-		protected function determineStyleType ( ):void {
+		protected function parseStyle ( ):void {
 			
+		}
+		
+		protected function formatTextField ( ):void {
+			
+		}
+		
+		protected function rearrange ( ):void {
+			_layout.rearrange(this, _textFieldArray);
+		}
+		
+		protected function measureDimensions ( ):void {
+			
+		}
+		
+		protected function draw ( ):void {
+			_background.draw(this);
+		}
+		
+		protected function determineStyleType ( ):String {
+			var styleType:String = TextStyleType.TEXTFORMAT;
+			
+			var spanMatch:Array;
+			if (_text.indexOf("<span") > 0 || ((spanMatch = _text.match(/<span/gm)) && spanMatch.length >= 2) || _text.match(/<a(.*?)>/gm) {
+				styleType = TextStyleType.STYLESHEET;
+			}
+			
+			return styleType;
 		}
 		
 		override protected function dispatchDisplayInvalidation ( ):void {
@@ -230,24 +244,144 @@ package fritz3.display.text {
 		protected function applyCondenseWhite ( ):void {
 			_textField.condenseWhite = _condenseWhite;
 			_invalidationHelper.invalidateMethod(this.formatTextField);
+			_invalidationHelper.invalidateMethod(this.measureDimensions);
 		}
 		
 		protected function applyCSS ( ):void {
 			_invalidationHelper.invalidateMethod(this.formatTextField);
+			_invalidationHelper.invalidateMethod(this.measureDimensions);
 		}
 		
 		protected function applyDisplayAsPassword ( ):void {
 			_textField.displayAsPassword = _displayAsPassword;
 			_invalidationHelper.invalidateMethod(this.formatTextField);
+			_invalidationHelper.invalidateMethod(this.measureDimensions);
 		}
 		
 		protected function applyEmbedFonts ( ):void {
 			_textField.embedFonts = _embedFonts;
 			_invalidationHelper.invalidateMethod(this.formatTextField);
+			_invalidationHelper.invalidateMethod(this.measureDimensions);
 		}
 		
 		protected function applyGridFitType ( ):void {
 			_textField.gridFitType = _gridFitType;
+		}
+		
+		protected function applyMaxChars ( ):void {
+			_textField.maxChars = _maxChars;
+			_invalidationHelper.invalidateMethod(this.formatTextField);
+			_invalidationHelper.invalidateMethod(this.measureDimensions);
+		}
+		
+		protected function applyMultiline ( ):void {
+			_textField.multiline = _multiline;
+			_invalidationHelper.invalidateMethod(this.formatTextField);
+			_invalidationHelper.invalidateMethod(this.measureDimensions);
+		}
+		
+		protected function applyRestrict ( ):void {
+			_textField.restrict = _restrict;
+			_invalidationHelper.invalidateMethod(this.formatTextField);
+			_invalidationHelper.invalidateMethod(this.measureDimensions);
+		}
+		
+		protected function applyScrollH ( ):void {
+			_textField.scrollH = _scrollH;
+		}
+		
+		protected function applyScrollV ( ):void {
+			_textField.scrollV = _scrollV;
+		}
+		
+		protected function applySharpness ( ):void {
+			_textField.sharpness = _sharpness;
+		}
+		
+		protected function applyThickness ( ):void {
+			_textField.thickness = _thickness;
+		}
+		
+		protected function applyText ( ):void {
+			var styleType:String = this.determineStyleType();
+			if (_textStyleType != styleType) {
+				_textStyleType = styleType;
+				_invalidationHelper.invalidateMethod(this.parseStyle);
+			}
+			
+			_invalidationHelper.invalidateMethod(this.formatTextField);
+			_invalidationHelper.invalidateMethod(this.measureDimensions);
+		}
+		
+		protected function applyType ( ):void {
+			_textField.type = _type;
+		}
+		
+		protected function applyWordWrap ( ):void {
+			_textField.wordWrap = _wordWrap;
+			_invalidationHelper.invalidateMethod(this.formatTextField);
+			_invalidationHelper.invalidateMethod(this.measureDimensions);
+		}
+		
+		protected function applyBlockIndent ( ):void {
+			_invalidationHelper.invalidateMethod(this.formatTextField);
+			_invalidationHelper.invalidateMethod(this.measureDimensions);
+		}
+		
+		protected function applyBullet ( ):void {
+			_invalidationHelper.invalidateMethod(this.parseStyle);
+		}
+		
+		protected function applyFontFamily ( ):void {
+			
+		}
+		
+		protected function applyColor ( ):void {
+			
+		}
+		
+		protected function applyFontWeight ( ):void {
+			
+		}
+		
+		protected function applyFontSize ( ):void {
+			
+		}
+		
+		protected function applyFontStyle ( ):void {
+			
+		}
+		
+		protected function applyIndent ( ):void {
+			
+		}
+		
+		protected function applyLetterSpacing ( ):void {
+			
+		}
+		
+		protected function applyKerning ( ):void {
+			
+		}
+		
+		protected function applyTabStops ( ):void {
+			
+		}
+		
+		protected function applyTarget ( ):void {
+			
+		}
+		
+		protected function applyURL ( ):void {
+			
+		}
+		
+		protected function applyTextAlign ( ):void {
+			
+		}
+		
+		protected function applyTextDecoration ( ):void {
+			
 		}
 		
 		override public function get width ( ):Number { return _width; }
