@@ -3,9 +3,11 @@ package fritz3.display.text {
 	import flash.text.engine.FontWeight;
 	import flash.text.FontStyle;
 	import flash.text.GridFitType;
+	import flash.text.StyleSheet;
 	import flash.text.TextField;
 	import flash.text.TextFieldAutoSize;
 	import flash.text.TextFieldType;
+	import flash.text.TextFormat;
 	import flash.text.TextFormatAlign;
 	import fritz3.display.core.PositionableDisplayComponent;
 	import fritz3.display.graphics.Background;
@@ -36,6 +38,9 @@ package fritz3.display.text {
 		protected var _measuredHeight:Number = 0;
 		
 		protected var _textFieldArray:Array;
+		
+		protected var _textFormat:TextFormat;
+		protected var _styleSheet:StyleSheet;
 		
 		protected var _padding:Number = 0;
 		protected var _paddingTop:Number = 0;
@@ -104,6 +109,7 @@ package fritz3.display.text {
 		override protected function setInvalidationMethodOrder ( ):void {
 			super.setInvalidationMethodOrder();
 			_invalidationHelper.insertBefore(this.parseStyle, this.dispatchDisplayInvalidation);
+			_invalidationHelper.insertBefore(this.applyStyle, this.dispatchDisplayInvalidation);
 			_invalidationHelper.insertBefore(this.formatTextField, this.dispatchDisplayInvalidation);
 			_invalidationHelper.insertBefore(this.rearrange, this.dispatchDisplayInvalidation);
 			_invalidationHelper.insertBefore(this.measureDimensions, this.dispatchDisplayInvalidation);
@@ -166,6 +172,10 @@ package fritz3.display.text {
 			
 		}
 		
+		protected function applyStyle ( ):void {
+			
+		}
+		
 		protected function formatTextField ( ):void {
 			
 		}
@@ -186,7 +196,7 @@ package fritz3.display.text {
 			var styleType:String = TextStyleType.TEXTFORMAT;
 			
 			var spanMatch:Array;
-			if (_text.indexOf("<span") > 0 || ((spanMatch = _text.match(/<span/gm)) && spanMatch.length >= 2) || _text.match(/<a(.*?)>/gm) {
+			if (_text.indexOf("<span") > 0 || ((spanMatch = _text.match(/<span/)) && spanMatch.length >= 2) || _text.match(/<a(.*?)>/)) {
 				styleType = TextStyleType.STYLESHEET;
 			}
 			
@@ -243,25 +253,15 @@ package fritz3.display.text {
 		
 		protected function applyCondenseWhite ( ):void {
 			_textField.condenseWhite = _condenseWhite;
-			_invalidationHelper.invalidateMethod(this.formatTextField);
-			_invalidationHelper.invalidateMethod(this.measureDimensions);
 		}
 		
 		protected function applyCSS ( ):void {
-			_invalidationHelper.invalidateMethod(this.formatTextField);
-			_invalidationHelper.invalidateMethod(this.measureDimensions);
 		}
 		
 		protected function applyDisplayAsPassword ( ):void {
-			_textField.displayAsPassword = _displayAsPassword;
-			_invalidationHelper.invalidateMethod(this.formatTextField);
-			_invalidationHelper.invalidateMethod(this.measureDimensions);
 		}
 		
 		protected function applyEmbedFonts ( ):void {
-			_textField.embedFonts = _embedFonts;
-			_invalidationHelper.invalidateMethod(this.formatTextField);
-			_invalidationHelper.invalidateMethod(this.measureDimensions);
 		}
 		
 		protected function applyGridFitType ( ):void {
@@ -271,19 +271,16 @@ package fritz3.display.text {
 		protected function applyMaxChars ( ):void {
 			_textField.maxChars = _maxChars;
 			_invalidationHelper.invalidateMethod(this.formatTextField);
-			_invalidationHelper.invalidateMethod(this.measureDimensions);
 		}
 		
 		protected function applyMultiline ( ):void {
 			_textField.multiline = _multiline;
 			_invalidationHelper.invalidateMethod(this.formatTextField);
-			_invalidationHelper.invalidateMethod(this.measureDimensions);
 		}
 		
 		protected function applyRestrict ( ):void {
 			_textField.restrict = _restrict;
 			_invalidationHelper.invalidateMethod(this.formatTextField);
-			_invalidationHelper.invalidateMethod(this.measureDimensions);
 		}
 		
 		protected function applyScrollH ( ):void {
@@ -307,10 +304,10 @@ package fritz3.display.text {
 			if (_textStyleType != styleType) {
 				_textStyleType = styleType;
 				_invalidationHelper.invalidateMethod(this.parseStyle);
+				_invalidationHelper.invalidateMethod(this.applyStyle);
 			}
 			
 			_invalidationHelper.invalidateMethod(this.formatTextField);
-			_invalidationHelper.invalidateMethod(this.measureDimensions);
 		}
 		
 		protected function applyType ( ):void {
@@ -318,18 +315,12 @@ package fritz3.display.text {
 		}
 		
 		protected function applyWordWrap ( ):void {
-			_textField.wordWrap = _wordWrap;
-			_invalidationHelper.invalidateMethod(this.formatTextField);
-			_invalidationHelper.invalidateMethod(this.measureDimensions);
 		}
 		
 		protected function applyBlockIndent ( ):void {
-			_invalidationHelper.invalidateMethod(this.formatTextField);
-			_invalidationHelper.invalidateMethod(this.measureDimensions);
 		}
 		
 		protected function applyBullet ( ):void {
-			_invalidationHelper.invalidateMethod(this.parseStyle);
 		}
 		
 		protected function applyFontFamily ( ):void {
@@ -337,27 +328,21 @@ package fritz3.display.text {
 		}
 		
 		protected function applyColor ( ):void {
-			
 		}
 		
 		protected function applyFontWeight ( ):void {
-			
 		}
 		
 		protected function applyFontSize ( ):void {
-			
 		}
 		
 		protected function applyFontStyle ( ):void {
-			
 		}
 		
 		protected function applyIndent ( ):void {
-			
 		}
 		
 		protected function applyLetterSpacing ( ):void {
-			
 		}
 		
 		protected function applyKerning ( ):void {
