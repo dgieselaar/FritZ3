@@ -20,6 +20,7 @@
 	import fritz3.display.graphics.BoxBackground;
 	import fritz3.display.graphics.utils.getGradientMatrix;
 	import fritz3.display.layout.Align;
+	import fritz3.display.text.TextComponent;
 	import fritz3.document.ApplicationDocument;
 	import fritz3.invalidation.InvalidationManager;
 	import fritz3.style.StandardStyleSheetCollector;
@@ -45,9 +46,9 @@
 			var styleSheetXML:XML = XML(new StyleSheetXML());
 			StyleManager.parseXML(styleSheetXML);
 			
-			var graphicsComponent:GraphicsComponent = new GraphicsComponent( { id: "1" } );
+			var textComponent:TextComponent = new TextComponent( { id: "1" } );
 			
-			this.add(graphicsComponent);
+			this.add(textComponent);
 			
 			//this.add(new GraphicsComponent( { id: "2" } ));
 			//this.add(new GraphicsComponent( { id: "3" } ));

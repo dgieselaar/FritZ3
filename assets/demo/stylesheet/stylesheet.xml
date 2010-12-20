@@ -11,15 +11,17 @@
 		<property name="layout.padding">10</property>
 	</rule>
 	
-	<rule where="GraphicsComponent">
-		<property name="background.backgroundColor">0xCECECE</property>
-		<property name="background.roundedCorners">10</property>
-		<property name="background.background-image">url("http://a2.twimg.com/profile_images/1184828794/foto_normal.png")</property>
-		<property name="background.background-position">center center</property>
-		<property name="background.background-size">100% 100%</property>
-		<property name="background.background-repeat">round space</property>
+	<rule where="#1">
+		<property name="background.background-color">0xFFFFFF</property>
+		<property name="background.border">1</property>
+		<property name="background.border-position">inside</property>
+		<property name="background.border-color">#000000</property>
 		<property name="width">250</property>
-		<property name="height">200</property>
+		<property name="height">100</property>
+		<property name="embed-fonts">false</property>
+		<property name="font-family">Arial</property>
+		<property name="padding">5</property>
+		<property name="text">Eva is een schatje</property>
 	</rule>
 
 </data>
