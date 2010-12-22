@@ -18,6 +18,7 @@ package fritz3.display.text {
 	import fritz3.display.layout.Rearrangable;
 	import fritz3.display.layout.RectangularLayout;
 	import fritz3.display.text.layout.TextLayout;
+	import fritz3.style.invalidation.InvalidatableStyleSheetCollector;
 	/**
 	 * ...
 	 * @author Dario Gieselaar
@@ -33,6 +34,9 @@ package fritz3.display.text {
 		
 		protected var _dispatchedWidth:Number = 0;
 		protected var _dispatchedHeight:Number = 0;
+		
+		protected var _autoWidth:Number = 0;
+		protected var _autoHeight:Number = 0;
 		
 		protected var _measuredWidth:Number = 0;
 		protected var _measuredHeight:Number = 0;
@@ -92,6 +96,8 @@ package fritz3.display.text {
 			this.initializeLayout();
 			this.initializeBackground();
 			this.initializeTextField();
+			this.initializeTextFormatObject();
+			this.initializeStyleSheetObject();
 		}
 		
 		protected function initializeLayout ( ):void {
@@ -104,6 +110,14 @@ package fritz3.display.text {
 		
 		protected function initializeTextField ( ):void {
 			this.textField = new TextField();
+		}
+		
+		protected function initializeTextFormatObject ( ):void {
+			_textFormat = new TextFormat();
+		}
+		
+		protected function initializeStyleSheetObject ( ):void {
+			_styleSheet = new StyleSheet();
 		}
 		
 		override protected function setInvalidationMethodOrder ( ):void {
@@ -173,10 +187,28 @@ package fritz3.display.text {
 		}
 		
 		protected function applyStyle ( ):void {
-			
+			switch(_textStyleType) {
+				case TextStyleType.TEXTFORMAT:
+				_textField.defaultTextFormat = _textFormat;
+				break;
+				
+				case TextStyleType.STYLESHEET:
+				_textField.styleSheet = _styleSheet;
+				break;
+			}
 		}
 		
 		protected function formatTextField ( ):void {
+			_textField.text = this.getFormattedString();
+			if(!_autoWidth) {
+				var availableWidth:Number = _width - _paddingLeft - _paddingRight;
+				_textField.width = availableWidth;
+			}
+			
+			if (!_autoHeight) {
+				var availableHeight:Number = _height - _paddingTop - _paddingBottom;
+				_textField.height = availableHeight;
+			}
 			
 		}
 		
@@ -201,6 +233,14 @@ package fritz3.display.text {
 			}
 			
 			return styleType;
+		}
+		
+		protected function getFormattedString ( ):String {
+			var formattedString:String = _text;
+			if (_textStyleType == TextStyleType.STYLESHEET) {
+				formattedString = "<p>" + formattedString + "</p>";
+			}
+			return formattedString;
 		}
 		
 		override protected function dispatchDisplayInvalidation ( ):void {
@@ -234,6 +274,14 @@ package fritz3.display.text {
 			}
 		}
 		
+		protected function applyAutoWidth ( ):void {
+			_invalidationHelper.invalidateMethod(this.formatTextField);
+		}
+		
+		protected function applyAutoHeight ( ):void {
+			_invalidationHelper.invalidateMethod(this.formatTextField);
+		}
+		
 		protected function applyPadding ( ):void {
 			if (_layout is TextLayout) {
 				var layout:TextLayout = TextLayout(_layout);
@@ -244,7 +292,6 @@ package fritz3.display.text {
 				layout.paddingRight = _paddingRight;
 			}
 			_invalidationHelper.invalidateMethod(this.measureDimensions);
-			_invalidationHelper.invalidateMethod(this.draw);
 		}
 		
 		protected function applyAntiAliasType ( ):void {
@@ -256,12 +303,22 @@ package fritz3.display.text {
 		}
 		
 		protected function applyCSS ( ):void {
+			_styleSheet.parseCSS(_css);
+			if (_textStyleType == TextStyleType.TEXTFORMAT) {
+				_invalidationHelper.invalidateMethod(this.parseStyle);
+			}
+			_invalidationHelper.invalidateMethod(this.applyStyle);
+			_invalidationHelper.invalidateMethod(this.formatTextField);
 		}
 		
 		protected function applyDisplayAsPassword ( ):void {
+			_textField.displayAsPassword = _displayAsPassword;
+			_invalidationHelper.invalidateMethod(this.formatTextField);
 		}
 		
 		protected function applyEmbedFonts ( ):void {
+			_textField.embedFonts = _embedFonts;
+			_invalidationHelper.invalidateMethod(this.formatTextField);
 		}
 		
 		protected function applyGridFitType ( ):void {
@@ -312,61 +369,205 @@ package fritz3.display.text {
 		
 		protected function applyType ( ):void {
 			_textField.type = _type;
+			this.invalidateCollector();
 		}
 		
 		protected function applyWordWrap ( ):void {
+			_textField.wordWrap = _wordWrap;
+			_invalidationHelper.invalidateMethod(this.formatTextField);
 		}
 		
 		protected function applyBlockIndent ( ):void {
+			_textFormat.blockIndent = _blockIndent;
+			if (_textStyleType == TextStyleType.TEXTFORMAT) {
+				_invalidationHelper.invalidateMethod(this.applyStyle);
+				_invalidationHelper.invalidateMethod(this.formatTextField);
+			}
 		}
 		
 		protected function applyBullet ( ):void {
+			_textFormat.bullet = _bullet;
+			if (_textStyleType == TextStyleType.TEXTFORMAT) {
+				_invalidationHelper.invalidateMethod(this.applyStyle);
+				_invalidationHelper.invalidateMethod(this.formatTextField);
+			}
 		}
 		
 		protected function applyFontFamily ( ):void {
-			
+			switch(_textStyleType) {
+				case TextStyleType.TEXTFORMAT:
+				_textFormat.font = _fontFamily;
+				trace("FontFamily: " + _fontFamily);
+				break;
+				
+				case TextStyleType.STYLESHEET:
+				var obj:Object = _styleSheet.getStyle("p");
+				obj.fontFamily = _fontFamily;
+				_styleSheet.setStyle("p", obj);
+				break;
+			}
+			_invalidationHelper.invalidateMethod(this.applyStyle);
+			_invalidationHelper.invalidateMethod(this.formatTextField);
 		}
 		
 		protected function applyColor ( ):void {
+			switch(_textStyleType) {
+				case TextStyleType.TEXTFORMAT:
+				_textFormat.color = _color;
+				break;
+				
+				case TextStyleType.STYLESHEET:
+				var obj:Object = _styleSheet.getStyle("p");
+				obj.color = _color;
+				_styleSheet.setStyle("p", obj);
+				break;
+			}
+			_invalidationHelper.invalidateMethod(this.applyStyle);
+			_invalidationHelper.invalidateMethod(this.formatTextField);
 		}
 		
 		protected function applyFontWeight ( ):void {
+			switch(_textStyleType) {
+				case TextStyleType.TEXTFORMAT:
+				_textFormat.bold = _fontWeight == FontWeight.BOLD;
+				break;
+				
+				case TextStyleType.STYLESHEET:
+				var obj:Object = _styleSheet.getStyle("p");
+				obj.fontWeight = _fontWeight;
+				_styleSheet.setStyle("p", obj);
+				break;
+			}
+			_invalidationHelper.invalidateMethod(this.applyStyle);
+			_invalidationHelper.invalidateMethod(this.formatTextField);
 		}
 		
 		protected function applyFontSize ( ):void {
+			switch(_textStyleType) {
+				case TextStyleType.TEXTFORMAT:
+				_textFormat.size = _fontSize;
+				break;
+				
+				case TextStyleType.STYLESHEET:
+				var obj:Object = _styleSheet.getStyle("p");
+				obj.fontSize = _fontSize;
+				_styleSheet.setStyle("p", obj);
+				break;
+			}
+			_invalidationHelper.invalidateMethod(this.applyStyle);
+			_invalidationHelper.invalidateMethod(this.formatTextField);
 		}
 		
 		protected function applyFontStyle ( ):void {
+			switch(_textStyleType) {
+				case TextStyleType.TEXTFORMAT:
+				_textFormat.italic = _fontStyle == FontStyle.ITALIC;
+				break;
+				
+				case TextStyleType.STYLESHEET:
+				var obj:Object = _styleSheet.getStyle("p");
+				obj.fontStyle = _fontStyle;
+				_styleSheet.setStyle("p", obj);
+				break;
+			}
+			_invalidationHelper.invalidateMethod(this.applyStyle);
+			_invalidationHelper.invalidateMethod(this.formatTextField);
 		}
 		
 		protected function applyIndent ( ):void {
+			_textFormat.indent = _indent;
+			if (_textStyleType == TextStyleType.TEXTFORMAT) {
+				_invalidationHelper.invalidateMethod(this.applyStyle);
+				_invalidationHelper.invalidateMethod(this.formatTextField);
+			}
 		}
 		
 		protected function applyLetterSpacing ( ):void {
+			switch(_textStyleType) {
+				case TextStyleType.TEXTFORMAT:
+				_textFormat.letterSpacing = _letterSpacing;
+				break;
+				
+				case TextStyleType.STYLESHEET:
+				var obj:Object = _styleSheet.getStyle("p");
+				obj.letterSpacing = _letterSpacing;
+				_styleSheet.setStyle("p", obj);
+				break;
+			}
+			_invalidationHelper.invalidateMethod(this.applyStyle);
+			_invalidationHelper.invalidateMethod(this.formatTextField);
 		}
 		
 		protected function applyKerning ( ):void {
-			
+			switch(_textStyleType) {
+				case TextStyleType.TEXTFORMAT:
+				_textFormat.kerning = _kerning;
+				break;
+				
+				case TextStyleType.STYLESHEET:
+				var obj:Object = _styleSheet.getStyle("p");
+				obj.kerning = _kerning;
+				_styleSheet.setStyle("p", obj);
+				break;
+			}
+			_invalidationHelper.invalidateMethod(this.applyStyle);
+			_invalidationHelper.invalidateMethod(this.formatTextField);
 		}
 		
 		protected function applyTabStops ( ):void {
-			
+			_textFormat.tabStops = _tabStops;
+			if (_textStyleType == TextStyleType.TEXTFORMAT) {
+				_invalidationHelper.invalidateMethod(this.applyStyle);
+				_invalidationHelper.invalidateMethod(this.formatTextField);
+			}
 		}
 		
 		protected function applyTarget ( ):void {
-			
+			_textFormat.target = _target;
+			if (_textStyleType == TextStyleType.TEXTFORMAT) {
+				_invalidationHelper.invalidateMethod(this.applyStyle);
+				_invalidationHelper.invalidateMethod(this.formatTextField);
+			}
 		}
 		
 		protected function applyURL ( ):void {
-			
+			_textFormat.target = _target;
+			if (_textStyleType == TextStyleType.TEXTFORMAT) {
+				_invalidationHelper.invalidateMethod(this.applyStyle);
+				_invalidationHelper.invalidateMethod(this.formatTextField);
+			}
 		}
 		
 		protected function applyTextAlign ( ):void {
-			
+			switch(_textStyleType) {
+				case TextStyleType.TEXTFORMAT:
+				_textFormat.align = _textAlign;
+				break;
+				
+				case TextStyleType.STYLESHEET:
+				var obj:Object = _styleSheet.getStyle("p");
+				obj.textAlign = _textAlign;
+				_styleSheet.setStyle("p", obj);
+				break;
+			}
+			_invalidationHelper.invalidateMethod(this.applyStyle);
+			_invalidationHelper.invalidateMethod(this.formatTextField);
 		}
 		
 		protected function applyTextDecoration ( ):void {
-			
+			switch(_textStyleType) {
+				case TextStyleType.TEXTFORMAT:
+				_textFormat.underline = _textDecoration == TextDecoration.UNDERLINE;
+				break;
+				
+				case TextStyleType.STYLESHEET:
+				var obj:Object = _styleSheet.getStyle("p");
+				obj.textDecoration = _textDecoration;
+				_styleSheet.setStyle("p", obj);
+				break;
+			}
+			_invalidationHelper.invalidateMethod(this.applyStyle);
+			_invalidationHelper.invalidateMethod(this.formatTextField);
 		}
 		
 		override public function get width ( ):Number { return _width; }
@@ -691,6 +892,22 @@ package fritz3.display.text {
 			if (_textDecoration != value) {
 				_textDecoration = value;
 				this.applyTextDecoration();
+			}
+		}
+		
+		public function get autoWidth ( ):Number { return _autoWidth; }
+		public function set autoWidth ( value:Number ):void {
+			if (_autoWidth != value) {
+				_autoWidth = value;
+				this.applyAutoWidth();
+			}
+		}
+		
+		public function get autoHeight ( ):Number { return _autoHeight; }
+		public function set autoHeight ( value:Number ):void {
+			if (_autoHeight != value) {
+				_autoHeight = value;
+				this.applyAutoHeight();
 			}
 		}
 	}
