@@ -153,21 +153,11 @@ package fritz3.style {
 			var object:Object, target:Object, injectable:Injectable;
 			var stylable:Stylable = _stylable;
 			while (node) {
-				try {
-					target = node.target == null ? stylable : stylable[node.target];
-				} catch ( error:Error ) {
-					//trace("Target " + node.target + " not found on " + stylable);
-					node = node.nextNode;
-					continue;
-				}
-				try { 
-					if (target is Injectable) {
-						Injectable(target).setProperty(node.propertyName, node.value);
-					} else {
-						target[node.propertyName] = node.value;
-					}
-				} catch ( error:Error ) {
-					//trace("Error applying " + node.propertyName + " to " + stylable);
+				target = node.target == null ? stylable : stylable[node.target];
+				if (target is Injectable) {
+					Injectable(target).setProperty(node.propertyName, node.value);
+				} else {
+					target[node.propertyName] = node.value;
 				}
 				node = node.nextNode;
 			}
