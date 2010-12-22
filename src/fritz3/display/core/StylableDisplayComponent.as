@@ -57,9 +57,7 @@ package fritz3.display.core  {
 		
 		override public function onAdd ( ):void {
 			super.onAdd();
-			if (_styleSheetCollector && _styleSheetCollector is InvalidatableStyleSheetCollector) {
-				InvalidatableStyleSheetCollector(_styleSheetCollector).invalidateCollector();
-			}
+			this.invalidateCollector();
 			this.invalidateStyle();
 		}
 		
@@ -67,28 +65,26 @@ package fritz3.display.core  {
 			_invalidationHelper.invalidateMethod(this.getStyle);
 		}
 		
-		protected function applyID ( ):void {
-			if (_styleSheetCollector is InvalidatableStyleSheetCollector) {
+		protected function invalidateCollector ( ):void {
+			if (_styleSheetCollector && _styleSheetCollector is InvalidatableStyleSheetCollector) {
 				InvalidatableStyleSheetCollector(_styleSheetCollector).invalidateCollector();
 			}
+		}
+		
+		protected function applyID ( ):void {
+			this.invalidateCollector();
 		}
 		
 		protected function applyName ( ):void {
-			if (_styleSheetCollector is InvalidatableStyleSheetCollector) {
-				InvalidatableStyleSheetCollector(_styleSheetCollector).invalidateCollector();
-			}
+			this.invalidateCollector();
 		}
 		
 		protected function applyClassName ( ):void {
-			if (_styleSheetCollector is InvalidatableStyleSheetCollector) {
-				InvalidatableStyleSheetCollector(_styleSheetCollector).invalidateCollector();
-			}
+			this.invalidateCollector();
 		}
 		
 		public function invalidateChildState ( ):void{
-			if (_styleSheetCollector is InvalidatableStyleSheetCollector) {
-				InvalidatableStyleSheetCollector(_styleSheetCollector).invalidateCollector();
-			}
+			this.invalidateCollector();
 		}
 		
 		public function get styleSheetCollector ( ):StyleSheetCollector { return _styleSheetCollector; }
