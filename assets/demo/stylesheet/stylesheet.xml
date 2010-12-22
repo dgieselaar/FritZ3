@@ -16,6 +16,7 @@
 		<property name="background.border">1</property>
 		<property name="background.border-position">inside</property>
 		<property name="background.border-color">#000000</property>
+		<property name="background.background-gradient">linear 40 0xFF68EB 90% 0, 0x00B4FF 40% 255</property>
 		<property name="width">200</property>
 		<property name="height">100</property>
 		<property name="layout.vertical-align">center</property>
