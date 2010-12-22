@@ -16,12 +16,21 @@
 		<property name="background.border">1</property>
 		<property name="background.border-position">inside</property>
 		<property name="background.border-color">#000000</property>
-		<property name="width">250</property>
+		<property name="width">200</property>
 		<property name="height">100</property>
+		<property name="layout.vertical-align">center</property>
 		<property name="embed-fonts">false</property>
 		<property name="font-family">Arial</property>
 		<property name="padding">5</property>
-		<property name="text">Eva is een schatje</property>
+		<property name="text"><![CDATA[Testing <b>text</b> stuff, <u>making</u> the line a little longer]]></property>
+	</rule>
+	
+	<rule where="#1:!highlighted">
+		<property name="background.background-color">0xFFFFFF</property>
+	</rule>
+	
+	<rule where="#1:highlighted">
+		<property name="background.background-color">0xECECEC</property>
 	</rule>
 
 </data>

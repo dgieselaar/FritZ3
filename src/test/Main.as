@@ -14,6 +14,7 @@
 	import flash.geom.Matrix;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
+	import fritz3.display.button.TextButton;
 	import fritz3.display.core.DisplayComponentContainer;
 	import fritz3.display.core.GraphicsComponent;
 	import fritz3.display.core.InvalidatableDisplayComponent;
@@ -46,7 +47,7 @@
 			var styleSheetXML:XML = XML(new StyleSheetXML());
 			StyleManager.parseXML(styleSheetXML);
 			
-			var textComponent:TextComponent = new TextComponent( { id: "1" } );
+			var textComponent:TextButton = new TextButton( { id: "1" } );
 			
 			this.add(textComponent);
 			
