@@ -1,4 +1,5 @@
 package fritz3.display.text {
+	import flash.geom.Rectangle;
 	import flash.text.AntiAliasType;
 	import flash.text.engine.FontWeight;
 	import flash.text.FontStyle;
@@ -40,6 +41,9 @@ package fritz3.display.text {
 		
 		protected var _measuredWidth:Number = 0;
 		protected var _measuredHeight:Number = 0;
+		
+		protected var _measuredTextWidth:Number = 0;
+		protected var _measuredTextHeight:Number = 0;
 		
 		protected var _textFieldArray:Array;
 		
@@ -183,7 +187,7 @@ package fritz3.display.text {
 		}
 		
 		protected function parseStyle ( ):void {
-			
+			// TODO: convert stylesheet <-> textformat
 		}
 		
 		protected function applyStyle ( ):void {
@@ -199,17 +203,35 @@ package fritz3.display.text {
 		}
 		
 		protected function formatTextField ( ):void {
-			_textField.text = this.getFormattedString();
-			if(!_autoWidth) {
+			_textField.htmlText = this.getFormattedString();
+			
+			if (!_autoWidth) {
 				var availableWidth:Number = _width - _paddingLeft - _paddingRight;
-				_textField.width = availableWidth;
+				_textField.width = Math.min(_textField.textWidth + 4, availableWidth);
+			} else {
+				if (_wordWrap) {
+					_textField.wordWrap = false;
+					_textField.width = _textField.textWidth + 4;
+					_textField.wordWrap = true;
+				} else {
+					_textField.width = _textField.textWidth + 4;
+				}
 			}
 			
-			if (!_autoHeight) {
+			if(!_autoHeight) {
 				var availableHeight:Number = _height - _paddingTop - _paddingBottom;
-				_textField.height = availableHeight;
+				_textField.height = Math.min(_textField.textHeight + 6, availableHeight);
+			} else {
+				_textField.height = _textField.textHeight + 6;
 			}
 			
+			var textWidth:Number = _textField.textWidth, textHeight:Number = _textField.textHeight;
+			if (textWidth != _measuredTextHeight || textHeight != _measuredTextHeight) {
+				_invalidationHelper.invalidateMethod(this.rearrange);
+				_invalidationHelper.invalidateMethod(this.measureDimensions);
+			}
+			_measuredTextWidth = textWidth;
+			_measuredTextHeight = textHeight;
 		}
 		
 		protected function rearrange ( ):void {
@@ -217,7 +239,24 @@ package fritz3.display.text {
 		}
 		
 		protected function measureDimensions ( ):void {
+			var measuredWidth:Number = _textField.textWidth + 4 + _paddingLeft + _paddingRight;
+			var measuredHeight:Number = _textField.textHeight + 6 + _paddingTop + _paddingBottom;
 			
+			if (_autoWidth) {
+				if (_width != measuredWidth) {
+					_width = measuredWidth;
+					this.setDependenciesWidth();
+					_invalidationHelper.invalidateMethod(this.dispatchDisplayInvalidation);
+				}
+			}
+			
+			if (_autoHeight) {
+				if (_height != measuredHeight) {
+					_height = measuredHeight;
+					this.setDependenciesHeight();
+					_invalidationHelper.invalidateMethod(this.dispatchDisplayInvalidation);
+				}
+			}
 		}
 		
 		protected function draw ( ):void {
@@ -256,30 +295,64 @@ package fritz3.display.text {
 			_invalidationHelper.invalidateMethod(this.rearrange);
 		}
 		
-		protected function applyWidth ( ):void {
-			if (_width != _dispatchedWidth) {
-				this.invalidateDisplay();
+		protected function setDependenciesWidth ( ):void {
+			if (!_autoWidth) {
+				if (_layout && _layout is RectangularLayout) {
+					RectangularLayout(_layout).width = _width;
+				}
+			} else {
+				if (_layout && _layout is RectangularLayout) {
+					RectangularLayout(_layout).width = NaN;
+				}
 			}
+			
 			if (_background && _background is RectangularBackground) {
 				RectangularBackground(_background).width = _width;
 			}
 		}
 		
-		protected function applyHeight ( ):void {
-			if (_height != _dispatchedHeight) {
-				this.invalidateDisplay();
+		protected function setDependenciesHeight ( ):void {
+			if (!_autoHeight) {
+				if (_layout && _layout is RectangularLayout) {
+					RectangularLayout(_layout).height = _height;
+				}
+			} else {
+				if (_layout && _layout is RectangularLayout) {
+					RectangularLayout(_layout).height = NaN;
+				}
 			}
+			
 			if (_background && _background is RectangularBackground) {
 				RectangularBackground(_background).height = _height;
 			}
 		}
 		
+		protected function applyWidth ( ):void {
+			_invalidationHelper.invalidateMethod(this.formatTextField);
+			if (_width != _dispatchedWidth) {
+		 		this.invalidateDisplay();
+			}
+			
+			this.setDependenciesWidth();
+		}
+		
+		protected function applyHeight ( ):void {
+			_invalidationHelper.invalidateMethod(this.formatTextField);
+			if (_height != _dispatchedHeight) {
+				this.invalidateDisplay();
+			}
+			
+			this.setDependenciesHeight();
+		}
+		
 		protected function applyAutoWidth ( ):void {
 			_invalidationHelper.invalidateMethod(this.formatTextField);
+			this.setDependenciesWidth();
 		}
 		
 		protected function applyAutoHeight ( ):void {
 			_invalidationHelper.invalidateMethod(this.formatTextField);
+			this.setDependenciesHeight();
 		}
 		
 		protected function applyPadding ( ):void {
@@ -303,10 +376,36 @@ package fritz3.display.text {
 		}
 		
 		protected function applyCSS ( ):void {
-			_styleSheet.parseCSS(_css);
-			if (_textStyleType == TextStyleType.TEXTFORMAT) {
-				_invalidationHelper.invalidateMethod(this.parseStyle);
+			switch(_textStyleType) {
+				case TextStyleType.TEXTFORMAT:
+				_styleSheet.clear();
+				_styleSheet.parseCSS(_css);
+				var style:Object = _styleSheet.getStyle("p");
+				for (var id:String in style) {
+					switch(id) {
+						default:
+						this[id] = style[id];
+						break;
+						
+						case "marginLeft":
+						case "marginRight":
+						break;
+						
+						case "textIndent":
+						this.indent = style[id];
+						break;
+					}
+					this[id] = style[id];
+				}
+				_styleSheet.clear();
+				break;
+				
+				case TextStyleType.STYLESHEET:
+				_styleSheet.clear();
+				_styleSheet.parseCSS(_css);
+				break;
 			}
+			
 			_invalidationHelper.invalidateMethod(this.applyStyle);
 			_invalidationHelper.invalidateMethod(this.formatTextField);
 		}
@@ -397,7 +496,6 @@ package fritz3.display.text {
 			switch(_textStyleType) {
 				case TextStyleType.TEXTFORMAT:
 				_textFormat.font = _fontFamily;
-				trace("FontFamily: " + _fontFamily);
 				break;
 				
 				case TextStyleType.STYLESHEET:
