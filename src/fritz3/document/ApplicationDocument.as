@@ -3,7 +3,15 @@ package fritz3.document  {
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
 	import flash.events.Event;
+	import flash.filters.BevelFilter;
+	import flash.filters.BlurFilter;
+	import flash.filters.ColorMatrixFilter;
+	import flash.filters.DropShadowFilter;
+	import flash.filters.GlowFilter;
+	import flash.filters.GradientBevelFilter;
+	import flash.filters.GradientGlowFilter;
 	import flash.utils.getDefinitionByName;
+	import flash.utils.getQualifiedClassName;
 	import fritz3.display.core.DisplayComponentContainer;
 	import fritz3.invalidation.InvalidationManager;
 	import fritz3.style.invalidation.InvalidatableStyleSheetCollector;
@@ -72,9 +80,20 @@ package fritz3.document  {
 		}
 		
 		protected function getClassDefinitions ( ):void {
+			// define filters
+			var classes:Array = this.getNativeDefinitions();
+			var i:int, l:int = classes.length, classObject:Class, definition:String, alias:String;
+			for (; i < l; ++i) {
+				classObject = classes[i];
+				definition = getQualifiedClassName(classObject);
+				alias = definition.match(/(.*?::)?(.*?)$/)[2];
+				if (!hasClassAlias(alias)) {
+					addClassAlias(alias, classObject);
+				}
+			}
+			
 			var definitions:Array = getDefinitionNames(stage.loaderInfo.bytes, true, false);
-			var definition:String, alias:String, classObject:Class;
-			for (var i:int, l:int = definitions.length; i < l; ++i) {
+			for (i = 0, l = definitions.length; i < l; ++i) {
 				definition = definitions[i];
 				try {
 					classObject = getDefinitionByName(definition) as Class;
@@ -91,6 +110,13 @@ package fritz3.document  {
 					
 				}
 			}
+		}
+		
+		protected function getNativeDefinitions ( ):Array {
+			var array:Array = [
+			BevelFilter, BlurFilter, ColorMatrixFilter, DropShadowFilter, GlowFilter, GradientBevelFilter, GradientGlowFilter
+			];
+			return array;
 		}
 		
 	}
