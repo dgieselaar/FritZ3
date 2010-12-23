@@ -1,4 +1,5 @@
 package fritz3.style {
+	import fritz3.style.transition.TransitionData;
 	/**
 	 * ...
 	 * @author Dario Gieselaar
@@ -11,6 +12,8 @@ package fritz3.style {
 		public var propertyName:String;
 		public var value:*
 		public var target:String;
+		
+		public var transitionData:TransitionData;
 		
 		public function PropertyData ( ) {
 			
