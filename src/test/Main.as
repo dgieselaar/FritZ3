@@ -26,6 +26,7 @@
 	import fritz3.invalidation.InvalidationManager;
 	import fritz3.style.StandardStyleSheetCollector;
 	import fritz3.style.StyleManager;
+	import fritz3.utils.math.MathUtil;
 	import fritz3.utils.signals.fast.FastSignal;
 	import ru.etcs.utils.getDefinitionNames;
 	
@@ -48,16 +49,12 @@
 			StyleManager.parseXML(styleSheetXML);
 			
 			var textComponent:TextButton = new TextButton( { id: "1" } );
-			
 			this.add(textComponent);
 			
 			//this.add(new GraphicsComponent( { id: "2" } ));
 			//this.add(new GraphicsComponent( { id: "3" } ));
 			//this.add(new GraphicsComponent( { id: "4" } ));
 			//this.add(new GraphicsComponent( { id: "5" } ));
-			
-			
-			
 			
 			
 		}
