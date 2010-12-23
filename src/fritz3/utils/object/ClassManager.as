@@ -31,9 +31,15 @@ package fritz3.utils.object {
 		public static function getClass ( alias:String ):Class {
 			var classObject:Class = _classByAlias[alias];
 			if (!classObject) {
-				classObject = Class(getDefinitionByName(alias));
-				if (!classObject) {
-					classObject = getClassByAlias(alias);
+				try {
+					classObject = Class(getDefinitionByName(alias));
+				} catch ( error:Error ) {
+					if (!classObject) {
+						classObject = getClassByAlias(alias);
+					}
+					if (!classObject) {
+						throw error;
+					}
 				}
 				_classByAlias[alias] = classObject;
 			}
