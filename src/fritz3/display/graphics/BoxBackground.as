@@ -374,13 +374,12 @@
 		
 		protected function drawBackgroundImage ( ):void {
 			
-			
-			if (_backgroundBitmapData) {
-				_backgroundBitmapData.dispose();
-				_backgroundBitmapData = null;
-			}
-			
 			if (!_backgroundImage) {
+				if (_backgroundBitmapData) {
+					_backgroundBitmapData.dispose();
+					_backgroundBitmapData = null;
+				}
+				_backgroundImageInvalidated = false;
 				return;
 			}
 			
