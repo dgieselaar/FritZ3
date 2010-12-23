@@ -1,5 +1,8 @@
 package fritz3.display.graphics.parser.gradient {
 	import flash.display.GraphicsGradientFill;
+	import fritz3.display.core.DisplayValueType;
+	import fritz3.display.graphics.gradient.GraphicsGradientColor;
+	import fritz3.display.graphics.gradient.GraphicsGradientData;
 	import fritz3.style.PropertyParser;
 	/**
 	 * ...
@@ -23,21 +26,42 @@ package fritz3.display.graphics.parser.gradient {
 			return _cachedData[value] ||= this.getGradientData(value);
 		}
 		
-		public function getGradientData ( value:String ):GradientData {
-			var data:GradientData = new GradientData();
+		public function getGradientData ( value:String ):GraphicsGradientData {
+			var data:GraphicsGradientData;
 			var match:Array = value.match(/(linear|radial)\s+([0-9]{1,3}\s+)?(.+)/);
 			if (match) {
-				var gradientFill:GraphicsGradientFill = new GraphicsGradientFill();
-				gradientFill.type = match[1];
+				data = new GraphicsGradientData();
+				data.type = match[1];
 				var angle:Number = 90;
 				if (match[2]) {
 					angle = match[2];
 				}
-				var colors:Array = String(match[4]).split(",");
-				var colorValue:String, color:uint, 
+				data.angle = angle;
+				var colors:Array = String(match[3]).split(",");
+				var colorValue:String, color:uint, alpha:Number, position:Number, positionValueType:String;
+				var gradientColor:GraphicsGradientColor, gradientColorArray:Array = [];
+				var colorMatch:Array;
 				for (var i:int, l:int = colors.length; i < l; ++i) {
+					colorValue = colors[i];
+					colorMatch = colorValue.match(/([0-9xXA-Fa-f]+)(\s+(\d{1,3})%)?(\s+(\d+)(px|%)?)?/);
+					if (!colorMatch) {
+						continue;
+					}
 					
+					color = uint(colorMatch[1]);
+					alpha = (colorMatch[3] || 100) / 100;
+					position = colorMatch[5] || (255 / (l - 1) * i);
+					positionValueType = colorMatch[6] || DisplayValueType.RATIO;
+					if (positionValueType == DisplayValueType.PERCENTAGE) {
+						position = (position / 100) * 255;
+						positionValueType = DisplayValueType.RATIO;
+					}
+					gradientColor = new GraphicsGradientColor();
+					gradientColor.color = color, gradientColor.alpha = alpha, gradientColor.position = position, gradientColor.positionValueType = positionValueType;
+					gradientColorArray.push(gradientColor);
 				}
+				data.gradientColors = gradientColorArray;
+				data.invalidate();
 			}
 			return data;
 		}
