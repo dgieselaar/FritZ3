@@ -9,6 +9,15 @@ package fritz3.display.graphics.gradient {
 		
 		public var type:String;
 		public var angle:Number;
+		public var focalPointRatio:Number;
+		public var focalPointRatioValueType:String;
+		
+		public var offsetX:Number;
+		public var offsetXValueType:String;
+		
+		public var offsetY:Number;
+		public var offsetYValueType:String;
+		
 		public var gradientColors:Array;
 		
 		public var colors:Array;
@@ -60,6 +69,18 @@ package fritz3.display.graphics.gradient {
 				ratios.push(position);
 			}
 			return ratios;
+		}
+		
+		public function getFocalPointRatio ( width:Number, height:Number ):Number {
+			if (this.focalPointRatioValueType != DisplayValueType.PIXEL) {
+				return this.focalPointRatio;
+			}
+			
+			var focalPoint:Number = this.focalPointRatio;
+			var length:Number = MathUtil.getLineLength(width, height, angle * Math.PI / 180);
+			focalPoint = focalPoint / (length / 2) * 2 -1;
+			trace(focalPoint);
+			return focalPoint;
 		}
 		
 	}
