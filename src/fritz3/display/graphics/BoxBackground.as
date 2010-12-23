@@ -17,6 +17,9 @@
 	import fritz3.binding.AccessType;
 	import fritz3.binding.Binding;
 	import fritz3.display.core.DisplayValueType;
+	import fritz3.display.graphics.gradient.GraphicsGradientColor;
+	import fritz3.display.graphics.gradient.GraphicsGradientData;
+	import fritz3.display.graphics.parser.gradient.GradientParser;
 	import fritz3.display.graphics.parser.position.BackgroundPositionData;
 	import fritz3.display.graphics.parser.position.BackgroundPositionParser;
 	import fritz3.display.graphics.parser.repeat.BackgroundRepeatData;
@@ -48,8 +51,7 @@
 		
 		protected var _backgroundColor:Object;
 		protected var _backgroundAlpha:Number = 1;
-		protected var _backgroundGradient:GraphicsGradientFill;
-		protected var _backgroundGradientAngle:Number = 90;
+		protected var _backgroundGradient:GraphicsGradientData;
 		
 		protected var _fillType:String = FillType.RECTANGLE;
 		
@@ -67,8 +69,7 @@
 		protected var _borderRight:Number = 0;
 		protected var _borderAlpha:Number = 1;
 		protected var _borderColor:Object;
-		protected var _borderGradient:GraphicsGradientFill;
-		protected var _borderGradientAngle:Number = 90;
+		protected var _borderGradient:GraphicsGradientData;
 		protected var _borderOffset:Number = 0;
 		protected var _borderLineStyle:Array = LineStyle.SOLID;
 		
@@ -117,6 +118,8 @@
 			this.addParser("backgroundPosition", BackgroundPositionParser.parser);
 			this.addParser("backgroundSize", BackgroundSizeParser.parser);
 			this.addParser("backgroundRepeat", BackgroundRepeatParser.parser);
+			this.addParser("backgroundGradient", GradientParser.parser);
+			this.addParser("borderGradient", GradientParser.parser);
 		}
 		
 		protected function addParser ( propertyName:String, parser:PropertyParser ):void {
@@ -178,7 +181,8 @@
 			}
 			
 			if (_backgroundGradient != null) {
-				_graphics.beginGradientFill(_backgroundGradient.type, _backgroundGradient.colors, _backgroundGradient.alphas, _backgroundGradient.ratios, getGradientMatrix(_width, _height, _backgroundGradientAngle), _backgroundGradient.spreadMethod, _backgroundGradient.interpolationMethod, _backgroundGradient.focalPointRatio);
+				var ratios:Array = _backgroundGradient.getRatios(_width, _height);
+				_graphics.beginGradientFill(_backgroundGradient.type, _backgroundGradient.colors, _backgroundGradient.alphas, ratios, getGradientMatrix(_width, _height, _backgroundGradient.angle));
 				this.drawOutline();
 				_graphics.endFill();
 			}
@@ -197,10 +201,6 @@
 			
 			var width:Number = this.getBorderOffset(_borderLeft) + _width + this.getBorderOffset(_borderRight);
 			var height:Number = this.getBorderOffset(_borderTop) + _height + this.getBorderOffset(_borderBottom);
-			
-			if (_borderGradient) {
-				_borderGradient.matrix = getGradientMatrix(borderWidth, borderHeight, _borderGradientAngle);
-			}
 			
 			if (_linePatternData) {
 				_linePatternData.dispose();
@@ -338,7 +338,8 @@
 		
 		protected function setLineGradientStyle ( thickness:Number ):void {
 			_graphics.lineStyle(thickness, 0, _borderAlpha, true, LineScaleMode.NORMAL, CapsStyle.NONE);
-			_graphics.lineGradientStyle(_borderGradient.type, _borderGradient.colors, _borderGradient.alphas, _borderGradient.ratios, _borderGradient.matrix, _borderGradient.spreadMethod, _borderGradient.interpolationMethod, _borderGradient.focalPointRatio);
+			var ratios:Array = _borderGradient.getRatios(_width, _height);
+			_graphics.lineGradientStyle(_borderGradient.type, _borderGradient.colors, _borderGradient.alphas, ratios, getGradientMatrix(_width,_height,_borderGradient.angle));
 		}
 		
 		protected function setLinePatternStyle ( thickness:Number ):void {
@@ -478,7 +479,6 @@
 			ct.alphaMultiplier = _backgroundImageAlpha;
 			
 			if (scaleX != 1 || scaleY != 1 || spaceX || spaceY) {
-				trace(spaceX);
 				data = new BitmapData(imageWidth * scaleX + spaceX, imageHeight * scaleY + spaceY, true, 0x00FFFFFF);
 				var m:Matrix = new Matrix();
 				m.scale(scaleX, scaleY);
@@ -822,7 +822,8 @@
 			graphics.endFill();
 			
 			if (_borderGradient != null) {
-				graphics.beginGradientFill(_borderGradient.type, _borderGradient.colors, _borderGradient.alphas, _borderGradient.ratios, getGradientMatrix(width, height, _borderGradientAngle), _borderGradient.spreadMethod, _borderGradient.interpolationMethod, _borderGradient.focalPointRatio);
+				var ratios:Array = _borderGradient.getRatios(_width, _height);
+				graphics.beginGradientFill(_borderGradient.type, _borderGradient.colors, _borderGradient.alphas, ratios, getGradientMatrix(width, height, _borderGradient.angle));
 			}
 			
 			this.fillLineBitmap(graphics, width, height);
@@ -909,6 +910,14 @@
 				case "backgroundRepeat":
 				this.parseBackgroundRepeat(value);
 				break;
+				
+				case "backgroundGradient":
+				this.parseBackgroundGradient(value);
+				break;
+				
+				case "borderGradient":
+				this.parseBorderGradient(value);
+				break;
 			}
 		}
 		
@@ -967,6 +976,22 @@
 				var data:BackgroundRepeatData = BackgroundRepeatData(parser.parseValue(value));
 				this.backgroundImageRepeatX = data.repeatX;
 				this.backgroundImageRepeatY = data.repeatY;
+			}
+		}
+		
+		protected function parseBackgroundGradient ( value:String ):void {
+			var parser:PropertyParser = this.getParser("backgroundGradient");
+			if (parser) {
+				var data:GraphicsGradientData = GraphicsGradientData(parser.parseValue(value));
+				this.backgroundGradient = data;
+			}
+		}
+		
+		protected function parseBorderGradient ( value:String ):void {
+			var parser:PropertyParser = this.getParser("borderGradient");
+			if (parser) {
+				var data:GraphicsGradientData = GraphicsGradientData(parser.parseValue(value));
+				this.borderGradient = data;
 			}
 		}
 		
@@ -1046,24 +1071,11 @@
 			}
 		}
 		
-		public function get backgroundGradient ( ):GraphicsGradientFill { return _backgroundGradient; }
-		public function set backgroundGradient ( value:GraphicsGradientFill ):void {
-			if (_backgroundGradient != value) {
-				_backgroundGradient = value;
-				this.invalidate();
-			}
+		public function get backgroundGradient ( ):GraphicsGradientData { return _backgroundGradient; }
+		public function set backgroundGradient ( value:GraphicsGradientData ):void {
+			_backgroundGradient = value;
+			this.invalidate();
 		}
-		
-		
-		
-		public function get backgroundGradientAngle ( ):Number { return _backgroundGradientAngle; }
-		public function set backgroundGradientAngle ( value:Number ):void {
-			if(_backgroundGradientAngle != value) {
-				_backgroundGradientAngle = value;
-				this.invalidate();
-			}
-		}
-		
 		
 		public function get fillType ( ):String { return _fillType; }
 		public function set fillType ( value:String ):void {
@@ -1179,20 +1191,10 @@
 			}
 		}
 		
-		public function get borderGradient ( ):GraphicsGradientFill { return _borderGradient; }
-		public function set borderGradient ( value:GraphicsGradientFill ):void {
-			if (_borderGradient != value) {
-				_borderGradient = value;
-				this.invalidate();
-			}
-		}
-		
-		public function get borderGradientAngle ( ):Number { return _borderGradientAngle; }
-		public function set borderGradientAngle ( value:Number ):void {
-			if(_borderGradientAngle != value) {
-				_borderGradientAngle = value;
-				this.invalidate();
-			}
+		public function get borderGradient ( ):GraphicsGradientData { return _borderGradient; }
+		public function set borderGradient ( value:GraphicsGradientData ):void {
+			_borderGradient = value;
+			this.invalidate();
 		}
 		
 		public function get borderOffset ( ):Number { return _borderOffset; }
