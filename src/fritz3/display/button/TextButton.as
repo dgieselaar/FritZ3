@@ -161,7 +161,7 @@ package fritz3.display.button {
 		
 		public function get pressed ( ):Boolean { return ValueState(this.getStateObject(ButtonState.PRESSED)).value; }
 		public function set pressed ( value:Boolean ):void {
-			ValueState(this.getStateObject(ButtonState.HIGHLIGHTED)).value = value;
+			ValueState(this.getStateObject(ButtonState.PRESSED)).value = value;
 		}
 		
 		public function get disabled ( ):Boolean { return ValueState(this.getStateObject(ButtonState.DISABLED)).value; }
