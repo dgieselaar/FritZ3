@@ -1,9 +1,11 @@
 package fritz3.style {
+	import flash.utils.Dictionary;
 	import fritz3.base.injection.Injectable;
 	import fritz3.invalidation.InvalidationHelper;
 	import fritz3.style.invalidation.InvalidatableStyleSheetCollector;
 	import fritz3.style.selector.ObjectCache;
 	import fritz3.style.Stylable;
+	import fritz3.utils.object.ObjectParser;
 	/**
 	 * ...
 	 * @author Dario Gieselaar
@@ -28,8 +30,11 @@ package fritz3.style {
 		
 		protected var _dataByTarget:Object;
 		
+		protected var _complexContent:Dictionary;
+		
 		public function StandardStyleSheetCollector ( properties:Object = null ) {
 			_dataByTarget = { };
+			_complexContent = new Dictionary();
 			for (var id:String in properties) {
 				this[id] = properties[id];
 			}
@@ -125,6 +130,7 @@ package fritz3.style {
 			
 			var ruleNode:PropertyData, prevNode:PropertyData;
 			_firstNode = _lastNode = null;
+			var value:*
 			for (var i:int, l:int = rules ? rules.length : 0; i < l; ++i) {
 				rule = rules[i];
 				ruleNode = rule.firstNode;
@@ -142,7 +148,11 @@ package fritz3.style {
 					}
 					node.propertyName = ruleNode.propertyName;
 					node.target = ruleNode.target;
-					node.value = ruleNode.value;
+					value = ruleNode.value;
+					if (value is XML) {
+						value = this.getComplexContent(value);
+					}
+					node.value = value;
 					ruleNode = ruleNode.nextNode;
 				}
 			}
@@ -152,15 +162,31 @@ package fritz3.style {
 			var node:PropertyData = _firstNode;
 			var object:Object, target:Object, injectable:Injectable;
 			var stylable:Stylable = _stylable;
+			var value:*
 			while (node) {
 				target = node.target == null ? stylable : stylable[node.target];
+				value = node.value;
 				if (target is Injectable) {
-					Injectable(target).setProperty(node.propertyName, node.value);
+					Injectable(target).setProperty(node.propertyName, value);
 				} else {
-					target[node.propertyName] = node.value;
+					target[node.propertyName] = value;
 				}
 				node = node.nextNode;
 			}
+		}
+		
+		protected function getComplexContent ( value:XML ):* {
+			var object:*;
+			if (_complexContent[value] === undefined) {
+				object = _complexContent[value] = this.parseComplexContent(value);
+			} else {
+				object = _complexContent[value];
+			}
+			return object;
+		}
+		
+		protected function parseComplexContent ( value:XML ):* {
+			return ObjectParser.parseXML(value);
 		}
 		
 		public function invalidateRule ( styleRule:StyleRule ):void {
