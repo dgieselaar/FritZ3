@@ -28,16 +28,23 @@ package fritz3.display.graphics.parser.gradient {
 		
 		public function getGradientData ( value:String ):GraphicsGradientData {
 			var data:GraphicsGradientData;
-			var match:Array = value.match(/(linear|radial)\s+([0-9]{1,3}\s+)?(.+)/);
+			var match:Array = value.match(/(linear|radial)(\s+([0-9]{1,3})\s+)?(\s*(\d+)(%|px)?\s+)?(.+)/);
 			if (match) {
 				data = new GraphicsGradientData();
 				data.type = match[1];
-				var angle:Number = 90;
-				if (match[2]) {
-					angle = match[2];
+				var focalPointRatio:Number = 0, focalPointRatioValueType:String = DisplayValueType.RATIO
+				data.angle = match[3] || 90;
+				if (data.type == "radial") {
+					data.focalPointRatio = match[5] || 0;
+					data.focalPointRatioValueType = match[6] || DisplayValueType.RATIO;
+					if (match[7] == DisplayValueType.PERCENTAGE) {
+						data.focalPointRatio = match[6] / 100;
+						data.focalPointRatioValueType = DisplayValueType.RATIO;
+					}
+				} else {
+					data.focalPointRatio = 0;
 				}
-				data.angle = angle;
-				var colors:Array = String(match[3]).split(",");
+				var colors:Array = String(match[7]).split(",");
 				var colorValue:String, color:uint, alpha:Number, position:Number, positionValueType:String;
 				var gradientColor:GraphicsGradientColor, gradientColorArray:Array = [];
 				var colorMatch:Array;
