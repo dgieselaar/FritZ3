@@ -6,8 +6,9 @@ package fritz3.display.graphics.gradient {
 	public class GraphicsGradientColor {
 		
 		public var color:uint;
-		public var location:Number;
-		public var locationType:String;
+		public var alpha:Number;
+		public var position:Number;
+		public var positionValueType:String;
 		
 		public function GraphicsGradientColor() {
 			
