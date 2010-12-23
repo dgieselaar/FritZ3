@@ -48,8 +48,10 @@
 			var styleSheetXML:XML = XML(new StyleSheetXML());
 			StyleManager.parseXML(styleSheetXML);
 			
-			var textComponent:TextButton = new TextButton( { id: "1" } );
-			this.add(textComponent);
+
+			for (var i:int, l:int = 5; i < l; ++i) {
+				this.add(new TextButton( { id: i, className: "text_button" } ));
+			}
 			
 			//this.add(new GraphicsComponent( { id: "2" } ));
 			//this.add(new GraphicsComponent( { id: "3" } ));
