@@ -49,7 +49,7 @@
 			StyleManager.parseXML(styleSheetXML);
 			
 
-			for (var i:int, l:int = 5; i < l; ++i) {
+			for (var i:int, l:int = 6; i < l; ++i) {
 				this.add(new TextButton( { id: i, className: "text_button" } ));
 			}
 			
