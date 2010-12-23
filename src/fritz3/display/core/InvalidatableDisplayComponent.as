@@ -7,6 +7,7 @@
 	import fritz3.invalidation.Invalidatable;
 	import fritz3.invalidation.InvalidationHelper;
 	import fritz3.invalidation.InvalidationManager;
+	import fritz3.style.transition.TransitionData;
 	import org.osflash.signals.IDispatcher;
 	import org.osflash.signals.ISignal;
 	import org.osflash.signals.Signal;
@@ -46,14 +47,18 @@
 			if (propertyBindings) {
 				for (var i:int, l:int = propertyBindings.length; i < l; ++i) {
 					isSet = true;
-					Binding(propertyBindings[i]).setProperty(propertyName, value);
+					Binding(propertyBindings[i]).setProperty(propertyName, value, parameters);
 				}
 			}
 			
 			_properties[propertyName] = value;
 			
 			if (this.hasOwnProperty(propertyName)) {
-				this[propertyName] = value;
+				if (parameters && parameters.transition) {
+					var transitionData:TransitionData = TransitionData(parameters.transition);
+				} else {
+					this[propertyName] = value;
+				}
 			} else {
 				if (!isSet) {
 					throw new Error("Property " + propertyName + " not found  on " + this + " and there is no Binding registered.");
