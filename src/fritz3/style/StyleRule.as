@@ -2,6 +2,7 @@ package fritz3.style {
 	import fritz3.style.invalidation.StyleRuleInvalidationSignal;
 	import fritz3.style.selector.Selector;
 	import fritz3.style.selector.SelectorList;
+	import fritz3.style.transition.TransitionData;
 	/**
 	 * ...
 	 * @author Dario Gieselaar
@@ -32,7 +33,9 @@ package fritz3.style {
 		
 		public function append ( propertyData:PropertyData ):void {
 			var duplicate:PropertyData = this.getPropertyData(propertyData.propertyName, propertyData.target);
+			var transitionData:TransitionData;
 			if (duplicate) {
+				transitionData = duplicate.transitionData;
 				this.remove(duplicate);
 			}
 			
@@ -42,6 +45,9 @@ package fritz3.style {
 			if (this.lastNode) {
 				this.lastNode.nextNode = propertyData;
 				propertyData.prevNode = this.lastNode;
+			}
+			if (transitionData) {
+				propertyData.transitionData = transitionData;
 			}
 			this.lastNode = propertyData;
 		}
