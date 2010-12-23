@@ -15,10 +15,11 @@
 		<property name="background.background-color">0xFFFFFF</property>
 		<property name="background.border">1</property>
 		<property name="background.border-position">inside</property>
-		<property name="background.border-color">#000000</property>
-		<property name="background.background-gradient">linear 40 0xFF68EB 90% 0, 0x00B4FF 40% 255</property>
+		<property name="background.background-gradient">linear 90 0xFFFFFF, 0xEFEFEF</property>
+		<property name="background.border-gradient">linear 90 0xCFCFCF, 0xAEAEAE</property>
+		<property name="background.rounded-corners">5</property>
 		<property name="width">200</property>
-		<property name="height">100</property>
+		<property name="auto-height">true</property>
 		<property name="layout.vertical-align">center</property>
 		<property name="embed-fonts">false</property>
 		<property name="font-family">Arial</property>
@@ -26,12 +27,8 @@
 		<property name="text"><![CDATA[Testing <b>text</b> stuff, <u>making</u> the line a little longer]]></property>
 	</rule>
 	
-	<rule where="#1:!highlighted">
-		<property name="background.background-color">0xFFFFFF</property>
-	</rule>
-	
 	<rule where="#1:highlighted">
-		<property name="background.background-color">0xECECEC</property>
+		<property name="background.background-gradient">linear 90 0xFFFFFF, 0xFAFAFA</property>
 	</rule>
 
 </data>
