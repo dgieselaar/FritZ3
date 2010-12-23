@@ -207,7 +207,13 @@ package fritz3.display.text {
 			
 			if (!_autoWidth) {
 				var availableWidth:Number = _width - _paddingLeft - _paddingRight;
-				_textField.width = Math.min(_textField.textWidth + 4, availableWidth);
+				if (_wordWrap) {
+					_textField.wordWrap = false;
+					_textField.width = Math.min(_textField.textWidth + 4, availableWidth);
+					_textField.wordWrap = true;
+				} else {
+					_textField.width = Math.min(_textField.textWidth + 4, availableWidth);
+				}
 			} else {
 				if (_wordWrap) {
 					_textField.wordWrap = false;
