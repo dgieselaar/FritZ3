@@ -3,11 +3,14 @@
 	import flash.display.BitmapData;
 	import flash.display.CapsStyle;
 	import flash.display.DisplayObject;
+	import flash.display.GradientType;
 	import flash.display.Graphics;
 	import flash.display.GraphicsGradientFill;
+	import flash.display.InterpolationMethod;
 	import flash.display.LineScaleMode;
 	import flash.display.Loader;
 	import flash.display.Shape;
+	import flash.display.SpreadMethod;
 	import flash.display.Sprite;
 	import flash.geom.ColorTransform;
 	import flash.geom.Matrix;
@@ -182,7 +185,8 @@
 			
 			if (_backgroundGradient != null) {
 				var ratios:Array = _backgroundGradient.getRatios(_width, _height);
-				_graphics.beginGradientFill(_backgroundGradient.type, _backgroundGradient.colors, _backgroundGradient.alphas, ratios, getGradientMatrix(_width, _height, _backgroundGradient.angle));
+				var focalPointRatio:Number = _backgroundGradient.getFocalPointRatio(_width, _height);
+				_graphics.beginGradientFill(_backgroundGradient.type, _backgroundGradient.colors, _backgroundGradient.alphas, ratios, getGradientMatrix(_width, _height, _backgroundGradient.angle), SpreadMethod.PAD, InterpolationMethod.RGB, focalPointRatio);
 				this.drawOutline();
 				_graphics.endFill();
 			}
