@@ -1,10 +1,15 @@
 package fritz3.style {
+	import aze.motion.easing.Cubic;
+	import aze.motion.easing.Quadratic;
 	import fritz3.invalidation.InvalidationHelper;
 	import fritz3.invalidation.InvalidationPriorityTreshold;
 	import fritz3.style.invalidation.StyleManagerInvalidationSignal;
 	import fritz3.style.selector.ObjectCache;
 	import fritz3.style.selector.Selector;
 	import fritz3.style.selector.SelectorList;
+	import fritz3.style.transition.TransitionData;
+	import fritz3.style.transition.TransitionType;
+	import fritz3.utils.object.getClass;
 	import org.osflash.signals.IDispatcher;
 	import org.osflash.signals.ISignal;
 	/**
@@ -17,6 +22,7 @@ package fritz3.style {
 		
 		protected static var _firstNodeByID:Object;
 		protected static var _lastNodeByID:Object;
+		protected static var _easeFunctions:Object;
 		
 		protected static var _onChange:StyleManagerInvalidationSignal;
 		protected static var _invalidationHelper:InvalidationHelper;
@@ -24,6 +30,9 @@ package fritz3.style {
 		{
 			_firstNodeByID = { };
 			_lastNodeByID = { };
+			
+			_easeFunctions = { };
+			
 			_onChange = new StyleManagerInvalidationSignal();
 			_invalidationHelper = new InvalidationHelper();
 			_invalidationHelper.append(dispatchChange);
@@ -103,16 +112,17 @@ package fritz3.style {
 		
 		protected static function getStyleRuleFromXML ( xml:XML ):StyleRule {
 			var rule:StyleRule = new StyleRule();
-			const children:XMLList = xml.children();
+			var children:XMLList = xml.property;
 			var i:int = 0;
-			const l:int = children.length();
+			var l:int = children.length();
 			rule.selectorList = new SelectorList(xml.@where.toString());
 			var child:XML, propertyName:String, propertyValue:*, target:String;
 			var dotIndex:int, data:PropertyData;
+			var nodes:Object = { };
 			for (; i < l; ++i) {
 				child = children[i];
 				target = null;
-				propertyName = child.@name.toString().replace(/-[a-z]/g, replaceDash);
+				propertyName = child.@name.toString();
 				if ((dotIndex = propertyName.indexOf(".")) != -1) {
 					target = propertyName.substr(0, dotIndex);
 					propertyName = propertyName.substr(dotIndex+1);
@@ -127,6 +137,55 @@ package fritz3.style {
 				data.value = propertyValue;
 				data.target = target;
 				rule.append(data);
+				(nodes[target] ||= { } )[propertyName] = data;
+			}
+			
+			children = xml.transition;
+			l = children.length();
+			var transitionData:TransitionData, type:String, duration:Number, delay:Number, easeStr:String, ease:Function;
+			for (i = 0; i < l; ++i) {
+				child = children[i];
+				propertyName = child.@name.toString();
+				type = child.@type == undefined ? TransitionType.TO : child.@type.toString();
+				duration = child.@duration;
+				delay = child.@delay == undefined ? 0 : child.@delay;
+				if (child.@ease != undefined) {
+					easeStr = child.@ease.toString();
+					ease = getEaseFunction(easeStr);
+				} else {
+					ease = Quadratic.easeOut;
+				}
+				
+				
+				if ((dotIndex = propertyName.indexOf(".")) != -1) {
+					target = propertyName.substr(0, dotIndex);
+					propertyName = propertyName.substr(dotIndex+1);
+				} else {
+					target = null;
+				}
+				
+				data = (nodes[target] ||= { } )[propertyName];
+				if (!data) {
+					nodes[target][propertyName] = data = new PropertyData();
+					data.propertyName = propertyName;
+					data.target = target;
+					rule.append(data);
+				}
+				
+				transitionData = new TransitionData();
+				transitionData.type = type;
+				transitionData.duration = duration;
+				transitionData.delay = delay;
+				transitionData.ease = ease;
+				if (transitionData.type == TransitionType.FROM) {
+					if (child.hasSimpleContent()) {
+						propertyValue = getSimpleValue(child.toString());
+					} else {
+						propertyValue = child.children()[0];
+					}
+					transitionData.from = propertyValue;
+				}
+				data.transitionData = transitionData;
 			}
 			return rule;
 		}
@@ -164,6 +223,18 @@ package fritz3.style {
 			}
 			
 			return value;	
+		}
+		
+		protected static function getEaseFunction ( string:String ):Function {
+			var ease:Function;
+			if (_easeFunctions[string]) {
+				ease = _easeFunctions[string];
+			} else {
+				var indexOfDot:int = string.indexOf(".");
+				trace(string.substr(0, indexOfDot));
+				_easeFunctions[string] = ease = new (getClass(string.substr(0, indexOfDot)))()[string.substr(indexOfDot + 1)];
+			}
+			return _easeFunctions[string] ||= getClass(string.substr(0,string.indexOf(".")))
 		}
 		
 		public static function getFirstRule ( styleSheetID:String = null ):StyleRule {
