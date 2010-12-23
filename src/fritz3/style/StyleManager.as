@@ -120,7 +120,7 @@ package fritz3.style {
 				if (child.hasSimpleContent()) {
 					propertyValue = getSimpleValue(child.toString());
 				} else {
-					propertyValue = child;
+					propertyValue = child.children()[0];
 				}
 				data = new PropertyData();
 				data.propertyName = propertyName;
