@@ -18,6 +18,8 @@ package fritz3.document  {
 	import fritz3.style.StyleManager;
 	import fritz3.utils.object.addClassAlias;
 	import fritz3.utils.object.hasClassAlias;
+	import fritz3.utils.tween.TweenEngine;
+	import fritz3.utils.tween.Tweener;
 	import ru.etcs.utils.getDefinitionNames;
 	/**
 
@@ -49,6 +51,7 @@ package fritz3.document  {
 			}
 			_initialized = true;
 			this.getClassDefinitions();
+			Tweener.engine = this.getTweenEngine();
 			super.initializeComponent();
 		}
 		
@@ -117,6 +120,10 @@ package fritz3.document  {
 			BevelFilter, BlurFilter, ColorMatrixFilter, DropShadowFilter, GlowFilter, GradientBevelFilter, GradientGlowFilter
 			];
 			return array;
+		}
+		
+		protected function getTweenEngine ( ):TweenEngine {
+			return null;
 		}
 		
 	}
