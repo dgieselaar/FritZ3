@@ -33,11 +33,13 @@
 	import fritz3.display.layout.Align;
 	import fritz3.invalidation.Invalidatable;
 	import fritz3.style.PropertyParser;
+	import fritz3.style.transition.TransitionData;
 	import fritz3.utils.assets.AssetLoader;
 	import fritz3.utils.assets.image.ImageAssetLoader;
 	import fritz3.utils.assets.image.ImageAssetManager;
 	import fritz3.utils.object.getClass;
 	import fritz3.utils.object.ObjectPool;
+	import fritz3.utils.tween.tween;
 	/**
 	 * ...
 	 * @author Dario Gieselaar
@@ -889,9 +891,18 @@
 		}
 		
 		public function setProperty ( propertyName:String, value:*, parameters:Object = null ):void {
+			var transitionData:TransitionData;
+			if (parameters) {
+				transitionData = TransitionData(parameters.transition);
+			}
 			switch(propertyName) {
 				default:
-				this[propertyName] = value;
+				if (!transitionData) {
+					this[propertyName] = value;
+				} else {
+					trace(transitionData);
+					tween(this, transitionData);
+				}
 				break;
 				
 				case "background":
