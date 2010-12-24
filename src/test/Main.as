@@ -28,6 +28,9 @@
 	import fritz3.style.StyleManager;
 	import fritz3.utils.math.MathUtil;
 	import fritz3.utils.signals.fast.FastSignal;
+	import fritz3.utils.tween.ftween.FTweenEngine;
+	import fritz3.utils.tween.gtween.GTweenEngine;
+	import fritz3.utils.tween.TweenEngine;
 	import ru.etcs.utils.getDefinitionNames;
 	
 	/**
@@ -59,6 +62,10 @@
 			//this.add(new GraphicsComponent( { id: "5" } ));
 			
 			
+		}
+		
+		override protected function getTweenEngine ( ):TweenEngine {
+			return new GTweenEngine();
 		}
 		
 	}

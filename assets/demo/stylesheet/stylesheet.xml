@@ -19,7 +19,7 @@
 		<property name="background.borderPosition">1</property>
 		<property name="background.borderGradient">linear 90 0x008fcc, 0x006b99</property>
 		<property name="background.roundedCorners">3</property>
-		<property name="color">0xFFFFFF</property>
+		<property name="color">0x9FE2FF</property>
 		<property name="textField.filters">
 			<Array>
 				<DropShadowFilter distance="1" alpha="0.5" blurX="0" blurY="0" strength="5" quality="3" color="0x004766" />
@@ -38,13 +38,16 @@
 	</rule>
 	
 	<rule where="TextButton:init">
-		<transition name="alpha" type="from" duration="1">0</transition>
+		<transition name="alpha" type="from" duration="0.25">0</transition>
 	</rule>
 	
 	<rule where="TextButton:highlighted">
-		<transition name="color" duration="0.25"/>
-		<property name="color">0x00FFFF</property>
+		<property name="color">0xFFFFFF</property>
 		<property name="background.backgroundGradient">linear 90 0x00B4FF, 0x00aaf2</property>
+	</rule>
+	
+	<rule where="TextButton:!highlighted:!init">
+		<transition name="color" duration="0.5"/>
 	</rule>
 	
 	<rule where="TextButton:pressed">
