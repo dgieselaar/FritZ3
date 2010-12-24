@@ -9,8 +9,11 @@ package fritz3.style.transition {
 		public var ease:Function;
 		public var duration:Number;
 		public var delay:Number;
-		
 		public var from:*;
+		
+		public var target:Object;
+		public var propertyName:String;
+		public var value:Object;
 		
 		public function TransitionData ( ) {
 			

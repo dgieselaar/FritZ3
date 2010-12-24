@@ -1,6 +1,4 @@
 package fritz3.style {
-	import aze.motion.easing.Cubic;
-	import aze.motion.easing.Quadratic;
 	import fritz3.invalidation.InvalidationHelper;
 	import fritz3.invalidation.InvalidationPriorityTreshold;
 	import fritz3.style.invalidation.StyleManagerInvalidationSignal;
@@ -10,6 +8,7 @@ package fritz3.style {
 	import fritz3.style.transition.TransitionData;
 	import fritz3.style.transition.TransitionType;
 	import fritz3.utils.object.getClass;
+	import fritz3.utils.tween.Tweener;
 	import org.osflash.signals.IDispatcher;
 	import org.osflash.signals.ISignal;
 	/**
@@ -22,7 +21,6 @@ package fritz3.style {
 		
 		protected static var _firstNodeByID:Object;
 		protected static var _lastNodeByID:Object;
-		protected static var _easeFunctions:Object;
 		
 		protected static var _onChange:StyleManagerInvalidationSignal;
 		protected static var _invalidationHelper:InvalidationHelper;
@@ -30,8 +28,6 @@ package fritz3.style {
 		{
 			_firstNodeByID = { };
 			_lastNodeByID = { };
-			
-			_easeFunctions = { };
 			
 			_onChange = new StyleManagerInvalidationSignal();
 			_invalidationHelper = new InvalidationHelper();
@@ -151,9 +147,9 @@ package fritz3.style {
 				delay = child.@delay == undefined ? 0 : child.@delay;
 				if (child.@ease != undefined) {
 					easeStr = child.@ease.toString();
-					ease = getEaseFunction(easeStr);
+					ease = Tweener.engine.getEaseFunction(easeStr);
 				} else {
-					ease = Quadratic.easeOut;
+					ease = Tweener.engine.defaultEaseFunction;
 				}
 				
 				
@@ -223,18 +219,6 @@ package fritz3.style {
 			}
 			
 			return value;	
-		}
-		
-		protected static function getEaseFunction ( string:String ):Function {
-			var ease:Function;
-			if (_easeFunctions[string]) {
-				ease = _easeFunctions[string];
-			} else {
-				var indexOfDot:int = string.indexOf(".");
-				trace(string.substr(0, indexOfDot));
-				_easeFunctions[string] = ease = new (getClass(string.substr(0, indexOfDot)))()[string.substr(indexOfDot + 1)];
-			}
-			return _easeFunctions[string] ||= getClass(string.substr(0,string.indexOf(".")))
 		}
 		
 		public static function getFirstRule ( styleSheetID:String = null ):StyleRule {

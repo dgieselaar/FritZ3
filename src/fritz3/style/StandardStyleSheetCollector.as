@@ -130,12 +130,12 @@ package fritz3.style {
 			
 			var ruleNode:PropertyData, prevNode:PropertyData;
 			_firstNode = _lastNode = null;
-			var value:*
+			var value:*;
 			for (var i:int, l:int = rules ? rules.length : 0; i < l; ++i) {
 				rule = rules[i];
 				ruleNode = rule.firstNode;
 				while (ruleNode) {
-					node = getPropertyData(ruleNode.target, ruleNode.propertyName);
+					node = this.getPropertyData(ruleNode.target, ruleNode.propertyName);
 					if (!node) {
 						node = getPropertyDataObject();
 						node.prevNode = prevNode;
@@ -145,14 +145,19 @@ package fritz3.style {
 							_firstNode = node;
 						}
 						_lastNode = prevNode = node;
+						(_dataByTarget[ruleNode.target] ||= { } )[ruleNode.propertyName] = node;
 					}
 					node.propertyName = ruleNode.propertyName;
 					node.target = ruleNode.target;
-					value = ruleNode.value;
-					if (value is XML) {
-						value = this.getComplexContent(value);
+					if (ruleNode.value != undefined) {
+						value = ruleNode.value;
+						if (value is XML) {
+							value = this.getComplexContent(value);
+						}
+						node.value = value;
 					}
-					node.value = value;
+					// TODO: copy transitionData
+					node.transitionData = ruleNode.transitionData;
 					ruleNode = ruleNode.nextNode;
 				}
 			}
@@ -167,7 +172,13 @@ package fritz3.style {
 				target = node.target == null ? stylable : stylable[node.target];
 				value = node.value;
 				if (target is Injectable) {
-					Injectable(target).setProperty(node.propertyName, value);
+					if (node.transitionData) {
+						node.transitionData.value = node.value;
+						node.transitionData.propertyName = node.propertyName;
+						Injectable(target).setProperty(node.propertyName, value, { transition: node.transitionData } );
+					} else {
+						Injectable(target).setProperty(node.propertyName, value);
+					}
 				} else {
 					target[node.propertyName] = value;
 				}
