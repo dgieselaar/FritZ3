@@ -8,6 +8,9 @@
 	import fritz3.invalidation.InvalidationHelper;
 	import fritz3.invalidation.InvalidationManager;
 	import fritz3.style.transition.TransitionData;
+	import fritz3.utils.tween.hasTween;
+	import fritz3.utils.tween.removeTween;
+	import fritz3.utils.tween.tween;
 	import org.osflash.signals.IDispatcher;
 	import org.osflash.signals.ISignal;
 	import org.osflash.signals.Signal;
@@ -24,9 +27,9 @@
 		
 		protected var _properties:Object = { };
 		
-		protected var _propertyBindings:Object = { };
-		
 		protected var _parentComponent:Addable;
+		
+		protected var _tweens:Object;
 		
 		public function InvalidatableDisplayComponent ( parameters:Object = null ) {
 			super();
@@ -42,27 +45,16 @@
 		}
 		
 		public function setProperty ( propertyName:String, value:*, parameters:Object = null ):void {
-			var propertyBindings:Array = _propertyBindings[propertyName];
-			var isSet:Boolean;
-			if (propertyBindings) {
-				for (var i:int, l:int = propertyBindings.length; i < l; ++i) {
-					isSet = true;
-					Binding(propertyBindings[i]).setProperty(propertyName, value, parameters);
-				}
-			}
-			
 			_properties[propertyName] = value;
 			
-			if (this.hasOwnProperty(propertyName)) {
-				if (parameters && parameters.transition) {
-					var transitionData:TransitionData = TransitionData(parameters.transition);
-				} else {
-					this[propertyName] = value;
-				}
+			if (parameters && parameters.transition) {
+				var transitionData:TransitionData = TransitionData(parameters.transition);
+				tween(this, transitionData);
 			} else {
-				if (!isSet) {
-					throw new Error("Property " + propertyName + " not found  on " + this + " and there is no Binding registered.");
+				if (hasTween(this, propertyName)) {
+					removeTween(this, propertyName);
 				}
+				this[propertyName] = value;
 			}
 		}
 		
@@ -107,19 +99,6 @@
 		
 		public function executeInvalidatedMethods():void{
 			_invalidationHelper.executeInvalidatedMethods();
-		}
-		
-		protected function bindToProperty ( binding:Binding ):void {
-			((_propertyBindings[binding.propertyName] ||= []) as Array).push(binding);
-		}
-		
-		protected function unbindFromProperty ( binding:Binding ):void {
-			var propertyBindings:Array = _propertyBindings[binding.propertyName];
-			var index:int;
-			if (!propertyBindings || (index = _propertyBindings.indexOf(binding)) == -1) {
-				throw new Error("Binding " + binding + " registered for " + this);
-			}
-			propertyBindings.splice(index, 1);
 		}
 		
 		public function get priority ( ):int { return _priority; }
