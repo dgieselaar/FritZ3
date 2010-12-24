@@ -8,6 +8,7 @@ package fritz3.invalidation {
 		public static const DISPLAY_INVALIDATION:int = 0;
 		public static const CHILD_DISPLAY_INVALIDATION:int = 1000;
 		public static const DATA_INVALIDATION:int = 1000000;
+		public static const TWEEN_ENGINE_INVALIDATION:int = 1000000000;
 		
 		public function InvalidationPriorityTreshold() {
 			
