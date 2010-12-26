@@ -1,8 +1,13 @@
 package fritz3.display.core  {
+	import fritz3.display.core.parser.margin.MarginData;
+	import fritz3.display.core.parser.margin.MarginParser;
+	import fritz3.display.core.parser.padding.PaddingData;
+	import fritz3.display.core.parser.padding.PaddingParser;
 	import fritz3.display.layout.flexiblebox.Collapsable;
 	import fritz3.display.layout.flexiblebox.FlexibleBoxElement;
 	import fritz3.display.layout.InvalidatablePositionable;
 	import fritz3.display.layout.Positionable;
+	import fritz3.style.PropertyParser;
 	import fritz3.utils.signals.MonoSignal;
 	import org.osflash.signals.IDispatcher;
 	import org.osflash.signals.ISignal;
@@ -61,6 +66,11 @@ package fritz3.display.core  {
 			_invalidationHelper.append(this.dispatchDisplayInvalidation);
 		}
 		
+		override protected function setParsers ( ):void {
+			super.setParsers();
+			this.addParser("margin", MarginParser.parser);
+		}
+		
 		protected function initializeDisplayInvalidationSignal ( ):void {
 			_onDisplayInvalidation = new MonoSignal();
 		}
@@ -95,22 +105,23 @@ package fritz3.display.core  {
 				}
 				break;
 				
-				case "padding":
-				this.parsePadding(propertyName, value, parameters);
-				break;
-				
 				case "margin":
-				this.parseMargin(propertyName, value, parameters);
+				this.parseMargin(value, parameters);
 				break;
 			}
 		}
 		
-		protected function parsePadding ( propertyName:String, value:*, parameters:Object = null ):void {
-			
-		}
-		
-		protected function parseMargin ( propertyName:String, value:*, parameters:Object = null ):void {
-			
+		protected function parseMargin ( value:*, parameters:Object = null ):void {
+			var parser:PropertyParser = this.getParser("margin");
+			if (parser) {
+				var marginData:MarginData = MarginData(parser.parseValue(value));
+				if (!isNaN(marginData.margin)) {
+					this.margin = marginData.margin;
+				} else {
+					this.marginLeft = marginData.marginLeft, this.marginRight = marginData.marginRight;
+					this.marginTop = marginData.marginTop, this.marginBottom = marginData.marginBottom;
+				}
+			}
 		}
 		
 		protected function applyMinimumWidth ( ):void {
