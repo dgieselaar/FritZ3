@@ -6,7 +6,7 @@
 		<property name="autoHeight">false</property>
 		<property name="autoWidth">false</property>
 		<property name="layout.align">center</property>
-		<property name="layout.pack">justify</property>
+		<property name="layout.pack">center</property>
 		<property name="layout.direction">normal</property>
 		<property name="layout.orient">horizontal</property>
 		<property name="layout.padding">40</property>
@@ -16,7 +16,7 @@
 		<property name="background.backgroundColor">0xFFFFFF</property>
 		<property name="background.backgroundGradient">linear 90 0x00B4FF, 0x0098d9</property>
 		<property name="background.border">1</property>
-		<property name="background.borderPosition">1</property>
+		<property name="background.borderPosition">inside</property>
 		<property name="background.borderGradient">linear 90 0x008fcc, 0x006b99</property>
 		<property name="background.roundedCorners">3</property>
 		<property name="color">0x9FE2FF</property>
@@ -38,7 +38,7 @@
 	</rule>
 	
 	<rule where="TextButton:init">
-		<transition name="alpha" type="from" duration="0.25">0</transition>
+		<transition name="alpha" type="from" duration="0.5">0</transition>
 	</rule>
 	
 	<rule where="TextButton:highlighted">
@@ -50,9 +50,18 @@
 		<transition name="color" duration="0.5"/>
 	</rule>
 	
+	<rule where="TextButton:!pressed:!init">
+		<transition name="paddingLeft" duration="0.5"/>
+		<transition name="paddingRight" duration="0.5"/>
+	</rule>
+	
 	<rule where="TextButton:pressed">
 		<property name="background.backgroundGradient">linear 90 0x00aaf2, 0x00B4FF</property>
 		<property name="text"><![CDATA[<b>That's it!</b>]]></property>
+		<property name="paddingLeft">15</property>
+		<property name="paddingRight">15</property>
+		<transition name="paddingLeft" duration="0.25"/>
+		<transition name="paddingRight" duration="0.25"/>
 	</rule>
 	
 	<rule where="TextButton:first-child:!pressed">
@@ -65,7 +74,7 @@
 	</rule>
 	
 	<rule where="TextButton:!first-child">
-		<property name="marginLeft">5</property>
+		<property name="margin">1px 0px 0px</property>
 	</rule>
 	
 	<rule where="TextButton:nth-child(2)">
