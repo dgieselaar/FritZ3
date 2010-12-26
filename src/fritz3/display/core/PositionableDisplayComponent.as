@@ -73,6 +73,46 @@ package fritz3.display.core  {
 			_invalidationHelper.invalidateMethod(this.dispatchDisplayInvalidation);
 		}
 		
+		override public function setProperty(propertyName:String, value:*, parameters:Object = null):void {
+			switch(propertyName) {
+				default:
+				super.setProperty(propertyName, value, parameters);
+				break;
+				
+				case "width":
+				if (value == "auto") {
+					super.setProperty('autoWidth', true, parameters);
+				} else {
+					super.setProperty(propertyName, value, parameters);
+				}
+				break;
+				
+				case "height":
+				if (value == "auto") {
+					super.setProperty('autoHeight', true, parameters);
+				} else {
+					super.setProperty(propertyName, value, parameters);
+				}
+				break;
+				
+				case "padding":
+				this.parsePadding(propertyName, value, parameters);
+				break;
+				
+				case "margin":
+				this.parseMargin(propertyName, value, parameters);
+				break;
+			}
+		}
+		
+		protected function parsePadding ( propertyName:String, value:*, parameters:Object = null ):void {
+			
+		}
+		
+		protected function parseMargin ( propertyName:String, value:*, parameters:Object = null ):void {
+			
+		}
+		
 		protected function applyMinimumWidth ( ):void {
 			this.invalidateDisplay();
 		}
