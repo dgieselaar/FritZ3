@@ -7,6 +7,7 @@
 	import fritz3.invalidation.Invalidatable;
 	import fritz3.invalidation.InvalidationHelper;
 	import fritz3.invalidation.InvalidationManager;
+	import fritz3.style.PropertyParser;
 	import fritz3.style.transition.TransitionData;
 	import fritz3.utils.tween.hasTween;
 	import fritz3.utils.tween.removeTween;
@@ -27,9 +28,9 @@
 		
 		protected var _properties:Object = { };
 		
-		protected var _parentComponent:Addable;
+		protected var _propertyParsers:Object = {};
 		
-		protected var _tweens:Object;
+		protected var _parentComponent:Addable;
 		
 		public function InvalidatableDisplayComponent ( parameters:Object = null ) {
 			super();
@@ -40,6 +41,7 @@
 		protected function initializeComponent ( ):void {
 			this.initializeDependencies();
 			this.setInvalidationMethodOrder();
+			this.setParsers();
 			this.setDefaultProperties();
 			this.applyParameters();
 		}
@@ -74,6 +76,10 @@
 			
 		}
 		
+		protected function setParsers ( ):void {
+			
+		}
+		
 		protected function setDefaultProperties ( ):void {
 			
 		}
@@ -86,6 +92,18 @@
 			for (var name:String in _parameters) {
 				this.setProperty(name, _parameters[name]);
 			}
+		}
+		
+		protected function addParser ( propertyName:String, parser:PropertyParser ):void {
+			_propertyParsers[propertyName] = parser;
+		}
+		
+		protected function getParser ( propertyName:String ):PropertyParser {
+			return _propertyParsers[propertyName];
+		}
+		
+		protected function removeParser ( propertyName:String ):void {
+			delete _propertyParsers[propertyName];
 		}
 		
 		protected function setPriority ( value:int ):void {
