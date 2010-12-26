@@ -79,8 +79,35 @@ package fritz3.display.graphics.gradient {
 			var focalPoint:Number = this.focalPointRatio;
 			var length:Number = MathUtil.getLineLength(width, height, angle * Math.PI / 180);
 			focalPoint = focalPoint / (length / 2) * 2 -1;
-			trace(focalPoint);
 			return focalPoint;
+		}
+		
+		public function clone ( ):GraphicsGradientData {
+			var data:GraphicsGradientData = new GraphicsGradientData();
+			data.type = this.type;
+			data.angle = this.angle;
+			data.focalPointRatio = this.focalPointRatio;
+			data.focalPointRatioValueType = this.focalPointRatioValueType;
+			data.offsetX = this.offsetX;
+			data.offsetXValueType = this.offsetXValueType;
+			data.offsetY = this.offsetY;
+			data.offsetYValueType = this.offsetYValueType;
+			
+			var i:int, l:int, gradientColors:Array = [], gradientColorFrom:GraphicsGradientColor, gradientColorTo:GraphicsGradientColor;
+			for (i = 0, l = this.gradientColors ? this.gradientColors.length : 0; i < l; ++i) {
+				gradientColorFrom = this.gradientColors[i];
+				gradientColorTo = new GraphicsGradientColor();
+				gradientColorTo.alpha = gradientColorFrom.alpha;
+				gradientColorTo.color = gradientColorFrom.color;
+				gradientColorTo.position = gradientColorFrom.position;
+				gradientColorTo.positionValueType = gradientColorFrom.positionValueType;
+				gradientColors[i] = gradientColorTo;
+			}
+			
+			data.gradientColors = gradientColors;
+			data.invalidate();
+			
+			return data;
 		}
 		
 	}

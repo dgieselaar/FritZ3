@@ -997,7 +997,7 @@
 			var parser:PropertyParser = this.getParser("backgroundGradient");
 			if (parser) {
 				var data:GraphicsGradientData = GraphicsGradientData(parser.parseValue(value));
-				this.backgroundGradient = data;
+				this.backgroundGradient = data ? data.clone() : null;
 			}
 		}
 		
@@ -1005,7 +1005,7 @@
 			var parser:PropertyParser = this.getParser("borderGradient");
 			if (parser) {
 				var data:GraphicsGradientData = GraphicsGradientData(parser.parseValue(value));
-				this.borderGradient = data;
+				this.borderGradient = data ? data.clone() : null;
 			}
 		}
 		
