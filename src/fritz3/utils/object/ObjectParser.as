@@ -11,39 +11,44 @@ package fritz3.utils.object {
 		}
 		
 		public static function parseXML ( xml:XML ):* {
-			var container:Object = new (getClass(xml.name()))();
+			var parent:Object = new (getClass(xml.name()))();
 			var i:int, l:int;
 			var attributes:XMLList = xml.attributes();
 			var child:XML;
 			for (i = 0, l = attributes.length(); i < l; ++i) {
 				child = attributes[i];
-				container[child.name().toString()] = child;
+				parent[child.name().toString()] = child;
 			}
 			
-			if (!(container is ItemCollection || container is Array)) {
-				return container;
+			if (!(parent is ItemCollection || parent is Array)) {
+				return parent;
 			}
 			
-			var list:XMLList = xml.children();
-			var children:Array = [], childObject:Object;
+			return parseXMLChildren(parent, xml.children());
+			
+		}
+		
+		public static function parseXMLChildren ( parent:Object, list:XMLList ):* {
+			var i:int, l:int;
+			var child:XML, children:Array = [], childObject:Object;
 			for (i = 0, l = list.length(); i < l; ++i) {
 				child = list[i];
 				childObject = parseXML(child);
 				children.push(childObject);
 			}
 			
-			if (container is ItemCollection) {
-				var itemCollection:ItemCollection = ItemCollection(container);
+			if (parent is ItemCollection) {
+				var itemCollection:ItemCollection = ItemCollection(parent);
 				for (i = 0, l = children.length; i < l; ++i) {
 					itemCollection.add(children[i]);
 				}
-			} else if (container is Array) {
-				var array:Array = container as Array;
+			} else if (parent is Array) {
+				var array:Array = parent as Array;
 				for (i = 0, l = children.length; i < l; ++i) {
 					array.push(children[i]);
 				}
 			}
-			return container;
+			return parent;
 		}
 		
 	}
