@@ -89,22 +89,6 @@ package fritz3.display.core  {
 				super.setProperty(propertyName, value, parameters);
 				break;
 				
-				case "width":
-				if (value == "auto") {
-					super.setProperty('autoWidth', true, parameters);
-				} else {
-					super.setProperty(propertyName, value, parameters);
-				}
-				break;
-				
-				case "height":
-				if (value == "auto") {
-					super.setProperty('autoHeight', true, parameters);
-				} else {
-					super.setProperty(propertyName, value, parameters);
-				}
-				break;
-				
 				case "margin":
 				this.parseMargin(value, parameters);
 				break;
