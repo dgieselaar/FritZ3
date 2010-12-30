@@ -18,6 +18,9 @@ package fritz3.display.text.layout {
 		protected var _width:Number = 0;
 		protected var _height:Number = 0;
 		
+		protected var _autoWidth:Boolean;
+		protected var _autoHeight:Boolean;
+		
 		protected var _padding:Number = 0;
 		protected var _paddingTop:Number = 0;
 		protected var _paddingLeft:Number = 0;
@@ -50,7 +53,7 @@ package fritz3.display.text.layout {
 		public function rearrange ( container:DisplayObjectContainer, items:Array ):void {
 			var textField:DisplayObject = items[0];
 			var x:Number = _paddingLeft, y:Number = _paddingTop;
-			if (_width == _width) {
+			if (!_autoWidth) {
 				var childWidth:Number = textField.width;
 				var availableWidth:Number = _width - _paddingLeft - _paddingBottom;
 				switch(_horizontalAlign) {
@@ -69,7 +72,7 @@ package fritz3.display.text.layout {
 				}
 			}
 			
-			if (_height == _height) {
+			if (!_autoHeight) {
 				var childHeight:Number = textField.height;
 				var availableHeight:Number = _height - _paddingTop - _paddingBottom;
 				switch(_verticalAlign) {
@@ -165,6 +168,22 @@ package fritz3.display.text.layout {
 		public function set verticalAlign ( value:String ):void {
 			if (_verticalAlign != value) {
 				_verticalAlign = value;
+				this.invalidate();
+			}
+		}
+		
+		public function get autoWidth ( ):Boolean { return _autoWidth; }
+		public function set autoWidth ( value:Boolean ):void {
+			if (_autoWidth != value) {
+				_autoWidth = value;
+				this.invalidate();
+			}
+		}
+		
+		public function get autoHeight ( ):Boolean { return _autoHeight; }
+		public function set autoHeight ( value:Boolean ):void {
+			if (_autoHeight != value) {
+				_autoHeight = value;
 				this.invalidate();
 			}
 		}

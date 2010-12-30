@@ -36,8 +36,8 @@ package fritz3.display.text {
 		protected var _dispatchedWidth:Number = 0;
 		protected var _dispatchedHeight:Number = 0;
 		
-		protected var _autoWidth:Number = 0;
-		protected var _autoHeight:Number = 0;
+		protected var _autoWidth:Boolean = true;
+		protected var _autoHeight:Boolean = true;
 		
 		protected var _measuredWidth:Number = 0;
 		protected var _measuredHeight:Number = 0;
@@ -141,6 +141,32 @@ package fritz3.display.text {
 			this.multiline = true;
 		}
 		
+		override public function setProperty(propertyName:String, value:*, parameters:Object = null):void {
+			switch(propertyName) {
+				default:
+				super.setProperty(propertyName, value, parameters);
+				break;
+				
+				case "width":
+				if (value == "auto") {
+					this.autoWidth = true;
+				} else {
+					this.autoWidth = false;
+					super.setProperty(propertyName, value, parameters);
+				}
+				break;
+				
+				case "height":
+				if (value == "auto") {
+					this.autoHeight = true;
+				} else {
+					this.autoHeight = false;
+					super.setProperty(propertyName, value, parameters);
+				}
+				break;
+			}
+		}
+		
 		protected function setBackground ( background:Background ):void {
 			if (_background) {
 				_background.drawable = null;
@@ -169,6 +195,8 @@ package fritz3.display.text {
 				if (_layout is RectangularLayout) {
 					RectangularLayout(_layout).width = _width;
 					RectangularLayout(_layout).height = _height;
+					RectangularLayout(_layout).autoWidth = _autoWidth;
+					RectangularLayout(_layout).autoHeight = _autoHeight;
 					this.applyPadding();
 				}
 			}
@@ -302,13 +330,10 @@ package fritz3.display.text {
 		}
 		
 		protected function setDependenciesWidth ( ):void {
-			if (!_autoWidth) {
-				if (_layout && _layout is RectangularLayout) {
+			if (_layout && _layout is RectangularLayout) {
+				RectangularLayout(_layout).autoWidth = _autoWidth;
+				if (!_autoWidth) {
 					RectangularLayout(_layout).width = _width;
-				}
-			} else {
-				if (_layout && _layout is RectangularLayout) {
-					RectangularLayout(_layout).width = NaN;
 				}
 			}
 			
@@ -318,13 +343,10 @@ package fritz3.display.text {
 		}
 		
 		protected function setDependenciesHeight ( ):void {
-			if (!_autoHeight) {
-				if (_layout && _layout is RectangularLayout) {
+			if (_layout && _layout is RectangularLayout) {
+				RectangularLayout(_layout).autoHeight = _autoHeight;
+				if (!_autoHeight) {
 					RectangularLayout(_layout).height = _height;
-				}
-			} else {
-				if (_layout && _layout is RectangularLayout) {
-					RectangularLayout(_layout).height = NaN;
 				}
 			}
 			
@@ -999,16 +1021,16 @@ package fritz3.display.text {
 			}
 		}
 		
-		public function get autoWidth ( ):Number { return _autoWidth; }
-		public function set autoWidth ( value:Number ):void {
+		public function get autoWidth ( ):Boolean { return _autoWidth; }
+		public function set autoWidth ( value:Boolean ):void {
 			if (_autoWidth != value) {
 				_autoWidth = value;
 				this.applyAutoWidth();
 			}
 		}
 		
-		public function get autoHeight ( ):Number { return _autoHeight; }
-		public function set autoHeight ( value:Number ):void {
+		public function get autoHeight ( ):Boolean { return _autoHeight; }
+		public function set autoHeight ( value:Boolean ):void {
 			if (_autoHeight != value) {
 				_autoHeight = value;
 				this.applyAutoHeight();
