@@ -195,6 +195,18 @@
 			_layout = layout;
 			if (_layout) {
 				_layout.rearrangable = this;
+				if (_layout is RectangularLayout) {
+					var rectLayout:RectangularLayout = RectangularLayout(_layout);
+					rectLayout.autoWidth = _autoWidth;
+					rectLayout.autoHeight = _autoHeight;
+					if (!_autoWidth) {
+						rectLayout.width = _width;
+					}
+					if (!_autoHeight) {
+						rectLayout.height = _height;
+					}
+				
+				}
 			}
 		}
 		
