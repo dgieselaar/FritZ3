@@ -23,6 +23,9 @@ package fritz3.display.layout.flexiblebox {
 		protected var _width:Number = 0;
 		protected var _height:Number = 0;
 		
+		protected var _autoWidth:Boolean;
+		protected var _autoHeight:Boolean;
+		
 		protected var _orient:String = Orientation.HORIZONTAL;
 		protected var _direction:String = Direction.NORMAL;
 		protected var _align:String = Align.START
@@ -70,8 +73,8 @@ package fritz3.display.layout.flexiblebox {
 		
 		protected function layoutHorizontally ( container:DisplayObjectContainer, items:Array ):void {
 			var positionable:Positionable, child:DisplayObject, boxElement:FlexibleBoxElement;
-			var availableWidth:Number = _width - _paddingLeft - _paddingRight;
-			var availableHeight:Number = _height - _paddingTop - _paddingBottom;
+			var availableWidth:Number = (_autoWidth ? 0 : _width - _paddingLeft - _paddingRight);
+			var availableHeight:Number = (_autoHeight ? 0 : _height - _paddingTop - _paddingBottom);
 			var toPosition:Array = [], flexible:Array = [];
 			var groups:Array = [], flexGroups:Array = [];
 			var group:Array, flexGroup:Array;
@@ -86,6 +89,7 @@ package fritz3.display.layout.flexiblebox {
 					continue;
 				}
 				
+				// TODO: move this to bottom after dimensions are determined
 				if (child is Positionable) {
 					positionable = Positionable(child);
 					if ((positionable.top || positionable.bottom) && (positionable.left || positionable.bottom)) {
@@ -125,7 +129,7 @@ package fritz3.display.layout.flexiblebox {
 				group[group.length] = child;
 			}
 			
-			var minWidth:Number = 0;
+			var minWidth:Number = 0, maxChildHeight:Number = 0;
 			for (i = 0, l = toPosition.length; i < l; ++i) {
 				child = toPosition[i];
 				if (!isFlexible[child]) {
@@ -140,6 +144,11 @@ package fritz3.display.layout.flexiblebox {
 					positionable = Positionable(child);
 					minWidth += (positionable.marginLeft + positionable.marginRight);
 				}
+				maxChildHeight = Math.max(maxChildHeight, child.height);
+			}
+			
+			if (_autoHeight) {
+				availableHeight = maxChildHeight;
 			}
 			
 			var spaceToDistribute:Number = Math.max(0, availableWidth - minWidth);
@@ -241,8 +250,8 @@ package fritz3.display.layout.flexiblebox {
 		
 		protected function layoutVertically ( container:DisplayObjectContainer, items:Array ):void {
 			var positionable:Positionable, child:DisplayObject, boxElement:FlexibleBoxElement;
-			var availableWidth:Number = _width - _paddingLeft - _paddingRight;
-			var availableHeight:Number = _height - _paddingTop - _paddingBottom;
+			var availableWidth:Number = _autoWidth ? 0 : _width - _paddingLeft - _paddingRight;
+			var availableHeight:Number = _autoHeight ? 0 : _height - _paddingTop - _paddingBottom;
 			var toPosition:Array = [], flexible:Array = [];
 			var groups:Array = [], flexGroups:Array = [];
 			var group:Array, flexGroup:Array;
@@ -256,6 +265,8 @@ package fritz3.display.layout.flexiblebox {
 					child.x = child.y = 0;
 					continue;
 				}
+				
+				// TODO: move this to bottom after dimensions are determined
 				
 				if (child is Positionable) {
 					positionable = Positionable(child);
@@ -296,7 +307,7 @@ package fritz3.display.layout.flexiblebox {
 				group[group.length] = child;
 			}
 			
-			var minHeight:Number = 0;
+			var minHeight:Number = 0, maxChildWidth:Number = 0;
 			for (i = 0, l = toPosition.length; i < l; ++i) {
 				child = toPosition[i];
 				if (!isFlexible[child]) {
@@ -311,6 +322,11 @@ package fritz3.display.layout.flexiblebox {
 					positionable = Positionable(child);
 					minHeight += (positionable.marginTop + positionable.marginBottom);
 				}
+				maxChildWidth = Math.max(child.width, maxChildWidth);
+			}
+			
+			if (_autoWidth) {
+				availableWidth = maxChildWidth;
 			}
 			
 			var spaceToDistribute:Number = Math.max(0, availableHeight - minHeight);
@@ -598,6 +614,22 @@ package fritz3.display.layout.flexiblebox {
 		public function set paddingRight ( value:Number ):void {
 			if (_paddingRight != value) {
 				_paddingRight = value;
+				this.invalidate();
+			}
+		}
+		
+		public function get autoWidth ( ):Boolean { return _autoWidth; }
+		public function set autoWidth ( value:Boolean ):void {
+			if (_autoWidth != value) {
+				_autoWidth = value;
+				this.invalidate();
+			}
+		}
+		
+		public function get autoHeight ( ):Boolean { return _autoHeight; }
+		public function set autoHeight ( value:Boolean ):void {
+			if (_autoHeight != value) {
+				_autoHeight = value;
 				this.invalidate();
 			}
 		}
