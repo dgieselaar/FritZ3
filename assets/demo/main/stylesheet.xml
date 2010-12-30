@@ -3,13 +3,20 @@
 	
 	<rule where="ApplicationDocument">
 		<property name="background.backgroundColor">0xEFEFEF</property>
-		<property name="autoHeight">false</property>
-		<property name="autoWidth">false</property>
 		<property name="layout.align">center</property>
 		<property name="layout.pack">center</property>
 		<property name="layout.direction">normal</property>
+		<property name="layout.orient">vertical</property>
+		<property name="padding">40</property>
+	</rule>
+	
+	<rule where="#container">
+		<property name="background.backgroundColor">0xFFFFFF</property>
+		<property name="padding">10</property>
 		<property name="layout.orient">horizontal</property>
-		<property name="layout.padding">40</property>
+		<property name="background.borderColor">0x000000</property>
+		<property name="background.borderPosition">inside</property>
+		<property name="background.border">1</property>
 	</rule>
 	
 	<rule where="TextButton">

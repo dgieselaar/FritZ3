@@ -27,6 +27,7 @@
 	import fritz3.style.StandardStyleSheetCollector;
 	import fritz3.style.StyleManager;
 	import fritz3.utils.math.MathUtil;
+	import fritz3.utils.object.ObjectParser;
 	import fritz3.utils.signals.fast.FastSignal;
 	import fritz3.utils.tween.ftween.FTweenEngine;
 	import fritz3.utils.tween.gtween.GTweenEngine;
@@ -39,8 +40,11 @@
 	 */
 	public class Main extends ApplicationDocument {
 	 
-		[Embed(source = '../../assets/demo/stylesheet/stylesheet.xml', mimeType="application/octet-stream")]
+		[Embed(source = '../../assets/demo/main/stylesheet.xml', mimeType="application/octet-stream")]
 		private var StyleSheetXML:Class;
+		
+		[Embed(source = '../../assets/demo/main/ui.xml', mimeType="application/octet-stream")]
+		private var UIXML:Class;
 		
 		public function Main():void {
 		}
@@ -48,18 +52,13 @@
 		override public function onAdd ( ):void  {
 			super.onAdd();
 			
+			var textButton:TextButton;
+			
 			var styleSheetXML:XML = XML(new StyleSheetXML());
 			StyleManager.parseXML(styleSheetXML);
 			
-
-			for (var i:int, l:int = 6; i < l; ++i) {
-				this.add(new TextButton( { id: i, className: "text_button" } ));
-			}
-			
-			//this.add(new GraphicsComponent( { id: "2" } ));
-			//this.add(new GraphicsComponent( { id: "3" } ));
-			//this.add(new GraphicsComponent( { id: "4" } ));
-			//this.add(new GraphicsComponent( { id: "5" } ));
+			var uiXML:XML = XML(new UIXML());
+			ObjectParser.parseXMLChildren(this, uiXML.children());
 			
 			
 		}
