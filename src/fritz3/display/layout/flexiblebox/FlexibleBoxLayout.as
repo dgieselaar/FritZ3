@@ -217,7 +217,7 @@ package fritz3.display.layout.flexiblebox {
 						break;
 						
 						case Align.CENTER:
-						y = availableHeight/2 - child.height / 2 + _paddingTop;
+						y = availableHeight / 2 - child.height / 2 + _paddingTop;
 						break;
 						
 						case Align.STRETCH:
