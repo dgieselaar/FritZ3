@@ -5,8 +5,8 @@ package fritz3.utils.tween {
 	 * @author Dario Gieselaar
 	 */
 		
-	public function tween ( target:Object, transitionData:TransitionData):void {
-		Tweener.engine.tween(target, transitionData);
+	public function tween ( target:Object, propertyName:String, transitionData:TransitionData):void {
+		Tweener.engine.tween(target, propertyName, transitionData);
 	}
 
 }
