@@ -9,8 +9,10 @@
 	import fritz3.invalidation.InvalidationManager;
 	import fritz3.style.PropertyParser;
 	import fritz3.style.transition.TransitionData;
+	import fritz3.style.transition.TransitionType;
 	import fritz3.utils.tween.hasTween;
 	import fritz3.utils.tween.removeTween;
+	import fritz3.utils.tween.reverseTween;
 	import fritz3.utils.tween.tween;
 	import org.osflash.signals.IDispatcher;
 	import org.osflash.signals.ISignal;
@@ -47,16 +49,25 @@
 		}
 		
 		public function setProperty ( propertyName:String, value:*, parameters:Object = null ):void {
+			this.applyProperty(propertyName, value, parameters);
+		}
+		
+		protected function applyProperty ( propertyName:String, value:*, parameters:Object = null ):void {
 			_properties[propertyName] = value;
-			
-			if (parameters && parameters.transition) {
-				var transitionData:TransitionData = TransitionData(parameters.transition);
-				tween(this, transitionData);
-			} else {
+			var transitionData:TransitionData;
+			if (parameters) {
+				transitionData = TransitionData(parameters.transition);
+			}
+			if (!transitionData) {
 				if (hasTween(this, propertyName)) {
-					removeTween(this, propertyName);
-				}
+					reverseTween(this, propertyName);
+				} 
 				this[propertyName] = value;
+			} else {
+				if (transitionData.type == TransitionType.TO) {
+					transitionData.value = value;
+				}
+				tween(this, propertyName, transitionData);
 			}
 		}
 		
