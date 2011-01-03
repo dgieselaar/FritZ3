@@ -7,6 +7,7 @@
 	import flash.display.Graphics;
 	import flash.display.GraphicsGradientFill;
 	import flash.display.InterpolationMethod;
+	import flash.display.JointStyle;
 	import flash.display.LineScaleMode;
 	import flash.display.Loader;
 	import flash.display.Shape;
@@ -22,11 +23,15 @@
 	import fritz3.display.core.DisplayValueType;
 	import fritz3.display.graphics.gradient.GraphicsGradientColor;
 	import fritz3.display.graphics.gradient.GraphicsGradientData;
+	import fritz3.display.graphics.parser.border.BorderData;
+	import fritz3.display.graphics.parser.border.BorderParser;
 	import fritz3.display.graphics.parser.gradient.GradientParser;
 	import fritz3.display.graphics.parser.position.BackgroundPositionData;
 	import fritz3.display.graphics.parser.position.BackgroundPositionParser;
 	import fritz3.display.graphics.parser.repeat.BackgroundRepeatData;
 	import fritz3.display.graphics.parser.repeat.BackgroundRepeatParser;
+	import fritz3.display.graphics.parser.side.SideData;
+	import fritz3.display.graphics.parser.side.SideParser;
 	import fritz3.display.graphics.parser.size.BackgroundSizeData;
 	import fritz3.display.graphics.parser.size.BackgroundSizeParser;
 	import fritz3.display.graphics.utils.getGradientMatrix;
@@ -34,11 +39,17 @@
 	import fritz3.invalidation.Invalidatable;
 	import fritz3.style.PropertyParser;
 	import fritz3.style.transition.TransitionData;
+	import fritz3.style.transition.TransitionType;
 	import fritz3.utils.assets.AssetLoader;
 	import fritz3.utils.assets.image.ImageAssetLoader;
 	import fritz3.utils.assets.image.ImageAssetManager;
+	import fritz3.utils.color.ColorUtil;
+	import fritz3.utils.math.MathUtil;
 	import fritz3.utils.object.getClass;
 	import fritz3.utils.object.ObjectPool;
+	import fritz3.utils.tween.hasTween;
+	import fritz3.utils.tween.removeTween;
+	import fritz3.utils.tween.reverseTween;
 	import fritz3.utils.tween.tween;
 	/**
 	 * ...
@@ -66,17 +77,11 @@
 		protected var _bottomLeftCorner:Number = 0;
 		protected var _bottomRightCorner:Number = 0;
 		
-		protected var _border:Number = 0;
-		protected var _borderPosition:String = BorderPosition.CENTER;
-		protected var _borderTop:Number = 0;
-		protected var _borderLeft:Number = 0;
-		protected var _borderBottom:Number = 0;
-		protected var _borderRight:Number = 0;
-		protected var _borderAlpha:Number = 1;
-		protected var _borderColor:Object;
-		protected var _borderGradient:GraphicsGradientData;
-		protected var _borderOffset:Number = 0;
-		protected var _borderLineStyle:Array = LineStyle.SOLID;
+		protected var _border:Border = new Border();
+		protected var _borderLeft:Border = _border.clone();
+		protected var _borderTop:Border = _border.clone();
+		protected var _borderRight:Border = _border.clone();
+		protected var _borderBottom:Border = _border.clone();
 		
 		protected var _backgroundImage:DisplayObject;
 		protected var _backgroundImageAlpha:Number = 1;
@@ -124,7 +129,9 @@
 			this.addParser("backgroundSize", BackgroundSizeParser.parser);
 			this.addParser("backgroundRepeat", BackgroundRepeatParser.parser);
 			this.addParser("backgroundGradient", GradientParser.parser);
+			this.addParser("border", BorderParser.parser);
 			this.addParser("borderGradient", GradientParser.parser);
+			this.addParser("roundedCorners", SideParser.parser);
 		}
 		
 		protected function addParser ( propertyName:String, parser:PropertyParser ):void {
@@ -143,7 +150,11 @@
 		}
 		
 		protected function setDefaultProperties ( ):void {
-			
+			_border.borderSize = 0;
+			_border.borderColor = 0x000000;
+			_border.borderAlpha = 1;
+			_border.borderLineStyle = LineStyle.SOLID;
+			_border.borderPosition = BorderPosition.CENTER;
 		}
 		
 		protected function applyParameters ( ):void {
@@ -197,7 +208,451 @@
 		
 		protected function drawBorder ( ):void {
 			
-			var leftOffset:Number = !isNaN(_borderLeft) ? (this.getBorderOffset(_borderLeft) + _borderLeft / 2) : 0;
+			if (_fillType != FillType.RECTANGLE || (_border.isEqualTo(_borderLeft) && _border.isEqualTo(_borderTop) && _border.isEqualTo(_borderRight) && _border.isEqualTo(_borderBottom))) {
+				this.drawSingleBorder();
+			} else {
+				this.drawSeparateBorders();
+			}
+		}
+		
+		protected function drawSingleBorder ( ):void {
+			var borderSize:Number = _border.borderSize;
+			
+			if (!borderSize) {
+				return;
+			}
+			
+			var offset:Number = this.getBorderOffset(borderSize, _border.borderPosition);
+			
+			var x:Number = -offset, y:Number = -offset, width:Number = _width + 2 * offset, height:Number = _height + 2 * offset;
+			
+			if (_border.borderLineStyle == LineStyle.SOLID) {
+				if (_border.borderColor != null) {
+					this.setLineStyle(_border);
+					this.drawOutline(x, y, width, height);
+				}
+				if (_border.borderGradient) {
+					this.setLineGradientStyle(_border);
+					this.drawOutline(x, y, width, height);
+				}
+			}
+			// TODO: implement line styles
+			/*else {
+				this.setLinePatternStyle(_border);			
+				this.drawOutline(x, y, width, height);
+			}*/
+			
+			_graphics.lineStyle();
+			
+		}
+		
+		protected function drawSeparateBorders ( ):void {
+			if (_borderLeft.borderSize) {
+				if (_borderLeft.borderColor != null) {
+					this.setLineStyle(_borderLeft, true);
+					this.drawLeftBorder();
+					_graphics.endFill();
+				}
+				if (_borderLeft.borderGradient) {
+					this.setLineGradientStyle(_borderLeft, true);
+					this.drawLeftBorder();
+					_graphics.endFill();
+				}
+			}
+			
+			if (_borderTop.borderSize) {
+				if (_borderTop.borderColor != null) {
+					this.setLineStyle(_borderTop, true);
+					this.drawTopBorder();
+					_graphics.endFill();
+				}
+				if (_borderTop.borderGradient) {
+					this.setLineGradientStyle(_borderTop, true);
+					this.drawTopBorder();
+					_graphics.endFill();
+				}
+			}
+			
+			if (_borderRight.borderSize) {
+				if (_borderRight.borderColor != null) {
+					this.setLineStyle(_borderRight, true);
+					this.drawRightBorder();
+					_graphics.endFill();
+				}
+				if (_borderRight.borderGradient) {
+					this.setLineGradientStyle(_borderRight, true);
+					this.drawRightBorder();
+					_graphics.endFill();
+				}
+			}
+			
+			if (_borderBottom.borderSize) {
+				if (_borderBottom.borderColor != null) {
+					this.setLineStyle(_borderBottom, true);
+					this.drawBottomBorder();
+					_graphics.endFill();
+				}
+				if (_borderBottom.borderGradient) {
+					this.setLineGradientStyle(_borderBottom, true);
+					this.drawBottomBorder();
+					_graphics.endFill();
+				}
+			}
+			
+			
+		}
+		
+		protected function drawLeftBorder ( ):void {
+			var graphics:Graphics = _graphics;
+			var borderSize:Number = _borderLeft.borderSize;
+			var position:String = _borderLeft.borderPosition;
+			var width:Number = borderSize, height:Number = _height;
+			var x:Number, y:Number;
+			switch(position) {
+				case BorderPosition.INSIDE:
+				x = y = 0;
+				break;
+				
+				case BorderPosition.CENTER:
+				x = y = -borderSize / 2;
+				height += borderSize;
+				break;
+				
+				case BorderPosition.OUTSIDE:
+				x = y = -borderSize;
+				height += borderSize * 2;
+				break;
+			}
+			
+			
+			var topLeftCorner:Number = _topLeftCorner;
+			var bottomLeftCorner:Number = _bottomLeftCorner;
+			
+			var from:Point = new Point(), to:Point = new Point(), cp:Point = new Point();
+			
+			var leftBorderOffset:Number = this.getBorderOffset(_borderLeft.borderSize, _borderLeft.borderPosition, true);
+			var topBorderOffset:Number = this.getBorderOffset(_borderTop.borderSize, _borderTop.borderPosition, true);
+			var bottomBorderOffset:Number = this.getBorderOffset(_borderBottom.borderSize, _borderBottom.borderPosition, true);
+			
+			if(!topLeftCorner) {
+				graphics.moveTo(x, -topBorderOffset);
+				graphics.lineTo(x + width, -topBorderOffset + _borderTop.borderSize);
+				graphics.lineTo(x + width, _height/2);
+				graphics.lineTo(x, _height/2);
+				graphics.lineTo(x, -topBorderOffset);
+			} else {
+				graphics.moveTo(x, _height/2);
+				from.x = x, from.y = topLeftCorner;
+				to.x = topLeftCorner, to.y = -topBorderOffset;
+				cp.x = from.x, cp.y = to.y;
+				graphics.lineTo(from.x, from.y);
+				this.drawBorderCurve(from, to, cp, topLeftCorner, _borderLeft.borderSize, _borderTop.borderSize, "horizontal", false, false);
+				graphics.lineTo(x + width, _height / 2);
+				graphics.lineTo(x, _height / 2);
+			}
+			
+			if (!bottomLeftCorner) {
+				graphics.moveTo(x, _height + bottomBorderOffset);
+				graphics.lineTo(x + width, _height - y - _borderBottom.borderSize);
+				graphics.lineTo(x + width, _height / 2);
+				graphics.lineTo(x, _height / 2);
+				graphics.lineTo(x, _height + bottomBorderOffset);
+			} else {
+				graphics.moveTo(x, _height/2);
+				from.x = x, from.y = _height - bottomLeftCorner;
+				to.x = bottomLeftCorner, to.y = _height + bottomBorderOffset;
+				cp.x = from.x, cp.y = to.y;
+				graphics.lineTo(from.x, from.y);
+				this.drawBorderCurve(from, to, cp, bottomLeftCorner, _borderLeft.borderSize, _borderBottom.borderSize, "horizontal", false, true);
+				graphics.lineTo(x + width, _height / 2);
+				graphics.lineTo(x, _height / 2);
+			}
+		}
+		
+		protected function drawTopBorder ( ):void {
+			var graphics:Graphics = _graphics;
+			var borderSize:Number = _borderTop.borderSize;
+			var position:String = _borderTop.borderPosition;
+			var width:Number = _width, height:Number = borderSize;
+			var x:Number, y:Number;
+			switch(position) {
+				case BorderPosition.INSIDE:
+				x = y = 0;
+				break;
+				
+				case BorderPosition.CENTER:
+				x = y = -borderSize / 2;
+				width += borderSize;
+				break;
+				
+				case BorderPosition.OUTSIDE:
+				x = y = -borderSize;
+				width += borderSize * 2;
+				break;
+			}
+			
+			
+			var topLeftCorner:Number = _topLeftCorner;
+			var topRightCorner:Number = _topRightCorner;
+			
+			var from:Point = new Point(), to:Point = new Point(), cp:Point = new Point();
+			
+			var leftBorderOffset:Number = this.getBorderOffset(_borderLeft.borderSize, _borderLeft.borderPosition, true);
+			var topBorderOffset:Number = this.getBorderOffset(_borderTop.borderSize, _borderTop.borderPosition, true);
+			var rightBorderOffset:Number = this.getBorderOffset(_borderRight.borderSize, _borderRight .borderPosition, true);
+			
+			if (!topLeftCorner) {
+				graphics.moveTo( -leftBorderOffset, y);
+				graphics.lineTo( -leftBorderOffset + _borderLeft.borderSize, y +height);
+				graphics.lineTo(_width/2, y+height);
+				graphics.lineTo(_width/2, y);
+				graphics.lineTo(-leftBorderOffset, y);
+			} else {
+				graphics.moveTo(_width/2,y);
+				from.x = topLeftCorner, from.y = y;
+				to.x = -leftBorderOffset, to.y = topLeftCorner;
+				cp.x = to.x, cp.y = from.y;
+				graphics.lineTo(from.x, from.y);
+				this.drawBorderCurve(from, to, cp, topLeftCorner, _borderTop.borderSize, _borderLeft.borderSize, "vertical", false, false);
+				graphics.lineTo(_width / 2, y + height);
+				graphics.lineTo(_width / 2, y);
+			}
+			
+			if (!topRightCorner) {
+				graphics.moveTo(_width + rightBorderOffset, y);
+				graphics.lineTo(_width + rightBorderOffset - _borderRight.borderSize, y + height);
+				graphics.lineTo(_width / 2, y + height);
+				graphics.lineTo(_width / 2, y);
+				graphics.lineTo(_width - rightBorderOffset, y);
+			} else {
+				graphics.moveTo(_width / 2, y);
+				from.x = _width - topRightCorner, from.y = y;
+				to.x = _width + rightBorderOffset, to.y = topRightCorner;
+				cp.x = to.x, cp.y = from.y;
+				graphics.lineTo(from.x, from.y);
+				this.drawBorderCurve(from, to, cp, topRightCorner, _borderTop.borderSize, _borderRight.borderSize, "vertical", true, false);
+				graphics.lineTo(_width / 2, y + height);
+				graphics.lineTo(_width / 2, y);
+			}
+		}
+		
+		protected function drawRightBorder ( ):void {
+			var graphics:Graphics = _graphics;
+			var borderSize:Number = _borderRight.borderSize;
+			var position:String = _borderRight.borderPosition;
+			var width:Number = borderSize, height:Number = _height;
+			var x:Number, y:Number;
+			switch(position) {
+				case BorderPosition.INSIDE:
+				x = y = _width-borderSize;
+				break;
+				
+				case BorderPosition.CENTER:
+				x = y = _width - (borderSize / 2);
+				height += borderSize;
+				break;
+				
+				case BorderPosition.OUTSIDE:
+				x = y = _width;
+				height += borderSize * 2;
+				break;
+			}
+			
+			
+			var topRightCorner:Number = _topRightCorner;
+			var bottomRightCorner:Number = _bottomRightCorner;
+			
+			var from:Point = new Point(), to:Point = new Point(), cp:Point = new Point();
+			
+			var topBorderOffset:Number = this.getBorderOffset(_borderTop.borderSize, _borderTop.borderPosition, true);
+			var rightBorderOffset:Number = this.getBorderOffset(_borderRight.borderSize, _borderRight.borderPosition, true);
+			var bottomBorderOffset:Number = this.getBorderOffset(_borderBottom.borderSize, _borderBottom.borderPosition, true);
+			
+			if (!topRightCorner) {
+				graphics.moveTo(x + width, -topBorderOffset);
+				graphics.lineTo(x, -topBorderOffset + _borderTop.borderSize);
+				graphics.lineTo(x, _height/2);
+				graphics.lineTo(x + width, _height/2);
+				graphics.lineTo(x + width, -topBorderOffset);
+			} else {
+				graphics.moveTo(x + width, _height / 2);
+				from.x = x + width, from.y = topRightCorner;
+				to.x = _width - topRightCorner, to.y = -topBorderOffset;
+				cp.x = from.x, cp.y = to.y;
+				graphics.lineTo(from.x, from.y);
+				this.drawBorderCurve(from, to, cp, topRightCorner, _borderRight.borderSize, _borderTop.borderSize, "horizontal", true, false);
+				graphics.lineTo(x, _height / 2);
+				graphics.lineTo(x + width, _height / 2);
+			}
+			
+			if (!bottomRightCorner) {
+				graphics.moveTo(x + width, _height + bottomBorderOffset);
+				graphics.lineTo(x, _height + bottomBorderOffset - _borderBottom.borderSize);
+				graphics.lineTo(x, _height / 2);
+				graphics.lineTo(x + width, _height / 2);
+				graphics.lineTo(x + width, _height + bottomBorderOffset);
+			} else {
+				graphics.moveTo(x + width, _height / 2);
+				from.x = x + width, from.y = _height - bottomRightCorner;
+				to.x = _width - bottomRightCorner, to.y = _height + bottomBorderOffset;
+				cp.x = from.x, cp.y = to.y;
+				graphics.lineTo(from.x, from.y);
+				this.drawBorderCurve(from, to, cp, bottomRightCorner, _borderRight.borderSize, _borderBottom.borderSize, "horizontal", true, true);
+				graphics.lineTo(x, _height / 2);
+				graphics.lineTo(x + width, _height / 2);
+			}
+		}
+		
+		protected function drawBottomBorder ( ):void {
+			var graphics:Graphics = _graphics;
+			var borderSize:Number = _borderBottom.borderSize;
+			var position:String = _borderBottom.borderPosition;
+			var width:Number = _width, height:Number = borderSize;
+			var y:Number;
+			switch(position) {
+				case BorderPosition.INSIDE:
+				y = _height - borderSize;
+				break;
+				
+				case BorderPosition.CENTER:
+				y = _height - borderSize / 2;
+				width += borderSize;
+				break;
+				
+				case BorderPosition.OUTSIDE:
+				y = _height;
+				width += borderSize * 2;
+				break;
+			}
+			
+			
+			var bottomLeftCorner:Number = _bottomLeftCorner;
+			var bottomRightCorner:Number = _bottomRightCorner;
+			
+			var from:Point = new Point(), to:Point = new Point(), cp:Point = new Point();
+			
+			var leftBorderOffset:Number = this.getBorderOffset(_borderLeft.borderSize, _borderLeft.borderPosition, true);
+			var bottomBorderOffset:Number = this.getBorderOffset(_borderBottom.borderSize, _borderBottom.borderPosition, true);
+			var rightBorderOffset:Number = this.getBorderOffset(_borderRight.borderSize, _borderRight.borderPosition, true);
+			
+			if (!bottomLeftCorner) {
+				graphics.moveTo( -leftBorderOffset, y + height);
+				graphics.lineTo( -leftBorderOffset + _borderLeft.borderSize, y);
+				graphics.lineTo(_width / 2, y);
+				graphics.lineTo(_width / 2, y + height);
+				graphics.lineTo( -leftBorderOffset, y + height);
+			} else {
+				graphics.moveTo(_width / 2, y + height);
+				from.x = bottomLeftCorner, from.y = y + height;
+				to.x = -leftBorderOffset, to.y = _height - bottomLeftCorner;
+				cp.x = to.x, cp.y = from.y;
+				graphics.lineTo(from.x, from.y);
+				this.drawBorderCurve(from, to, cp, bottomLeftCorner, _borderBottom.borderSize, _borderLeft.borderSize, "vertical", false, true);
+				graphics.lineTo(_width / 2, y);
+				graphics.lineTo(_width / 2, y + height);
+			}
+			
+			if (!bottomRightCorner) {
+				graphics.moveTo(_width + rightBorderOffset, y + height);
+				graphics.lineTo(_width + rightBorderOffset - _borderRight.borderSize, y);
+				graphics.lineTo(_width / 2, y);
+				graphics.lineTo(_width / 2, y +height);
+				graphics.lineTo(_width - rightBorderOffset, y + height);
+			} else {
+				graphics.moveTo(_width / 2, y + height);
+				from.x = _width - bottomRightCorner, from.y = y + height;
+				to.x = _width + rightBorderOffset, to.y = _height - bottomRightCorner;
+				cp.x = to.x, cp.y = from.y;
+				graphics.lineTo(from.x, from.y);
+				this.drawBorderCurve(from, to, cp, bottomRightCorner, _borderBottom.borderSize, _borderRight.borderSize, "vertical", true, true);
+				graphics.lineTo(_width / 2, y);
+				graphics.lineTo(_width / 2, y + height);
+			}
+		}
+		
+		protected function drawBorderCurve ( from:Point, to:Point, controlPoint:Point, roundedCorners:Number, fromSize:Number, toSize:Number, orient:String, invertX:Boolean, invertY:Boolean ):void {
+			var graphics:Graphics = _graphics;
+			var target:Point, cp:Point;
+			target = MathUtil.getPointOnCurve(from, to, controlPoint, 0.5);
+			cp = MathUtil.getControlPoint(from, to, controlPoint, 0, 0.5);
+			graphics.curveTo(cp.x, cp.y, target.x, target.y);
+			
+			if (orient == "horizontal") {
+				from.x = invertX ? from.x - fromSize : from.x + fromSize;
+				to.y = invertY ? to.y - toSize : to.y + toSize;
+				controlPoint.x = invertX ? controlPoint.x - fromSize : controlPoint.x + fromSize;
+				controlPoint.y = invertY ? controlPoint.y - toSize : controlPoint.y + toSize;
+			} else {
+				from.y = invertY ? from.y - fromSize : from.y + fromSize;
+				to.x = invertX ? to.x - toSize : to.x + toSize;
+				controlPoint.x = invertX ? controlPoint.x - toSize : controlPoint.x + toSize;
+				controlPoint.y = invertY ? controlPoint.y - fromSize : controlPoint.y + fromSize;
+			}
+			
+			target = MathUtil.getPointOnCurve(from, to, controlPoint, 0.5);
+			cp = MathUtil.getControlPoint(from, to, controlPoint, 0, 0.5);
+			
+			graphics.lineTo(target.x, target.y);
+			graphics.curveTo(cp.x, cp.y, from.x, from.y);
+			
+		}
+		
+		protected function setLineStyle ( border:Border, useFillMode:Boolean = false ):void {
+			if(!useFillMode) {
+				_graphics.lineStyle(border.borderSize, uint(border.borderColor), border.borderAlpha, true, LineScaleMode.NORMAL, CapsStyle.NONE, JointStyle.ROUND);
+			} else {
+				_graphics.beginFill(uint(border.borderColor), border.borderAlpha);
+			}
+		}
+		
+		protected function setLineGradientStyle ( border:Border, useFillMode:Boolean = false ):void {
+			var borderGradient:GraphicsGradientData = border.borderGradient;
+			var width:Number = this.getBorderOffset(_borderLeft.borderSize, _borderLeft.borderPosition) + _width + this.getBorderOffset(_borderRight.borderSize, _borderRight.borderPosition);
+			var height:Number = this.getBorderOffset(_borderTop.borderSize, _borderTop.borderPosition) + _height + this.getBorderOffset(_borderBottom.borderSize, _borderBottom.borderPosition);
+			var ratios:Array = borderGradient.getRatios(width, height);
+			if(!useFillMode) {
+				_graphics.lineStyle(border.borderSize, 0, border.borderAlpha, true, LineScaleMode.NORMAL, CapsStyle.NONE);
+				_graphics.lineGradientStyle(borderGradient.type, borderGradient.colors, borderGradient.alphas, ratios, getGradientMatrix(width, height, borderGradient.angle));
+			} else {
+				_graphics.beginGradientFill(borderGradient.type, borderGradient.colors, borderGradient.alphas, ratios, getGradientMatrix(width, height, borderGradient.angle));
+			}
+		}
+		
+		protected function getBorderOffset ( borderThickness:Number, position:String, useFillMode:Boolean = false ):Number {
+			if (isNaN(borderThickness)) {
+				return 0;
+			}
+			var offset:Number = 0;
+			switch(position) {
+				case BorderPosition.INSIDE:
+				if (!useFillMode) {
+					offset += borderThickness * -0.5;
+				} else {
+					offset += 0;
+				}
+				break;
+				
+				case BorderPosition.OUTSIDE:
+				if (!useFillMode) {
+					offset += borderThickness * 0.5;
+				} else {
+					offset += borderThickness;
+				}
+				break;
+				
+				case BorderPosition.CENTER:
+				if (!useFillMode) {
+					offset += 0;
+				} else {
+					offset += borderThickness / 2;
+				}
+				break;
+			}
+			return offset;
+		}
+	
+		protected function nothing ( ):void {	
+			/*var leftOffset:Number = !isNaN(_borderLeft) ? (this.getBorderOffset(_borderLeft) + _borderLeft / 2) : 0;
 			var rightOffset:Number = !isNaN(_borderRight) ? (this.getBorderOffset(_borderRight) + _borderRight / 2) : 0;
 			var topOffset:Number = !isNaN(_borderTop) ? (this.getBorderOffset(_borderTop) + _borderTop / 2) : 0;
 			var bottomOffset:Number = !isNaN(_borderBottom) ? (this.getBorderOffset(_borderBottom) + _borderBottom / 2) : 0;
@@ -226,11 +681,11 @@
 				this.drawSingleBorder();
 			} else {
 				this.drawSeparateBorders();
-			}
+			}*/
 			
 		}
 		
-		protected function drawSingleBorder ( ):void {
+		/*protected function drawSingleBorder ( ):void {
 			
 			if (!_border) {
 				return;
@@ -336,9 +791,9 @@
 				
 				graphics.lineStyle();
 			}
-		}
+		}*/
 		
-		protected function setLineStyle ( thickness:Number):void {
+		/*protected function setLineStyle ( thickness:Number):void {
 			_graphics.lineStyle(thickness, uint(_borderColor), _borderAlpha, true, LineScaleMode.NORMAL, CapsStyle.NONE);
 		}
 		
@@ -357,22 +812,7 @@
 			_graphics.lineBitmapStyle(_linePatternData, m, false, false);
 		}
 		
-		protected function getBorderOffset ( borderThickness:Number ):Number {
-			if (isNaN(borderThickness)) {
-				return 0;
-			}
-			var offset:Number = _borderOffset;
-			switch(_borderPosition) {
-				case BorderPosition.INSIDE:
-				offset += borderThickness * -0.5;
-				break;
-				
-				case BorderPosition.OUTSIDE:
-				offset += borderThickness * 0.5;
-				break;
-			}
-			return offset;
-		}
+		*/
 		
 		protected function drawBackgroundImage ( ):void {
 			
@@ -630,7 +1070,7 @@
 				var topLeftCorner:Number = Math.max(0, _topLeftCorner - Math.max(x,y));
 				var topRightCorner:Number = Math.max(0, _topRightCorner - Math.max(_width - (x+width), y));
 				var bottomLeftCorner:Number = Math.max(0, _bottomLeftCorner - Math.max(x,_height - (y+height)));
-				var bottomRightCorner:Number = Math.max(0, _bottomLeftCorner - Math.max(_width - (x + width), _height - (y + height)));
+				var bottomRightCorner:Number = Math.max(0, _bottomRightCorner - Math.max(_width - (x + width), _height - (y + height)));
 				if (roundedCorners || topLeftCorner || topRightCorner || bottomLeftCorner || bottomRightCorner) {
 					_graphics.drawRoundRectComplex(x, y, width, height, topLeftCorner, topRightCorner, bottomLeftCorner, bottomRightCorner);
 				} else {
@@ -809,7 +1249,7 @@
 			// TODO: Implement
 		}
 		
-		public function getLineBitmapPattern ( width:Number, height:Number ):BitmapData {
+		/*public function getLineBitmapPattern ( width:Number, height:Number ):BitmapData {
 			var shape:Shape = Shape(ObjectPool.getObject(Shape));
 			var bitmapData:BitmapData = new BitmapData(width, height, true, 0x00FFFFFF);
 			
@@ -831,7 +1271,7 @@
 				graphics.beginGradientFill(_borderGradient.type, _borderGradient.colors, _borderGradient.alphas, ratios, getGradientMatrix(width, height, _borderGradient.angle));
 			}
 			
-			this.fillLineBitmap(graphics, width, height);
+			//this.fillLineBitmap(graphics, width, height);
 			
 			bitmapData.draw(shape, null, null, null, null, false);
 			graphics.endFill();
@@ -888,58 +1328,104 @@
 				}
 			}
 			
-		}
+		}*/
 		
 		public function setProperty ( propertyName:String, value:*, parameters:Object = null ):void {
+			switch(propertyName) {
+				default:
+				this.applyProperty(propertyName, value, parameters);
+				break;
+				
+				case "background":
+				this.parseBackground(value, parameters);
+				break;
+				
+				case "backgroundImage":
+				this.parseBackgroundImage(value, parameters);
+				break;
+				
+				case "backgroundPosition":
+				this.parseBackgroundPosition(value, parameters);
+				break;
+				
+				case "backgroundSize":
+				this.parseBackgroundSize(value, parameters);
+				break;
+				
+				case "backgroundRepeat":
+				this.parseBackgroundRepeat(value, parameters);
+				break;
+				
+				case "backgroundGradient":
+				this.parseBackgroundGradient(value, parameters);
+				break;
+				
+				case "border":
+				case "borderLeft":
+				case "borderTop":
+				case "borderRight":
+				case "borderBottom":
+				this.parseBorder(propertyName, value, parameters);
+				break;
+				
+				case "borderGradient":
+				case "borderLeftGradient":
+				case "borderTopGradient":
+				case "borderRightGradient":
+				case "borderBottomGradient":
+				this.parseBorderGradient(propertyName, value, parameters);
+				break;
+				
+				case "roundedCorners":
+				this.parseRoundedCorners(value, parameters);
+				break;
+			}
+		}
+		
+		protected function applyProperty ( propertyName:String, value:*, parameters:Object = null ):void {
 			var transitionData:TransitionData;
 			if (parameters) {
 				transitionData = TransitionData(parameters.transition);
 			}
-			switch(propertyName) {
-				default:
-				if (!transitionData) {
-					this[propertyName] = value;
-				} else {
-					trace(transitionData);
-					tween(this, transitionData);
+			if (!transitionData) {	
+				if (hasTween(this, propertyName)) {
+					removeTween(this, propertyName);
 				}
-				break;
+				this[propertyName] = value;
+			} else {
+				if (transitionData.type == TransitionType.TO) {
+					transitionData.value = value;
+				}
+				switch(propertyName) {
+					case "borderPosition":
+					case "borderLeftPosition":
+					case "borderTopPosition":
+					case "borderRightPosition":
+					case "borderBottomPosition":
+					this[propertyName] = value;
+					break;
+					
+					case "borderLineStyle":
+					case "borderLeftLineStyle":
+					case "borderTopLineStyle":
+					case "borderRightLineStyle":
+					case "borderBottomLineStyle":
+					this[propertyName] = value;
+					break;
+					
+					default:
+					tween(this, propertyName, transitionData);
+					break;
+				}
 				
-				case "background":
-				this.parseBackground(value);
-				break;
-				
-				case "backgroundImage":
-				this.parseBackgroundImage(value);
-				break;
-				
-				case "backgroundPosition":
-				this.parseBackgroundPosition(value);
-				break;
-				
-				case "backgroundSize":
-				this.parseBackgroundSize(value);
-				break;
-				
-				case "backgroundRepeat":
-				this.parseBackgroundRepeat(value);
-				break;
-				
-				case "backgroundGradient":
-				this.parseBackgroundGradient(value);
-				break;
-				
-				case "borderGradient":
-				this.parseBorderGradient(value);
-				break;
 			}
 		}
 		
-		protected function parseBackground ( value:String ):void {
+		protected function parseBackground ( value:String, parameters:Object = null ):void {
 			
 		}
 		
-		protected function parseBackgroundImage ( value:String ):void {
+		protected function parseBackgroundImage ( value:String, parameters:Object = null ):void {
 			var match:Array = value.match(/^(url|resource|none|null)\("?(.*?)"?\)$/);
 			if (!match) {
 				this.backgroundImage = null;
@@ -956,21 +1442,21 @@
 			}
 		}
 		
-		protected function parseBackgroundPosition ( value:String ):void {
+		protected function parseBackgroundPosition ( value:String, parameters:Object = null ):void {
 			var parser:PropertyParser = this.getParser("backgroundPosition");
 			if (parser) {
 				var data:BackgroundPositionData = BackgroundPositionData(parser.parseValue(value));
-				this.backgroundImageHorizontalFloat = data.horizontalFloat;
-				this.backgroundImageOffsetX = data.offsetX;
-				this.backgroundImageOffsetXValueType = data.offsetXValueType;
+				this.applyProperty("backgroundImageHorizontalFloat", data.horizontalFloat, parameters);
+				this.applyProperty("backgroundImageOffsetX", data.offsetX, parameters);
+				this.applyProperty("backgroundImageOffsetXValueType", data.offsetXValueType, parameters);
 				
-				this.backgroundImageVerticalFloat = data.verticalFloat;
-				this.backgroundImageOffsetY = data.offsetY;
-				this.backgroundImageOffsetYValueType = data.offsetYValueType;
+				this.applyProperty("backgroundImageVerticalFloat", data.verticalFloat, parameters);
+				this.applyProperty("backgroundImageOffsetY", data.offsetY, parameters);
+				this.applyProperty("backgroundImageOffsetYValueType", data.offsetYValueType, parameters);
 			}
 		}
 		
-		protected function parseBackgroundSize ( value:String ):void {
+		protected function parseBackgroundSize ( value:String, parameters:Object = null ):void {
 			var parser:PropertyParser = this.getParser("backgroundSize");
 			if (parser) {
 				var data:BackgroundSizeData = BackgroundSizeData(parser.parseValue(value));
@@ -984,7 +1470,7 @@
 			}
 		}
 		
-		protected function parseBackgroundRepeat ( value:String ):void {
+		protected function parseBackgroundRepeat ( value:String, parameters:Object = null ):void {
 			var parser:PropertyParser = this.getParser("backgroundRepeat");
 			if (parser) {
 				var data:BackgroundRepeatData = BackgroundRepeatData(parser.parseValue(value));
@@ -993,21 +1479,93 @@
 			}
 		}
 		
-		protected function parseBackgroundGradient ( value:String ):void {
+		protected function parseBackgroundGradient ( value:String, parameters:Object = null ):void {
 			var parser:PropertyParser = this.getParser("backgroundGradient");
 			if (parser) {
 				var data:GraphicsGradientData = GraphicsGradientData(parser.parseValue(value));
-				this.backgroundGradient = data ? data.clone() : null;
+				this.applyProperty("backgroundGradient", data ? data.clone() : null, parameters);
 			}
 		}
 		
-		protected function parseBorderGradient ( value:String ):void {
+		protected function parseBorder ( propertyName:String, value:String, parameters:Object = null ):void {
+			var parser:PropertyParser = this.getParser("border");
+			if (parser) {
+				var data:BorderData = BorderData(parser.parseValue(value));
+				var border:Border;
+				switch(propertyName) {
+					case "border":
+					if (data.border) {
+						border = data.border;
+						this.applyToBorder(border, "", parameters);
+					} else {
+						if ((border = data.borderLeft)) {
+							this.applyToBorder(border, "Left", parameters);
+						}
+						if ((border = data.borderTop)) {
+							this.applyToBorder(border, "Top", parameters);
+						}
+						if ((border = data.borderRight)) {
+							this.applyToBorder(border, "Right", parameters);
+						}
+						if ((border = data.borderBottom)) {
+							this.applyToBorder(border, "Bottom", parameters);
+						}
+					}
+					break;
+					
+					case "borderLeft":
+					this.applyToBorder(data.border, "Left", parameters);
+					break;
+					
+					case "borderTop":
+					this.applyToBorder(data.border, "Top", parameters);
+					break;
+					
+					case "borderRight":
+					this.applyToBorder(data.border, "Right", parameters);
+					break;
+					
+					case "borderBottom":
+					this.applyToBorder(data.border, "Bottom", parameters);
+					break;
+				}
+			}
+		}
+		
+		protected function applyToBorder ( border:Border, side:String = "", parameters:Object = null ):void {
+			this.applyProperty("border" + side + "Size", border.borderSize, parameters);
+			this.applyProperty("border" + side + "Color", border.borderColor, parameters);
+			this.applyProperty("border" + side + "Alpha", border.borderAlpha, parameters);
+			this.applyProperty("border" + side + "Position", border.borderPosition, parameters);
+			this.applyProperty("border" + side + "LineStyle", border.borderLineStyle, parameters);
+		}
+		
+		protected function parseBorderGradient ( propertyName:String, value:String, parameters:Object = null ):void {
 			var parser:PropertyParser = this.getParser("borderGradient");
 			if (parser) {
 				var data:GraphicsGradientData = GraphicsGradientData(parser.parseValue(value));
-				this.borderGradient = data ? data.clone() : null;
+				if (data) {
+					data = data.clone();
+				}
+				this.applyProperty(propertyName, data, parameters);
 			}
 		}
+		
+		protected function parseRoundedCorners ( value:String, parameters:Object = null ):void {
+			var parser:PropertyParser = this.getParser("roundedCorners");
+			if (parser) {
+				var data:SideData = SideData(parser.parseValue(value));
+				if (data.all) {
+					this.applyProperty("roundedCorners", data.all, parameters);
+				} else {
+					this.applyProperty("topLeftCorner", data.first, parameters);
+					this.applyProperty("topRightCorner", data.second, parameters);
+					this.applyProperty("bottomLeftCorner", data.third, parameters);
+					this.applyProperty("bottomRightCorner", data.fourth, parameters);
+				}
+			}
+		}
+		
 		
 		protected function setBackgroundImage ( displayObject:DisplayObject ):void {
 			_backgroundImage = displayObject;
@@ -1140,91 +1698,216 @@
 			}
 		}
 		
-		public function get border ( ):Number { return _border; }
-		public function set border ( value:Number ):void {
-			if (_border != value) {
-				_border = value;
-				_borderLeft = _borderRight = _borderTop = _borderBottom = value;
+		public function get borderSize ( ):Number { return _border.borderSize; }
+		public function set borderSize ( value:Number ):void {
+			_border.borderSize = value;
+			this.borderLeftSize = this.borderTopSize = this.borderRightSize = this.borderBottomSize = value;
+		}
+		
+		public function get borderLeftSize ( ):Number { return _borderLeft.borderSize; }
+		public function set borderLeftSize ( value:Number ):void {
+			if (_borderLeft.borderSize != value) {
+				_borderLeft.borderSize = value;
 				this.invalidate();
 			}
 		}
 		
-		public function get borderPosition ( ):String { return _borderPosition; }
-		public function set borderPosition ( value:String ):void {
-			if (_borderPosition != value) {
-				_borderPosition = value;
+		public function get borderTopSize ( ):Number { return _borderTop.borderSize; }
+		public function set borderTopSize ( value:Number ):void {
+			if (_borderTop.borderSize != value) {
+				_borderTop.borderSize = value;
 				this.invalidate();
 			}
 		}
 		
-		public function get borderTop ( ):Number { return _borderTop; }
-		public function set borderTop ( value:Number ):void {
-			if (_borderTop != value) {
-				_borderTop = value;
+		public function get borderRightSize ( ):Number { return _borderRight.borderSize; }
+		public function set borderRightSize ( value:Number ):void {
+			if (_borderRight.borderSize != value) { 
+				_borderRight.borderSize = value;
 				this.invalidate();
 			}
 		}
 		
-		public function get borderLeft ( ):Number { return _borderLeft; }
-		public function set borderLeft ( value:Number ):void {
-			if (_borderLeft != value) {
-				_borderLeft = value;
+		public function get borderBottomSize ( ):Number { return _borderBottom.borderSize; }
+		public function set borderBottomSize ( value:Number ):void {
+			if (_borderBottom.borderSize != value) {
+				_borderBottom.borderSize = value;
 				this.invalidate();
 			}
 		}
 		
-		public function get borderBottom ( ):Number { return _borderBottom; }
-		public function set borderBottom ( value:Number ):void {
-			if (_borderBottom != value) {
-				_borderBottom = value;
-				this.invalidate();
-			}
-		}
-		
-		public function get borderRight ( ):Number { return _borderRight; }
-		public function set borderRight ( value:Number ):void {
-			if (_borderRight != value) {
-				_borderRight = value;
-				this.invalidate();
-			}
-		}
-		
-		public function get borderAlpha ( ):Number { return _borderAlpha; }
-		public function set borderAlpha ( value:Number ):void {
-			if (_borderAlpha != value) {
-				_borderAlpha = value;
-				this.invalidate();
-			}
-		}
-		
-		public function get borderColor ( ):Object { return _borderColor; }
+		public function get borderColor ( ):Object { return _border.borderColor; }
 		public function set borderColor ( value:Object ):void {
-			if (_borderColor != value) {
-				_borderColor = value;
+			_border.borderColor = value;
+			this.borderLeftColor = this.borderTopColor = this.borderRightColor = this.borderBottomColor = value;
+		}
+		
+		public function get borderLeftColor ( ):Object { return _borderLeft.borderColor; }
+		public function set borderLeftColor ( value:Object ):void {
+			if (_borderLeft.borderColor != value) {
+				_borderLeft.borderColor = value;
 				this.invalidate();
 			}
 		}
 		
-		public function get borderGradient ( ):GraphicsGradientData { return _borderGradient; }
+		public function get borderTopColor ( ):Object { return _borderTop.borderColor; }
+		public function set borderTopColor ( value:Object ):void {
+			if (_borderTop.borderColor != value) {
+				_borderTop.borderColor = value;
+				this.invalidate();
+			}
+		}
+		
+		public function get borderRightColor ( ):Object { return _borderRight.borderColor; }
+		public function set borderRightColor ( value:Object ):void {
+			if (_borderRight.borderColor != value) {
+				_borderRight.borderColor = value;
+				this.invalidate();
+			}
+		}
+		
+		public function get borderBottomColor ( ):Object { return _borderBottom.borderColor; }
+		public function set borderBottomColor ( value:Object ):void {
+			if (_borderBottom.borderColor != value) {
+				_borderBottom.borderColor = value;
+				this.invalidate();
+			}
+		}
+		
+		public function get borderAlpha ( ):Number { return _border.borderAlpha; }
+		public function set borderAlpha ( value:Number ):void {
+			_border.borderAlpha = value;
+			this.borderLeftAlpha = this.borderTopAlpha = this.borderRightAlpha = this.borderBottomAlpha = value;
+		}
+		
+		public function get borderLeftAlpha ( ):Number { return _borderLeft.borderAlpha; }
+		public function set borderLeftAlpha ( value:Number ):void {
+			if (_borderLeft.borderAlpha != value) {
+				_borderLeft.borderAlpha = value;
+				this.invalidate();
+			}
+		}
+		
+		public function get borderTopAlpha ( ):Number { return _borderTop.borderAlpha; }
+		public function set borderTopAlpha ( value:Number ):void {
+			if (_borderTop.borderAlpha != value) {
+				_borderTop.borderAlpha = value;
+				this.invalidate();
+			}
+		}
+		
+		public function get borderRightAlpha ( ):Number { return _borderRight.borderAlpha; }
+		public function set borderRightAlpha ( value:Number ):void {
+			if (_borderRight.borderAlpha != value) {
+				_borderRight.borderAlpha = value;
+				this.invalidate();
+			}
+		}
+		
+		public function get borderBottomAlpha ( ):Number { return _borderBottom.borderAlpha; }
+		public function set borderBottomAlpha ( value:Number ):void {
+			if (_borderBottom.borderAlpha != value) {
+				_borderBottom.borderAlpha = value;
+				this.invalidate();
+			}
+		}
+		
+		public function get borderPosition ( ):String { return _border.borderPosition; }
+		public function set borderPosition ( value:String ):void {
+			_border.borderPosition = value;
+			this.borderLeftPosition = this.borderTopPosition = this.borderRightPosition = this.borderBottomPosition = value;
+		}
+		
+		public function get borderLeftPosition ( ):String { return _borderLeft.borderPosition; }
+		public function set borderLeftPosition ( value:String ):void {
+			if (_borderLeft.borderPosition != value) {
+				_borderLeft.borderPosition = value;
+				this.invalidate();
+			}
+		}
+		
+		public function get borderTopPosition ( ):String { return _borderTop.borderPosition; }
+		public function set borderTopPosition ( value:String ):void {
+			if (_borderTop.borderPosition != value) {
+				_borderTop.borderPosition = value;
+				this.invalidate();
+			}
+		}
+		
+		public function get borderRightPosition ( ):String { return _borderRight.borderPosition; }
+		public function set borderRightPosition ( value:String ):void {
+			if (_borderRight.borderPosition != value) {
+				_borderRight.borderPosition = value;
+				this.invalidate();
+			}
+		}
+		
+		public function get borderBottomPosition ( ):String { return _borderBottom.borderPosition; }
+		public function set borderBottomPosition ( value:String ):void {
+			if (_borderBottom.borderPosition != value) {
+				_borderBottom.borderPosition = value;
+				this.invalidate();
+			}
+		}
+		
+		public function get borderGradient ( ):GraphicsGradientData { return _border.borderGradient; }
 		public function set borderGradient ( value:GraphicsGradientData ):void {
-			_borderGradient = value;
+			_border.borderGradient = value;
+			this.borderLeftGradient = this.borderTopGradient = this.borderRightGradient = this.borderBottomGradient = value;
+		}
+		
+		public function get borderLeftGradient ( ):GraphicsGradientData { return _borderLeft.borderGradient; }
+		public function set borderLeftGradient ( value:GraphicsGradientData ):void {
+			_borderLeft.borderGradient = value;
 			this.invalidate();
 		}
 		
-		public function get borderOffset ( ):Number { return _borderOffset; }
-		public function set borderOffset ( value:Number ):void {
-			if (_borderOffset != value) {
-				_borderOffset = value;
-				this.invalidate();
-			}
+		public function get borderTopGradient ( ):GraphicsGradientData { return _borderTop.borderGradient; }
+		public function set borderTopGradient ( value:GraphicsGradientData ):void {
+			_borderTop.borderGradient = value;
+			this.invalidate();
 		}
 		
-		public function get borderLineStyle ( ):Array { return _borderLineStyle; }
+		public function get borderRightGradient ( ):GraphicsGradientData { return _borderRight.borderGradient; }
+		public function set borderRightGradient ( value:GraphicsGradientData ):void {
+			_borderRight.borderGradient = value;
+			this.invalidate();
+		}
+		
+		public function get borderBottomGradient ( ):GraphicsGradientData { return _borderBottom.borderGradient; }
+		public function set borderBottomGradient ( value:GraphicsGradientData ):void {
+			_borderBottom.borderGradient = value;
+			this.invalidate();
+		}
+		
+		public function get borderLineStyle ( ):Array { return _border.borderLineStyle; }
 		public function set borderLineStyle ( value:Array ):void {
-			if (_borderLineStyle != value) {
-				_borderLineStyle = value;
-				this.invalidate();
-			}
+			_border.borderLineStyle = value;
+			this.borderLeftLineStyle = this.borderTopLineStyle = this.borderRightLineStyle = this.borderBottomLineStyle = value;
+		}
+		
+		public function get borderLeftLineStyle ( ):Array { return _borderLeft.borderLineStyle; }
+		public function set borderLeftLineStyle ( value:Array ):void {
+			_borderLeft.borderLineStyle = value;
+			this.invalidate();
+		}
+		
+		public function get borderTopLineStyle ( ):Array { return _borderTop.borderLineStyle; }
+		public function set borderTopLineStyle ( value:Array ):void {
+			_borderTop.borderLineStyle = value;
+			this.invalidate();
+		}
+		
+		public function get borderRightLineStyle ( ):Array { return _borderRight.borderLineStyle; }
+		public function set borderRightLineStyle ( value:Array ):void {
+			_borderRight.borderLineStyle = value;
+			this.invalidate();
+		}
+		
+		public function get borderBottomLineStyle ( ):Array { return _borderBottom.borderLineStyle; }
+		public function set borderBottomLineStyle ( value:Array ):void {
+			_borderBottom.borderLineStyle = value;
+			this.invalidate();
 		}
 		
 		public function get backgroundImage ( ):DisplayObject { return _backgroundImage; }
