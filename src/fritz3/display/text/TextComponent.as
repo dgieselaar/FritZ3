@@ -14,12 +14,15 @@ package fritz3.display.text {
 	import fritz3.display.graphics.Background;
 	import fritz3.display.graphics.BoxBackground;
 	import fritz3.display.graphics.Drawable;
+	import fritz3.display.graphics.parser.side.SideData;
+	import fritz3.display.graphics.parser.side.SideParser;
 	import fritz3.display.graphics.RectangularBackground;
 	import fritz3.display.layout.Layout;
 	import fritz3.display.layout.Rearrangable;
 	import fritz3.display.layout.RectangularLayout;
 	import fritz3.display.text.layout.TextLayout;
 	import fritz3.style.invalidation.InvalidatableStyleSheetCollector;
+	import fritz3.style.PropertyParser;
 	/**
 	 * ...
 	 * @author Dario Gieselaar
@@ -104,6 +107,11 @@ package fritz3.display.text {
 			this.initializeStyleSheetObject();
 		}
 		
+		override protected function setParsers():void {
+			super.setParsers();
+			this.addParser("padding", SideParser.parser);
+		}
+		
 		protected function initializeLayout ( ):void {
 			this.layout = new TextLayout();
 		}
@@ -164,6 +172,27 @@ package fritz3.display.text {
 					super.setProperty(propertyName, value, parameters);
 				}
 				break;
+				
+				case "padding":
+				this.parsePadding(propertyName, value, parameters);
+				break;
+			}
+		}
+		
+		protected function parsePadding ( propertyName:String, value:String, parameters:Object = null ):void {
+			var parser:PropertyParser = this.getParser("padding");
+			// TODO: fix tweening bug which occurs when .padding 
+			// returns value which doesn't correctly reflect state
+			if (parser) {
+				var sideData:SideData = SideData(parser.parseValue(value));
+				if (!isNaN(sideData.all)) {
+					this.applyProperty("padding", sideData.all, parameters);
+				} else {
+					this.applyProperty("paddingLeft", sideData.first, parameters);
+					this.applyProperty("paddingTop", sideData.second, parameters);
+					this.applyProperty("paddingRight", sideData.third, parameters);
+					this.applyProperty("paddingBottom", sideData.fourth, parameters);
+				}
 			}
 		}
 		
@@ -735,10 +764,8 @@ package fritz3.display.text {
 		
 		public function get padding ( ):Number { return _padding; }
 		public function set padding ( value:Number ):void {
-			if (_padding != value) {
-				_padding = _paddingTop = _paddingLeft = _paddingBottom = _paddingRight = value;
-				this.applyPadding();
-			}
+			_padding = value;
+			this.paddingLeft = this.paddingTop = this.paddingRight = this.paddingBottom = value;
 		}
 		
 		public function get paddingTop ( ):Number { return _paddingTop; }
