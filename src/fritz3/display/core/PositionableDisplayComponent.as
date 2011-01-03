@@ -1,8 +1,6 @@
 package fritz3.display.core  {
-	import fritz3.display.core.parser.margin.MarginData;
-	import fritz3.display.core.parser.margin.MarginParser;
-	import fritz3.display.core.parser.padding.PaddingData;
-	import fritz3.display.core.parser.padding.PaddingParser;
+	import fritz3.display.graphics.parser.side.SideData;
+	import fritz3.display.graphics.parser.side.SideParser;
 	import fritz3.display.layout.flexiblebox.Collapsable;
 	import fritz3.display.layout.flexiblebox.FlexibleBoxElement;
 	import fritz3.display.layout.InvalidatablePositionable;
@@ -68,7 +66,7 @@ package fritz3.display.core  {
 		
 		override protected function setParsers ( ):void {
 			super.setParsers();
-			this.addParser("margin", MarginParser.parser);
+			this.addParser("margin", SideParser.parser);
 		}
 		
 		protected function initializeDisplayInvalidationSignal ( ):void {
@@ -98,12 +96,12 @@ package fritz3.display.core  {
 		protected function parseMargin ( value:*, parameters:Object = null ):void {
 			var parser:PropertyParser = this.getParser("margin");
 			if (parser) {
-				var marginData:MarginData = MarginData(parser.parseValue(value));
-				if (!isNaN(marginData.margin)) {
-					this.margin = marginData.margin;
+				var sideData:SideData = SideData(parser.parseValue(value));
+				if (!isNaN(sideData.all)) {
+					this.margin = sideData.all;
 				} else {
-					this.marginLeft = marginData.marginLeft, this.marginRight = marginData.marginRight;
-					this.marginTop = marginData.marginTop, this.marginBottom = marginData.marginBottom;
+					this.marginLeft = sideData.first, this.marginRight = sideData.third;
+					this.marginTop = sideData.second, this.marginBottom = sideData.fourth;
 				}
 			}
 		}
@@ -158,10 +156,8 @@ package fritz3.display.core  {
 		
 		public function get margin ( ):Number { return _margin; }
 		public function set margin ( value:Number ):void {
-			if (_margin != value) {
-				_margin = _marginTop = _marginLeft = _marginBottom = _marginRight = value;
-				this.invalidateDisplay();
-			}
+			_margin = value;
+			this.marginLeft = this.marginTop = this.marginRight = this.marginBottom = value;
 		}
 		
 		public function get marginTop ( ):Number { return _marginTop; }
