@@ -29,9 +29,6 @@
 	import fritz3.utils.math.MathUtil;
 	import fritz3.utils.object.ObjectParser;
 	import fritz3.utils.signals.fast.FastSignal;
-	import fritz3.utils.tween.ftween.FTweenEngine;
-	import fritz3.utils.tween.gtween.GTweenEngine;
-	import fritz3.utils.tween.TweenEngine;
 	import ru.etcs.utils.getDefinitionNames;
 	
 	/**
@@ -52,7 +49,7 @@
 		override public function onAdd ( ):void  {
 			super.onAdd();
 			
-			var textButton:TextButton;
+			var textButton:TextButton, graphicsComponent:GraphicsComponent;
 			
 			var styleSheetXML:XML = XML(new StyleSheetXML());
 			StyleManager.parseXML(styleSheetXML);
@@ -60,11 +57,46 @@
 			var uiXML:XML = XML(new UIXML());
 			ObjectParser.parseXMLChildren(this, uiXML.children());
 			
+			/*var bg:Shape = new Shape();
+			this.add(bg);
 			
-		}
-		
-		override protected function getTweenEngine ( ):TweenEngine {
-			return new GTweenEngine();
+			var graphics:Graphics = bg.graphics;
+			
+			var width:Number = 100, height:Number = 20, ellipseSize:Number = 5;
+			graphics.beginFill(0xFF68EB, 1);
+			graphics.drawRoundRect(0, 0, width, height, ellipseSize, ellipseSize);
+			graphics.endFill();
+			
+			var borderLeft:Number = 1, borderTop:Number = 2;
+			
+			var from:Point, to:Point, controlPoint:Point, target:Point;
+			
+			graphics.beginFill(0x000000, 0.5);
+			graphics.moveTo(0, height/2);
+			graphics.lineTo(0, ellipseSize / 2);
+			
+			from = new Point(0, ellipseSize / 2);
+			to = new Point(ellipseSize / 2, 0);
+			controlPoint = new Point(0, 0);
+			target = MathUtil.getPointOnCurve(from, to, controlPoint, 0.5);
+			controlPoint = MathUtil.getControlPoint(from, to, controlPoint, 0, 0.5);
+			
+			graphics.curveTo(controlPoint.x, controlPoint.y, target.x, target.y);
+			
+			from = new Point(borderLeft, ellipseSize / 2);
+			to = new Point(ellipseSize / 2, borderTop);
+			controlPoint = new Point(borderLeft, borderTop);
+			target = MathUtil.getPointOnCurve(from, to, controlPoint, 0.5);
+			controlPoint = MathUtil.getControlPoint(from, to, controlPoint, 0, 0.5);
+			
+			graphics.lineTo(target.x, target.y);
+			graphics.curveTo(controlPoint.x, controlPoint.y, from.x, from.y);
+			graphics.lineTo(borderLeft, height / 2);
+			graphics.lineTo(0, height / 2);
+			
+			graphics.endFill();
+			
+			this.scaleX = this.scaleY = 5;*/
 		}
 		
 	}

@@ -1,13 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <data>
 	
-	<DisplayComponentContainer id="container">
-		<TextButton/>
-		<TextButton/>
-		<TextButton/>
-		<TextButton/>
-		<TextButton/>
-		<TextButton/>
-	</DisplayComponentContainer>
+	<TextButton id="button" />
+	<TextButton id="button" marginLeft="1" />
 
 </data>
