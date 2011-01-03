@@ -58,7 +58,7 @@ package fritz3.display.graphics.gradient {
 			
 			var ratios:Array = [], gradientColor:GraphicsGradientColor, position:Number, positionValueType:String;
 			var angle:Number = this.angle;
-			var length:Number = MathUtil.getLineLength(width, height, angle * Math.PI/180);
+			var length:Number = MathUtil.getLineLength(width, height, Math.abs(angle) * Math.PI / 180);
 			for (var i:int, l:int = this.gradientColors.length; i < l; ++i) {
 				gradientColor = this.gradientColors[i];
 				position = gradientColor.position;
