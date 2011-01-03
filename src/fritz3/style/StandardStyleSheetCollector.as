@@ -157,7 +157,9 @@ package fritz3.style {
 						node.value = value;
 					}
 					// TODO: copy transitionData
-					node.transitionData = ruleNode.transitionData;
+					if (ruleNode.transitionData) {
+						node.transitionData = ruleNode.transitionData;
+					}
 					ruleNode = ruleNode.nextNode;
 				}
 			}
