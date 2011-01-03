@@ -39,6 +39,9 @@ package fritz3.display.layout.flexiblebox {
 		
 		protected var _lines:String = BoxLines.MULTIPLE;
 		
+		protected var _measuredWidth:Number = 0;
+		protected var _measuredHeight:Number = 0;
+		
 		public function FlexibleBoxLayout ( ) {
 			
 		}
@@ -129,7 +132,7 @@ package fritz3.display.layout.flexiblebox {
 				group[group.length] = child;
 			}
 			
-			var minWidth:Number = 0, maxChildHeight:Number = 0;
+			var minWidth:Number = 0, childHeight:Number, maxChildIntrinsicHeight:Number = 0, maxChildBoundsHeight:Number = 0;
 			for (i = 0, l = toPosition.length; i < l; ++i) {
 				child = toPosition[i];
 				if (!isFlexible[child]) {
@@ -140,19 +143,22 @@ package fritz3.display.layout.flexiblebox {
 						minWidth += boxElement.minimumWidth;
 					}
 				}
+				childHeight = child.height;
+				maxChildIntrinsicHeight = Math.max(maxChildIntrinsicHeight, childHeight);
 				if (child is Positionable) {
 					positionable = Positionable(child);
 					minWidth += (positionable.marginLeft + positionable.marginRight);
+					childHeight += (positionable.marginTop + positionable.marginBottom);
 				}
-				maxChildHeight = Math.max(maxChildHeight, child.height);
+				maxChildBoundsHeight = Math.max(maxChildBoundsHeight, childHeight);
 			}
 			
 			if (_autoHeight) {
-				availableHeight = maxChildHeight;
+				availableHeight = maxChildIntrinsicHeight;
 			}
 			
 			var spaceToDistribute:Number = Math.max(0, availableWidth - minWidth);
-			var childWidth:Number, childHeight:Number, flexTotal:Number;
+			var childWidth:Number, flexTotal:Number;
 			
 			flexloop:for (var flexGroupID:Object in flexGroups) {
 				flexGroup = flexGroups[flexGroupID];
@@ -246,6 +252,13 @@ package fritz3.display.layout.flexiblebox {
 					}
 				}
 			}
+			
+			_measuredWidth = x + _paddingLeft;
+			if (align == Align.STRETCH) {
+				_measuredHeight = _height;
+			} else {
+				_measuredHeight = maxChildBoundsHeight + _paddingTop + _paddingBottom;
+			}
 		}
 		
 		protected function layoutVertically ( container:DisplayObjectContainer, items:Array ):void {
@@ -307,7 +320,7 @@ package fritz3.display.layout.flexiblebox {
 				group[group.length] = child;
 			}
 			
-			var minHeight:Number = 0, maxChildWidth:Number = 0;
+			var minHeight:Number = 0, childWidth:Number, maxChildWidth:Number = 0;
 			for (i = 0, l = toPosition.length; i < l; ++i) {
 				child = toPosition[i];
 				if (!isFlexible[child]) {
@@ -318,11 +331,13 @@ package fritz3.display.layout.flexiblebox {
 						minHeight += boxElement.minimumHeight;
 					}
 				}
+				childWidth = child.width;
 				if (child is Positionable) {
 					positionable = Positionable(child);
 					minHeight += (positionable.marginTop + positionable.marginBottom);
+					childWidth += (positionable.marginLeft + positionable.marginBottom);
 				}
-				maxChildWidth = Math.max(child.width, maxChildWidth);
+				maxChildWidth = Math.max(child.width, childWidth);
 			}
 			
 			if (_autoWidth) {
@@ -330,7 +345,7 @@ package fritz3.display.layout.flexiblebox {
 			}
 			
 			var spaceToDistribute:Number = Math.max(0, availableHeight - minHeight);
-			var childWidth:Number, childHeight:Number, flexTotal:Number;
+			var childHeight:Number, flexTotal:Number;
 			
 			flexloop:for (var flexGroupID:Object in flexGroups) {
 				flexGroup = flexGroups[flexGroupID];
@@ -633,6 +648,9 @@ package fritz3.display.layout.flexiblebox {
 				this.invalidate();
 			}
 		}
+		
+		public function get measuredWidth ( ):Number { return _measuredWidth; }
+		public function get measuredHeight ( ):Number { return _measuredHeight; }
 		
 	}
 
