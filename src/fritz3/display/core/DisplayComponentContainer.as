@@ -7,11 +7,11 @@
 	import flash.geom.Rectangle;
 	import fritz3.base.collection.ArrayItemCollection;
 	import fritz3.base.collection.ItemCollection;
-	import fritz3.display.core.parser.padding.PaddingData;
-	import fritz3.display.core.parser.padding.PaddingParser;
 	import fritz3.display.graphics.Background;
 	import fritz3.display.graphics.BoxBackground;
 	import fritz3.display.graphics.Drawable;
+	import fritz3.display.graphics.parser.side.SideData;
+	import fritz3.display.graphics.parser.side.SideParser;
 	import fritz3.display.graphics.RectangularBackground;
 	import fritz3.display.layout.flexiblebox.FlexibleBoxLayout;
 	import fritz3.display.layout.InvalidatablePositionable;
@@ -104,7 +104,7 @@
 		
 		override protected function setParsers():void {
 			super.setParsers();
-			this.addParser("padding", PaddingParser.parser);
+			this.addParser("padding", SideParser.parser);
 		}
 		
 		override public function setProperty(propertyName:String, value:*, parameters:Object = null):void {
@@ -132,20 +132,22 @@
 				break;
 				
 				case "padding":
-				this.parsePadding(value, parameters);
+				this.parsePadding(propertyName, value, parameters);
 				break;
 			}
 		}
 		
-		protected function parsePadding ( value:String, parameters:Object = null ):void {
+		protected function parsePadding ( propertyName:String, value:String, parameters:Object = null ):void {
 			var parser:PropertyParser = this.getParser("padding");
 			if (parser) {
-				var paddingData:PaddingData = PaddingData(parser.parseValue(value));
-				if (!isNaN(paddingData.padding)) {
-					this.padding = paddingData.padding;
+				var sideData:SideData = SideData(parser.parseValue(value));
+				if (!isNaN(sideData.all)) {
+					this.applyProperty("padding", sideData.all, parameters);
 				} else {
-					this.paddingLeft = paddingData.paddingLeft, this.paddingRight = paddingData.paddingRight;
-					this.paddingTop = paddingData.paddingTop, this.paddingBottom = paddingData.paddingBottom;
+					this.applyProperty("paddingLeft", sideData.first, parameters);
+					this.applyProperty("paddingTop", sideData.second, parameters);
+					this.applyProperty("paddingRight", sideData.third, parameters);
+					this.applyProperty("paddingBottom", sideData.fourth, parameters);
 				}
 			}
 		}
@@ -225,11 +227,16 @@
 		}
 		
 		protected function measureDimensions ( ):void {
-			if (_useScrollRect) {
-				var bounds:Rectangle = this.displayList.transform.pixelBounds;
-				_measuredWidth = bounds.width + _paddingLeft + _paddingRight, _measuredHeight = bounds.height + _paddingTop + _paddingBottom;
+			if (_layout && _layout is FlexibleBoxLayout) {
+				var layout:FlexibleBoxLayout = FlexibleBoxLayout(layout);
+				_measuredWidth = layout.measuredWidth, _measuredHeight = layout.measuredHeight;
 			} else {
-				_measuredWidth = _displayList.width + _paddingLeft + _paddingRight, _measuredHeight = _displayList.height + _paddingTop + _paddingBottom;
+				if (_useScrollRect) {
+					var bounds:Rectangle = this.displayList.transform.pixelBounds;
+				_measuredWidth = bounds.width + _paddingLeft + _paddingRight, _measuredHeight = bounds.height + _paddingTop + _paddingBottom;
+				} else {
+					_measuredWidth = _displayList.width + _paddingLeft + _paddingRight, _measuredHeight = _displayList.height + _paddingTop + _paddingBottom;
+				}
 			}
 			
 			if (_autoWidth) {
@@ -611,10 +618,8 @@
 		
 		public function get padding ( ):Number { return _padding; }
 		public function set padding ( value:Number ):void {
-			if (_padding != value) {
-				_padding = _paddingLeft = _paddingTop = _paddingRight = _paddingBottom = value;
-				this.applyPadding();
-			}
+			_padding = value;
+			this.paddingLeft = this.paddingTop = this.paddingRight = this.paddingBottom = value;
 		}
 		
 		public function get paddingLeft ( ):Number { return _paddingLeft; }
