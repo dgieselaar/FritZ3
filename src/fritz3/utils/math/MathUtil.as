@@ -31,6 +31,31 @@ package fritz3.utils.math {
 			return Math.sqrt(x * x + y * y);
 		}
 		
+		public static function getPointOnCurve ( from:Point, to:Point, controlPoint:Point, progress:Number ):Point {
+			if(controlPoint) {
+				return new Point(MathUtil.quadBezier(from.x, controlPoint.x, to.x, progress), MathUtil.quadBezier(from.y, controlPoint.y, to.y, progress));
+			} else {
+				return new Point(MathUtil.linearBezier(from.x, to.x, progress), MathUtil.linearBezier(from.y, to.y, progress));
+			}
+		}
+		
+		public static function getControlPoint ( start:Point, end:Point, control:Point, from:Number = 0, to:Number = 1, accuracy:Number = 0.01 ):Point {
+			if (from == 0) return MathUtil.getPointOnCurve(start, control, null, to);
+			if (from == 1) return MathUtil.getPointOnCurve(control, end, null, from);
+			
+			var p1:Point = MathUtil.getPointOnCurve(start, control, null, to);
+			var p2:Point = MathUtil.getPointOnCurve(start, end, control, to);
+			return MathUtil.getPointOnCurve(p1, p2, null, from / to);
+		}
+		
+		public static function quadBezier ( p0:Number, p1:Number, p2:Number, t:Number ):Number {
+			return Math.pow(1 - t, 2) * p0 + 2 * (1 - t) * t * p1 + Math.pow(t, 2) * p2;
+		}
+		
+		public static function linearBezier ( p0:Number, p1:Number, t:Number ):Number {
+			return p0 + t * (p1 - p0);
+		}
+		
 	}
 
 }
