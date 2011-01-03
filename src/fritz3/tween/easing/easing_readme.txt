@@ -1,5 +1,3 @@
-This readme file applies to all eases in this directory EXCEPT the CustomEase, EaseLookup, SteppedEase, FastEase, and RoughEase.
-
 ============================================================================================
  Easing Equations
  (c) 2003 Robert Penner, all rights reserved. 
