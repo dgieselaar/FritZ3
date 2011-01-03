@@ -43,10 +43,10 @@ package fritz3.display.graphics.parser.position  {
 			var match:Array = value.match(/(^((center|(left|right)|(top|bottom))\s*)?((\d+)(%|px)?)?$)|(^(((center|left|right)\s*)?((\d+)(%|px)?)?)\s*(((center|top|bottom)\s*)?((\d+)(%|px)?)?)$)/);
 			var val:Number, valueType:String;
 			var type:String;
-			if (match && match[1]) {
+			if (match && match[1] != undefined) {
 				type = match[5] ? "vertical" : "horizontal";
 				val = match[7];
-				if (match[8]) {
+				if (match[8] != undefined) {
 					valueType = match[8];
 				}
 				switch(type) {
@@ -62,30 +62,30 @@ package fritz3.display.graphics.parser.position  {
 					offsetYValueType = valueType;
 					break;
 				}
-			} else if (match && match[9]) {
-				if (match[10]) {
-					if (match[12]) {
+			} else if (match && match[9] != undefined) {
+				if (match[10] != undefined) {
+					if (match[12] != undefined) {
 						horizontalFloat = match[12];
 					} else {
 						horizontalFloat = Align.LEFT;
 					}
-					if (match[14]) {
+					if (match[14] != undefined) {
 						offsetX = match[14];
 					}
-					if (match[15]) {
+					if (match[15] != undefined) {
 						offsetXValueType = match[15];
 					}
 				}
-				if (match[16]) {
-					if (match[18]) {
+				if (match[16] != undefined) {
+					if (match[18] != undefined) {
 						verticalFloat = match[18];
 					} else {
 						verticalFloat = Align.TOP;
 					}
-					if (match[20]) {
+					if (match[20] != undefined) {
 						offsetY = match[20];
 					}
-					if (match[21]) {
+					if (match[21] != undefined) {
 						offsetYValueType = match[21];
 					}
 				}

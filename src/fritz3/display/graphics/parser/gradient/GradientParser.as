@@ -28,17 +28,17 @@ package fritz3.display.graphics.parser.gradient {
 		
 		public function getGradientData ( value:String ):GraphicsGradientData {
 			var data:GraphicsGradientData;
-			var match:Array = value.match(/(linear|radial)(\s+([0-9]{1,3})\s+)?(\s*(\d+)(%|px)?\s+)?(.+)/);
+			var match:Array = value.match(/(linear|radial)(\s+(-?[0-9]{1,3}))?(\s+(\d+)(%|px)?)?\s*\((.+)\)/);
 			if (match) {
 				data = new GraphicsGradientData();
 				data.type = match[1];
 				var focalPointRatio:Number = 0, focalPointRatioValueType:String = DisplayValueType.RATIO
-				data.angle = match[3] || 90;
+				data.angle = match[3] != undefined ? match[3] : 90;
 				if (data.type == "radial") {
-					data.focalPointRatio = match[5] || 0;
+					data.focalPointRatio = match[5] != undefined ? match[5] : 0;
 					data.focalPointRatioValueType = match[6] || DisplayValueType.RATIO;
-					if (match[7] == DisplayValueType.PERCENTAGE) {
-						data.focalPointRatio = match[6] / 100;
+					if (match[6] == DisplayValueType.PERCENTAGE) {
+						data.focalPointRatio = match[5] / 100;
 						data.focalPointRatioValueType = DisplayValueType.RATIO;
 					}
 				} else {
@@ -56,9 +56,9 @@ package fritz3.display.graphics.parser.gradient {
 					}
 					
 					color = uint(colorMatch[1]);
-					alpha = (colorMatch[3] || 100) / 100;
-					position = colorMatch[5] || (255 / (l - 1) * i);
-					positionValueType = colorMatch[6] || DisplayValueType.RATIO;
+					alpha = (colorMatch[3] != undefined ? colorMatch[3] : 100) / 100;
+					position = colorMatch[5] != undefined ? colorMatch[5] : (255 / (l - 1) * i);
+					positionValueType = colorMatch[6] || DisplayValueType.RATIO;	
 					if (positionValueType == DisplayValueType.PERCENTAGE) {
 						position = (position / 100) * 255;
 						positionValueType = DisplayValueType.RATIO;
