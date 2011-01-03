@@ -1,6 +1,9 @@
 ﻿package fritz3.invalidation {
 	import flash.display.Stage;
 	import flash.events.Event;
+	import fritz3.tween.core.FTweener;
+	import fritz3.utils.tween.ftween.FTweenEngine;
+	import fritz3.utils.tween.Tweener;
 	/**
 	 * ...
 	 * @author Dario Gieselaar
@@ -53,11 +56,16 @@
 			
 		}
 		
-		public static function executeWithoutThreading ( ):void {
+		public static function executeWithoutThreading ( first:Boolean = true ):void {
 			_priorities.sort(Array.NUMERIC | Array.DESCENDING);
 			var priority:int, node:InvalidationData, nextNode:InvalidationData;
 			var methodNode:InvalidatableMethod, nextMethodNode:InvalidatableMethod;
-			var hasExecutedNodes:Boolean;
+			var hasExecutedNodes:Boolean;			
+			
+			if (first && Tweener.engine is FTweenEngine) {
+				FTweener.render();
+			}
+			
 			for each(priority in _priorities) {
 				node = _firstNodeByPriority[priority];
 				while (node) {
@@ -77,9 +85,10 @@
 				delete _firstNodeByPriority[priority];
 				delete _lastNodeByPriority[priority];
 			}
+
 			
 			if (hasExecutedNodes) {
-				executeWithoutThreading();
+				executeWithoutThreading(false);
 			}
 		}
 		
