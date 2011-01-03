@@ -5,7 +5,9 @@ package fritz3.utils.tween.gtween {
 	import fritz3.style.transition.TransitionData;
 	import fritz3.style.transition.TransitionType;
 	import fritz3.utils.object.getClass;
-	import fritz3.utils.tween.gtween.plugins.ColorPlugin;
+	import fritz3.utils.tween.gtween.plugins.ArrayTweenPlugin;
+	import fritz3.utils.tween.gtween.plugins.ColorTweenPlugin;
+	import fritz3.utils.tween.gtween.plugins.gradient.GradientTweenPlugin;
 	import fritz3.utils.tween.TweenEngine;
 	/**
 	 * ...
@@ -16,21 +18,44 @@ package fritz3.utils.tween.gtween {
 		protected var _easeFunctions:String;
 		
 		public function GTweenEngine ( ) {
-			GTween.installPlugin(ColorPlugin.instance, [ "backgroundColor", "borderColor", "color" ], false);
+			GTween.installPlugin(ColorTweenPlugin.instance, [ "backgroundColor", "borderColor", "color" ], false);
+			GTween.installPlugin(ArrayTweenPlugin.instance, [ 
+			"borderLineStyle",
+			"borderLeftLineStyle",
+			"borderTopLineStyle",
+			"borderRightLineStyle",
+			"borderBottomLineStyle"
+			], false);
+			GTween.installPlugin(GradientTweenPlugin.instance, [
+			"backgroundGradient",
+			"borderGradient",
+			"borderLeftGradient",
+			"borderTopGradient",
+			"borderRightGradient",
+			"borderBottomGradient"
+			], false);
 		}
 		
-		public function tween ( target:Object, transitionData:TransitionData ):void {
+		public function tween ( target:Object, propertyName:String, transitionData:TransitionData ):void {
 			var value:Object = transitionData.value;
 			var values:Object = { };
+			var tween:GTween;
+			var position:Number = 0;
+			if ((tween = GTweener.getTween(target, propertyName))) {
+				position = tween.position;
+				this.removeTween(target, propertyName);
+			}
 			switch(transitionData.type) {
 				case TransitionType.FROM:
-				values[transitionData.propertyName] = transitionData.from;
-				GTweener.from(target, transitionData.duration, values, { ease: transitionData.ease, delay: transitionData.delay } );
+				values[propertyName] = transitionData.from;
+				tween = GTweener.from(target, transitionData.duration - (position * transitionData.duration), values, { ease: transitionData.ease, delay: transitionData.delay } );
+				tween.position = position;
 				break;
 				
 				case TransitionType.TO:
-				values[transitionData.propertyName] = transitionData.value;
-				GTweener.to(target, transitionData.duration, values, { ease: transitionData.ease, delay: transitionData.delay } );
+				values[propertyName] = transitionData.value;
+				tween = GTweener.to(target, transitionData.duration, values, { ease: transitionData.ease, delay: transitionData.delay } );
+				tween.position = position;
 				break;
 			}
 		}
@@ -43,7 +68,6 @@ package fritz3.utils.tween.gtween {
 			var tween:GTween = GTweener.getTween(target, propertyName);
 			if (tween) {
 				GTweener.remove(tween);
-				tween.end();
 			}
 		}
 		

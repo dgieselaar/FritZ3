@@ -6,7 +6,7 @@ package fritz3.utils.tween {
 	 */
 	public interface TweenEngine {
 		
-		function tween ( target:Object, transitionData:TransitionData ):void
+		function tween ( target:Object, propertyName:String, transitionData:TransitionData ):void
 		function hasTween ( target:Object, propertyName:String ):Boolean
 		function removeTween ( target:Object, propertyName:String ):void
 		
