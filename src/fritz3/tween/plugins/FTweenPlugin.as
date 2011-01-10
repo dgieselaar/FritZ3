@@ -7,8 +7,7 @@ package fritz3.tween.plugins {
 	 */
 	public interface FTweenPlugin {
 		
-		function onInit ( tween:FTween ):void
-		function onStart ( tween:FTween ):void
+		function onStart ( tween:FTween ):Boolean
 		function render ( tween:FTween, ratio:Number ):void
 		function onComplete ( tween:FTween ):void
 		function onRemove ( tween:FTween ):void

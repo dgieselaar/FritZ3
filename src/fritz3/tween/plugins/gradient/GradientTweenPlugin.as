@@ -21,16 +21,12 @@ package fritz3.tween.plugins.gradient {
 			
 		}
 		
-		public function onInit ( tween:FTween ):void {
-			
-		}
-		
-		public function onStart ( tween:FTween ):void {			
+		public function onStart ( tween:FTween ):Boolean {			
 			var startGradient:GraphicsGradientData = GraphicsGradientData(tween.from);
 			var endGradient:GraphicsGradientData = GraphicsGradientData(tween.to);
 			if (startGradient == endGradient || (startGradient && endGradient && startGradient.type != endGradient.type)) {
 				tween.target[tween.propertyName] = endGradient;
-				return;
+				return false;
 			}
 
 			var data:GradientTweenData = getGradientTweenDataObject();
@@ -74,6 +70,7 @@ package fritz3.tween.plugins.gradient {
 				gradientColors[i] = gradientColor;
 			}
 			intermediateGradient.gradientColors = gradientColors;
+			return true;
 		}
 		
 		public function render ( tween:FTween, ratio:Number ):void {

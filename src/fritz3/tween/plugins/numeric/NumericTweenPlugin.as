@@ -11,12 +11,10 @@ package fritz3.tween.plugins.numeric {
 			
 		}
 		
-		public function onInit ( tween:FTween ):void {
-			
-		}
-		
-		public function onStart ( tween:FTween ):void {
-			
+		public function onStart ( tween:FTween ):Boolean {
+			var from:Number = Number(tween.from);
+			var to:Number = Number(tween.to);
+			return !(from == to || isNaN(from) && isNaN(to));
 		}
 		
 		public function render ( tween:FTween, ratio:Number ):void {

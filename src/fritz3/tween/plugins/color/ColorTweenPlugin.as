@@ -20,11 +20,11 @@ package fritz3.tween.plugins.color {
 			
 		}
 		
-		public function onInit ( tween:FTween ):void {
+		public function onStart ( tween:FTween ):Boolean {
+			if (tween.from == tween.to) {
+				return false;
+			}
 			
-		}
-		
-		public function onStart ( tween:FTween ):void {
 			var colorData:ColorTweenData = getColorDataObject();
 			var startColor:uint = uint(tween.from);
 			var endColor:uint = uint(tween.to);
@@ -38,6 +38,8 @@ package fritz3.tween.plugins.color {
 			colorData.endB = endColor & 0xff;
 			
 			tween.pluginData = colorData;
+			
+			return true;
 		}
 		
 		public function render ( tween:FTween, ratio:Number ):void {
