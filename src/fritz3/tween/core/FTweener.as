@@ -1,10 +1,10 @@
 package fritz3.tween.core {
 	import flash.utils.Dictionary;
 	import flash.utils.getTimer;
+	import fritz3.base.transition.TransitionData;
+	import fritz3.base.transition.TransitionType;
 	import fritz3.invalidation.InvalidationData;
 	import fritz3.invalidation.InvalidationHelper;
-	import fritz3.style.transition.TransitionData;
-	import fritz3.style.transition.TransitionType;
 	import fritz3.tween.plugins.FTweenPlugin;
 	import fritz3.tween.plugins.numeric.NumericTweenPlugin;
 	/**
@@ -49,29 +49,34 @@ package fritz3.tween.core {
 			
 			_lastMeasure = newMeasure;
 			var node:FTween = _firstNode, nextNode:FTween;
-			var time:Number, newTime:Number, delay:Number, duration:Number, total:Number, ratio:Number;
-			var init:Boolean, start:Boolean, complete:Boolean;
-			while (node) {
+			var time:Number, newTime:Number, delay:Number, duration:Number, total:Number, ratio:Number, phase:int;
+			var start:Boolean, complete:Boolean;
+			renderloop:while (node) {
 				time = node.time;
 				delay = node.delay;
 				duration = node.duration;
 				newTime = time + delta;
 				total = delay + duration;
-				init = time == 0;
-				start = (!delay && time == 0) || (time < delay && newTime > delay);
+				phase = node.phase;
+				start = phase < FTweenPhase.STARTED && time-delay >= 0;
 				if (newTime >= total) {
 					newTime = total;
 				}
 				complete = newTime == total;
 				node.time = newTime;
-				if (init) {
-					node.plugin.onInit(node);
-				}
+				
+				nextNode = node.nextNode;
+				
 				if (start) {
 					if (node.from == undefined) {
 						node.from = node.target[node.propertyName];
 					}
-					node.plugin.onStart(node);
+					node.phase = FTweenPhase.STARTED;
+					if (!node.plugin.onStart(node)) {
+						removeTween(node.target, node.propertyName);
+						node = nextNode;
+						continue renderloop;
+					}
 				}
 				
 				if (newTime >= delay) {
@@ -79,9 +84,8 @@ package fritz3.tween.core {
 					node.plugin.render(node, ratio);
 				}
 				
-				nextNode = node.nextNode;
-				
 				if (complete) {
+					node.phase = FTweenPhase.COMPLETED;
 					node.plugin.onComplete(node);
 					removeTween(node.target, node.propertyName);
 				}
@@ -98,6 +102,7 @@ package fritz3.tween.core {
 			tween.ease = transitionData.ease;
 			tween.delay = transitionData.delay;
 			tween.duration = transitionData.duration;
+			tween.phase = FTweenPhase.INITIALIZED;
 			
 			if (transitionData.type == TransitionType.FROM) {
 				tween.from = transitionData.value;

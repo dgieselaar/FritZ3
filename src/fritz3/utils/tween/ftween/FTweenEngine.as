@@ -1,9 +1,21 @@
 package fritz3.utils.tween.ftween {
-	import fritz3.style.transition.TransitionData;
+	import fritz3.base.transition.TransitionData;
+	import fritz3.tween.core.FTween;
 	import fritz3.tween.core.FTweener;
+	import fritz3.tween.easing.Back;
+	import fritz3.tween.easing.Bounce;
+	import fritz3.tween.easing.Circ;
 	import fritz3.tween.easing.Cubic;
+	import fritz3.tween.easing.Elastic;
+	import fritz3.tween.easing.Expo;
+	import fritz3.tween.easing.Linear;
 	import fritz3.tween.easing.Quad;
+	import fritz3.tween.easing.Quart;
+	import fritz3.tween.easing.Quint;
+	import fritz3.tween.easing.Sine;
+	import fritz3.tween.easing.Strong;
 	import fritz3.tween.plugins.color.ColorTweenPlugin;
+	import fritz3.tween.plugins.displayvalue.DisplayValueTweenPlugin;
 	import fritz3.tween.plugins.gradient.GradientTweenPlugin;
 	import fritz3.utils.object.getClass;
 	import fritz3.utils.tween.TweenEngine;
@@ -17,6 +29,7 @@ package fritz3.utils.tween.ftween {
 		protected var _easeFunctions:Object = { };
 		
 		public function FTweenEngine ( ) {
+			Back, Bounce, Circ, Cubic, Elastic, Quad, Quart, Quint, Expo, Linear, Sine, Strong;
 			FTweener.addPlugin([ 
 			"color", "backgroundColor", "borderColor",
 			"borderLeftColor", "borderTopColor",
@@ -28,6 +41,14 @@ package fritz3.utils.tween.ftween {
 			"borderLeftGradient", "borderTopGradient",
 			"borderRightGradient", "borderBottomGradient"
 			], GradientTweenPlugin.instance);
+			
+			FTweener.addPlugin([
+			"preferredWidth", "preferredHeight",
+			"minimumWidth", "minimumHeight", "maximumWidth", "maximumHeight",
+			"margin", "marginLeft", "marginTop", "marginRight", "marginBottom",
+			"padding", "paddingLeft", "paddingTop", "paddingRight", "paddingBottom",
+			"backgroundImageWidth", "backgroundImageHeight"
+			], DisplayValueTweenPlugin.instance);
 		}
 		
 		public function tween ( target:Object, propertyName:String, transitionData:TransitionData ):void {
@@ -51,7 +72,7 @@ package fritz3.utils.tween.ftween {
 		
 		protected function parseEaseFunction ( string:String ):Function {
 			var indexOfDot:int = string.indexOf(".");
-			return new (getClass(string.substr(0, indexOfDot)))()[string.substr(indexOfDot + 1)];
+			return (getClass(string.substr(0, indexOfDot)))[string.substr(indexOfDot + 1)];
 		}
 		
 		public function get defaultEaseFunction ( ):Function {

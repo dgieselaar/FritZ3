@@ -89,6 +89,8 @@
 			var endGradientColors:Array = (endGradient ? endGradient.gradientColors : []) || [];
 			var intermediateGradientColors:Array = intermediateGradient.gradientColors;
 			
+			var tweenAlpha:Boolean = !(startGradient && endGradient);
+			
 			var i:int, l:int = intermediateGradientColors.length;
 			var gradientColor:GraphicsGradientColor, startGradientColor:GraphicsGradientColor, endGradientColor:GraphicsGradientColor;
 			var startColor:uint = 0, endColor:uint = 0;
@@ -103,14 +105,14 @@
 					startAlpha = startGradientColor.alpha;
 					startPosition = startGradientColor.position;
 				} else {
-					startColor = endGradientColor.color, startAlpha = 0, startPosition = endGradientColor.position;
+					startColor = endGradientColor.color, startAlpha = endGradientColor.alpha, startPosition = endGradientColor.position;
 				}
 				if (endGradientColor) {
 					endColor = endGradientColor.color;
 					endAlpha = endGradientColor.alpha;
 					endPosition = endGradientColor.position;
 				} else {
-					endAlpha = 0;
+					endAlpha = tweenAlpha ? 0 : 1;
 					endColor = startColor;
 					endPosition = startPosition;
 				}

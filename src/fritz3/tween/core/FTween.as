@@ -24,6 +24,8 @@ package fritz3.tween.core {
 		public var plugin:FTweenPlugin;
 		public var pluginData:Object;
 		
+		public var phase:int;
+		
 		
 		public function FTween ( ) {
 			
@@ -40,6 +42,7 @@ package fritz3.tween.core {
 			this.time = NaN;
 			this.plugin = null;
 			this.pluginData = null;
+			this.phase = -1;
 		}
 		
 	}

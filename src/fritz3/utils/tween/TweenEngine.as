@@ -1,5 +1,5 @@
 package fritz3.utils.tween {
-	import fritz3.style.transition.TransitionData;
+	import fritz3.base.transition.TransitionData;
 	/**
 	 * ...
 	 * @author Dario Gieselaar
