@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<data>
+	
+	<rule where="ApplicationDocument">
+		<property name="width">100%</property>
+		<property name="height">100%</property>
+		<property name="layout.orient">vertical</property>
+		<property name="layout.pack">center</property>
+		<property name="layout.align">center</property>
+		<property name="background.backgroundGradient">linear (0xCCCCCC, 0xBBBBBB)</property>
+	</rule>
+	
+	<rule where=".button_holder">
+		<property name="background.backgroundColor">0xFFFFFF</property>
+		<property name="background.border">1px 0xAAAAAA inside</property>
+		<property name="width">600px</property>
+		<property name="padding">10px</property>
+		<property name="layout.align">stretch</property>
+		<property name="marginBottom">10px</property>
+		<property name="filters">
+			<Array>
+				<DropShadowFilter blurX="3" blurY="3" distance="0" alpha="0.5" angle="90"/>
+			</Array>
+		</property>
+	</rule>
+	
+	<rule where=".button_holder:last-child">
+		<property name="marginBottom">0px</property>
+	</rule>
+	
+	<rule where="TextComponent">
+		<property name="embedFonts">false</property>
+		<property name="fontFamily">Helvetica</property>
+		<property name="fontSize">11</property>
+	</rule>
+	
+	<rule where="#introduction">
+		<property name="boxFlex">1</property>
+		<property name="wordWrap">true</property>
+		<property name="css">
+			p { fontFamily: Helvetica; fontSize: 12; }
+			a { color: #00B4FF; text-decoration: none; }
+			a:hover { text-decoration: underline; }
+		</property>
+	</rule>
+	
+	<rule where="TextButton">
+		<property name="fontWeight">bold</property>
+		<property name="layout.horizontalAlign">center</property>
+		<property name="layout.verticalAlign">center</property>
+	</rule>
+	
+	<rule where="#rogie">
+		<property name="layout.align">end</property>
+	</rule>
+	
+	<rule where=".rogie_button">
+		<property name="marginLeft">5px</property>
+		<property name="padding">10px 3px 10px 6px</property>
+		<property name="background.backgroundColor">0x00B4FF</property>
+		<property name="background.backgroundGradient">linear (0xFFFFFF 40%, 0xFFFFFF 0%)</property>
+		<property name="background.roundedCorners">4</property>
+		<property name="background.border">1px 1px 1px 5px</property>
+		<property name="background.borderPosition">inside</property>
+		<property name="background.borderColor">0x00B4FF</property>
+		<property name="background.borderGradient">linear -90 (0x000000 20% 0px, 0x000000 10% 1px, 0xFFFFFF 30% 2px)</property>
+		<property name="color">0x004B6C</property>
+		<property name="filters">
+			<Array>
+				<DropShadowFilter distance="1" blurX="2" blurY="2" alpha="0.5"/>
+			</Array>
+		</property>
+		<property name="textField.filters">
+			<Array>
+				<DropShadowFilter distance="1" blurX="1" blurY="1" alpha="1" color="0xFFFFFF" />
+			</Array>
+		</property>
+		<transition name="background.backgroundGradient" duration="0.10"/>
+		<transition name="background.border" duration="0.10"/>
+	</rule>
+	
+	<rule where=".rogie_button:first-child">
+		<property name="marginLeft">0</property>
+	</rule>
+	
+	<rule where=".rogie_button:highlighted">
+		<property name="background.backgroundGradient">linear (0xFFFFFF 50%, 0xFFFFFF 20%)</property>
+	</rule>
+	
+	<rule where=".rogie_button:pressed">
+		<property name="background.border">1px 1px 1px 1px</property>
+		<property name="padding">10px 3px</property>
+		<transition name="y" duration="0.10"/>
+		<transition name="height" duration="0.10"/>
+	</rule>
+	
+	<rule where=".casper_button">
+		<property name="padding">4px 4px</property>
+		<property name="boxFlex">1</property>
+		<property name="background.backgroundColor">0xFFFFFFF</property>
+		<property name="background.backgroundGradient">linear (0x000000 2%, 0x000000 10%)</property>
+		<property name="marginLeft">1</property>
+		<property name="background.borderLeft">1px 0xEEEEEE inside</property>
+		<property name="background.borderRight">1px 0xDDDDDD inside</property>
+		<property name="color">0x5c5c5c</property>
+		<property name="textField.filters">
+			<Array>
+				<DropShadowFilter distance="1" blurX="1" blurY="1" strength="4" alpha="1" color="0xFFFFFF"/>
+			</Array>
+		</property>
+		<transition name="color" duration="0.25"/>
+		<transition name="background.backgroundGradient" duration="0.25"/>
+	</rule>
+	
+	<rule where=".casper_button:first-child">
+		<property name="marginLeft">0</property>
+		<property name="background.borderLeft">1px 0xCCCCCC inside</property>
+	</rule>
+	
+	<rule where=".casper_button:highlighted">
+		<property name="color">0x00B4FF</property>
+	</rule>
+	
+	<rule where=".casper_button:pressed">
+		<property name="background.backgroundGradient">linear (0x000000 10%, 0x000000 2%)</property>
+	</rule>
+	
+	<rule where=".cilia_button">
+		<property name="padding">28px 4px 4px</property>
+		<property name="color">0xDDDDDD</property>
+		<!--property name="marginLeft">3px</property-->
+		<property name="background.borderLeft">5px 0xFF8080 inside</property>
+		<property name="background.backgroundColor">0x000000</property>
+		<property name="background.backgroundGradient">linear (0xFFFFFF 20%, 0xFFFFFF 10%)</property>
+		<property name="background.backgroundImage">url("link.png")</property>
+		<property name="background.backgroundSize">16px</property>
+		<property name="background.backgroundPosition">left 10px center</property>
+		<property name="background.backgroundImageAlpha">0.5</property>
+		<property name="layout.horizontalAlign">left</property>
+		<property name="filters">
+			<Array>
+				<DropShadowFilter distance="0" blurX="2" blurY="2" alpha="0.5"/>
+			</Array>
+		</property>
+		<property name="textField.filters">
+			<Array>
+				<DropShadowFilter distance="1" blurX="1" blurY="1" alpha="0.2" color="0xFFFFFF" />
+			</Array>
+		</property>
+		<property name="width">30px</property>
+		<transition name="x" duration="0.25"/>
+		<transition name="width" duration="0.25"/>
+		<transition name="background.backgroundImageAlpha" duration="0.25"/>
+		<transition name="background.backgroundGradient" duration="0.25"/>
+	</rule>
+	
+	<rule where=".cilia_button:highlighted">
+		<property name="width">auto</property>
+		<property name="background.backgroundImageAlpha">1</property>
+	</rule>
+	
+	<rule where=".cilia_button:pressed">
+		<property name="background.backgroundGradient">linear (0xFFFFFF 10%, 0xFFFFFF 20%)</property>
+	</rule>
+	
+	<rule where=".cilia_button:first-child">
+		<property name="marginLeft">0px</property>
+		<property name="background.borderLeftColor">0xFFFF80</property>
+	</rule>
+	
+	<rule where=".cilia_button:nth-child(2)">
+		<property name="background.borderLeftColor">0x80FF80</property>
+	</rule>
+	
+	<rule where=".cilia_button:nth-child(3)">
+		<property name="background.borderLeftColor">0x00FF80</property>
+	</rule>
+	
+	<rule where=".cilia_button:nth-child(4)">
+		<property name="background.borderLeftColor">0x80FFFF</property>
+	</rule>
+	
+	
+</data>

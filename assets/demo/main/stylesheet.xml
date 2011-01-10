@@ -2,44 +2,72 @@
 <data>
 	
 	<rule where="ApplicationDocument">
-		<property name="background.backgroundColor">0xEFEFEF</property>
-		<property name="layout.align">center</property>
-		<property name="layout.pack">center</property>
+		<property name="background.backgroundColor">0xFFFFFF</property>
 		<property name="layout.direction">normal</property>
 		<property name="layout.orient">horizontal</property>
+		<property name="layout.align">stretch</property>
 		<property name="padding">20px</property>
 	</rule>
 	
-	<rule where="TextButton">
+	<rule where="#navigation">
+		<property name="boxFlex">1</property>
+		<property name="padding">10px</property>
+	</rule>
+	
+	<rule where="#navigation > TextButton">
 		<property name="width">auto</property>
-		<property name="height">auto</property>
-		<property name="background.roundedCorners">5px</property>
-		<property name="background.border">1px 0x00B4FF solid inside</property>
-		<property name="background.backgroundGradient">linear 90 (0x00B4FF, 0x007EB3)</property>
+		<property name="height">28</property>
+		<property name="layout.verticalAlign">center</property>
 		<property name="embedFonts">false</property>
+		<property name="fontWeight">bold</property>
 		<property name="css">
 			p {
 			font-family: Helvetica;
-			font-size: 11;
-			font-weight: bold;
-			}</property>
-		<property name="padding">5px 5px 5px 5px</property>
-		<property name="text"><![CDATA[<b>Click me!</b>]]></property>
-		<property name="color">0xDDF4FF</property>
+			font-size: 12;
+			}
+		</property>
+		<property name="color">0xFFFFFF</property>
+		<property name="padding">8px 0px 8px 2px</property>
+		<property name="background.roundedCorners">5</property>
+		<property name="background.border">1px 1px 1px 4px</property>
+		<property name="background.borderGradient">linear -90 (0xD5006A 0px, 0xFF0482 1px, 0xFFFFFF 2px, 0xFFAAD5 3px)</property>
+		<property name="background.backgroundGradient">linear 90 (0xFF53A9, 0xFF8AC5)</property>
+		<property name="margin">5px 0px 0px 0px</property>		
+		<property name="textField.filters">
+			<Array>
+				<DropShadowFilter distance="1" blurX="0" blurY="0" strength="1" alpha="1" color="0xFF0080"/>
+			</Array>
+		</property>
 	</rule>
 	
-	<rule where="TextButton:!init">
-		<transition name="background.backgroundGradient" duration="0.25"/>
-		<transition name="background.border" duration="0.25"/>
-		<transition name="padding" duration="0.25"/>
+	<rule where="#navigation > TextButton:!init">
+		<transition name="margin" duration="0.10"/>
+		<transition name="height" duration="0.10"/>
+		<transition name="padding" duration="0.10"/>
+		<transition name="background.border" duration="0.10"/>
+		<transition name="background.borderGradient" duration="0.10"/>
 	</rule>
 	
-	<rule where="TextButton:highlighted">
-		<property name="background.backgroundGradient">linear 0 (0xFF68EB, 0xFF0000, 0xFF68EB)</property>
-		<property name="background.border">2px 0xFF0000 solid inside</property>
-		<property name="padding">8px 5px 5px 5px</property>
-		<property name="color">0xDDF4FF</property>
+	<rule where="#navigation > TextButton:!pressed:!init">
+		<transition name="margin" duration="0.25" ease="Quad.easeIn" />
+		<transition name="height" duration="0.25" ease="Quad.easeIn" />
+		<transition name="background.border" duration="0.25" ease="Quad.easeIn" />
+		<transition name="background.borderGradient" duration="0.25" ease="Quad.easeIn" />
+		<transition name="padding" duration="0.25" ease="Quad.easeIn" />
 	</rule>
+	
+	<rule where="#navigation > TextButton:pressed">
+		<property name="paddingBottom">0</property>
+		<property name="margin">5px 5px 0px 0px</property>
+		<property name="background.border">1px 1px 1px 1px</property>
+		<property name="background.borderGradient">linear -90 (0xFFFFFF 0px, 0xFFFFFF 0px, 0xFFFFFF 100% 1px, 0xFFAAD5 2px)</property>
+		<property name="height">25</property>
+	</rule>
+	
+	<rule where="#navigation > TextButton:first-child">
+		<property name="marginLeft">0</property>
+	</rule>
+	
 	
 	
 </data>

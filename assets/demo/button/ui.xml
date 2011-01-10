@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<data>
+	
+	<DisplayComponentContainer className="button_holder">
+		<TextComponent id="introduction" text="This is a small button demo of FritZ3. The UI description is available &lt;a href='ui.xml'&gt;here&lt;/a&gt; and you can find the stylesheet &lt;a href='stylesheet.xml'&gt;here&lt;/a&gt;."/>
+	</DisplayComponentContainer>
+	
+	
+	<DisplayComponentContainer id="rogie" className="button_holder">
+		<TextButton text="Home" className="rogie_button"/>
+		<TextButton text="About us" className="rogie_button"/>
+		<TextButton text="Portfolio" className="rogie_button"/>
+		<TextButton text="Pricing" className="rogie_button"/>
+		<TextButton text="Contact" className="rogie_button"/>
+	</DisplayComponentContainer>
+	
+	<DisplayComponentContainer id="casper" className="button_holder">
+		<TextButton text="Home" className="casper_button"/>
+		<TextButton text="About us" className="casper_button"/>
+		<TextButton text="Portfolio" className="casper_button"/>
+		<TextButton text="Pricing" className="casper_button"/>
+		<TextButton text="Contact" className="casper_button"/>
+	</DisplayComponentContainer>
+	
+	<DisplayComponentContainer id="cilia" className="button_holder">
+		<TextButton text="Home" className="cilia_button"/>
+		<TextButton text="About us" className="cilia_button"/>
+		<TextButton text="Portfolio" className="cilia_button"/>
+		<TextButton text="Pricing" className="cilia_button"/>
+		<TextButton text="Contact" className="cilia_button"/>
+	</DisplayComponentContainer>
+	
+</data>

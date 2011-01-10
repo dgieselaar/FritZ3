@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<data>
+	
+	<rule where="ApplicationDocument">
+		<property name="background.backgroundGradient">linear (0xCCCCCC, 0xBBBBBB)</property>
+	</rule>
+	
+	<rule where="ApplicationDocument > DisplayComponentContainer">
+		<property name="width">33%</property>
+		<property name="height">100%</property>
+		<property name="background.border">1px 0x000000 inside</property>
+		<property name="padding">1px</property>
+		<property name="background.backgroundColor">0xAAF2FF</property>
+		<property name="layout.orient">vertical</property>
+	</rule>
+	
+	<rule where="#second">
+		<property name="width">67%</property>
+		<property name="background.backgroundColor">0xDDFFAA</property>
+		<property name="layout.orient">vertical</property>
+		<property name="layout.align">stretch</property>
+	</rule>
+	
+	<rule where="TextComponent">
+		<property name="embedFonts">false</property>
+		<property name="fontFamily">Helvetica</property>
+		<property name="fontSize">11</property>
+	</rule>
+	
+	<rule where="#description">
+		<property name="width">100%</property>
+		<property name="background.borderBottom">1px inside 0x000000</property>
+		<property name="padding">5px</property>
+		<property name="background.backgroundColor">0xCCCCCC</property>
+		<property name="wordWrap">true</property>
+	</rule>
+	
+	<rule where=".button_holder">
+		<property name="background.backgroundGradient">linear (0xF0F0F0, 0xEFEFEF)</property>
+		<property name="background.border">1px 0xD3D3D3 inside</property>
+		<property name="boxFlex">1</property>
+	</rule>
+	
+	<rule where="#first > .button_holder">
+		<property name="width">100%</property>
+		<property name="layout.orient">vertical</property>
+		<property name="padding">10px</property>
+	</rule>
+	
+	<rule where="TextButton">
+		<property name="background.backgroundGradient">linear (0x000000 0%, 0x000000 15%)</property>
+		<property name="background.roundedCorners">3</property>
+		<property name="background.border">1px inside</property>
+		<!--property name="background.borderGradient">linear (0x000000 10%, 0x000000 20%)</property-->
+		<property name="padding">4px 4px</property>
+		<property name="layout.horizontalAlign">center</property>
+		<property name="layout.verticalAlign">center</property>
+		<transition name="background.backgroundGradient" duration="0.25"/>
+	</rule>
+	
+	<rule where="TextButton:highlighted">
+		<property name="background.backgroundGradient">linear (0x000000 0%, 0x000000 5%)</property>
+	</rule>
+	
+	<rule where="TextButton:pressed">
+		<property name="background.backgroundGradient">linear (0x000000 5%, 0x000000 0%)</property>
+	</rule>
+	
+	<rule where="#first TextButton">
+		<property name="width">100%</property>
+		<property name="marginTop">5px</property>
+	</rule>
+	
+	<rule where="#first TextButton:first-child">
+		<property name="marginTop">0px</property>
+	</rule>
+	
+	<rule where="#second > .button_holder">
+		<property name="width">100%</property>
+		<property name="layout.orient">horizontal</property>
+		<property name="padding">10px</property>
+		<property name="background.backgroundColor">0xFFFFFF</property>
+		<property name="background.backgroundGradient">none</property>
+		<property name="boxFlex">0</property>
+	</rule>
+	
+	<rule where="#second > .button_holder:first-child > TextButton">
+		<property name="boxFlex">1</property>
+		<property name="marginLeft">8</property>
+		<property name="background.backgroundColor">0x00B4FF</property>
+		<property name="background.borderColor">0x71D5FF</property>
+		<property name="background.border">0px 1px 1px 4px</property>
+		<property name="color">0xFFFFFF</property>
+		<property name="fontWeight">bold</property>
+		<property name="filters">
+			<Array>
+				<DropShadowFilter color="0x000000" alpha="0.5" blurX="3" blurY="3" distance="1"/>
+			</Array>
+		</property>
+		<property name="textField.filters">
+			<Array>
+				<DropShadowFilter color="0x000000" alpha="0.2" blurX="1" blurY="1" strength="2" distance="1"/>
+			</Array>
+		</property>
+		<transition name="padding" duration="0.25"/>
+	</rule>
+	
+	<rule where="#second > .button_holder:first-child > TextButton:highlighted">
+		<property name="padding">4px 10px</property>
+	</rule>
+	
+	<rule where="#second > .button_holder:first-child > TextButton:first-child">
+		<property name="marginLeft">0</property>
+	</rule>
+	
+	<rule where="#second > .button_holder:nth-child(2) > TextButton">
+		<property name="boxFlex">1</property>
+		<property name="background.roundedCorners">0px</property>
+		<property name="background.borderLeft">1px 0xCCCCCC inside</property>
+		<property name="background.borderRight">1px 0xFFFFFF inside</property>
+		<property name="background.borderTop">1px 0xCCCCCC inside</property>
+		<property name="background.borderBottom">1px 0xCCCCCC inside</property>>
+		<property name="fontWeight">bold</property>
+		<property name="color">0x5C5C5C</property>
+		<property name="textField.filters">
+			<Array>
+				<DropShadowFilter color="0xFFFFFF" blurX="1" blurY="1" distance="1" angle="45" strength="5" alpha="1"/>
+			</Array>
+		</property>
+	</rule>
+	
+	<rule where="#second > .button_holder:nth-child(2) > TextButton:first-child">
+		<property name="background.roundedCorners">5px 0px 5px 0px</property>
+	</rule>
+	
+	<rule where="#second > .button_holder:nth-child(2) > TextButton:last-child">
+		<property name="background.borderRight">1px 0xCCCCCC inside</property>
+		<property name="background.roundedCorners">0px 5px 0px 5px</property>
+	</rule>
+	
+	<rule where="#second > .button_holder:nth-child(2) > TextButton:selected">
+		<property name="boxFlex">2</property>
+		<property name="background.backgroundGradient">linear (0xFFFFFF 0%, 0xFFFFFF 15%)</property>
+		<property name="background.backgroundColor">0x00B4FF</property>
+		<property name="background.borderRight">0px</property>
+		<property name="color">0xFFFFFF</property>
+		<property name="textField.filters">null</property>
+	</rule>
+	
+	<rule where="#second > .button_holder:nth-child(2) > TextButton:pressed">
+		<property name="boxFlex">2</property>
+		<transition name="boxFlex" duration="0.25"/>
+	</rule>
+	
+	<rule where="#second > TextButton">
+		<property name="margin">10px</property>
+		<property name="width">100%</property>
+		<property name="boxFlex">1</property>
+		<property name="background.roundedCorners">30px 30px 60px 60px</property>
+		<property name="background.border">10px 20px 10px 40px</property>
+		<property name="background.borderPosition">inside</property>
+		<property name="background.borderColor">0xFFFFFF</property>
+		<property name="fontSize">40</property>
+		<property name="fontWeight">bold</property>
+		<property name="padding">30px</property>
+		<property name="wordWrap">true</property>
+		<property name="textAlign">center</property>
+		<property name="background.borderBottomColor">0xFF00FF</property>
+		<property name="background.borderLeftGradient">linear (0xFF0000, 0xFF00FF)</property>
+		<property name="background.borderTopGradient">linear 0 (0xFF0000, 0xFFFF00)</property>
+		<property name="background.borderRightGradient">linear (0xFFFF00, 0xFF00FF)</property>
+		<property name="background.backgroundColor">0xFFFFFF</property>
+		<property name="background.backgroundGradient">none</property>
+		<transition name="background.backgroundGradient" duration="0.5"/>
+	</rule>
+	
+	<rule where="#second > TextButton:highlighted">
+		<property name="background.backgroundGradient">linear 45 (0xFF0000, 0xFFFF00,0xFF00FF)</property>
+	</rule>
+</data>

@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <data>
 	
-	<TextButton id="button" />
-	<TextButton id="button" marginLeft="1" />
+	<DisplayComponentContainer id="navigation">
+		<TextButton text="Thuis"/>
+		<TextButton text="Fruitschalen"/>
+		<TextButton text="Fruit op maat"/>
+		<TextButton text="Contact"/>
+		<TextButton text="Over ons"/>
+	</DisplayComponentContainer>
+	
+	<DisplayComponentContainer id="content">
+		<TextComponent text="Welkom op de website van fruit.nu"/>
+	</DisplayComponentContainer>
 
 </data>
