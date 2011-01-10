@@ -1,12 +1,13 @@
 package fritz3.style {
+	import fritz3.base.transition.TransitionData;
+	import fritz3.base.transition.TransitionType;
+	import fritz3.display.core.CyclePhase;
 	import fritz3.invalidation.InvalidationHelper;
 	import fritz3.invalidation.InvalidationPriorityTreshold;
 	import fritz3.style.invalidation.StyleManagerInvalidationSignal;
 	import fritz3.style.selector.ObjectCache;
 	import fritz3.style.selector.Selector;
 	import fritz3.style.selector.SelectorList;
-	import fritz3.style.transition.TransitionData;
-	import fritz3.style.transition.TransitionType;
 	import fritz3.utils.object.getClass;
 	import fritz3.utils.tween.Tweener;
 	import org.osflash.signals.IDispatcher;
@@ -138,13 +139,14 @@ package fritz3.style {
 			
 			children = xml.transition;
 			l = children.length();
-			var transitionData:TransitionData, type:String, duration:Number, delay:Number, easeStr:String, ease:Function;
+			var transitionData:TransitionData, type:String, duration:Number, delay:Number, easeStr:String, ease:Function, phase:String;
 			for (i = 0; i < l; ++i) {
 				child = children[i];
 				propertyName = child.@name.toString();
 				type = child.@type == undefined ? TransitionType.TO : child.@type.toString();
 				duration = child.@duration;
 				delay = child.@delay == undefined ? 0 : child.@delay;
+				phase = child.@phase == undefined ? CyclePhase.LIVE : child.@phase.toString();
 				if (child.@ease != undefined) {
 					easeStr = child.@ease.toString();
 					ease = Tweener.engine.getEaseFunction(easeStr);
@@ -160,19 +162,15 @@ package fritz3.style {
 					target = null;
 				}
 				
-				data = (nodes[target] ||= { } )[propertyName];
-				if (!data) {
-					nodes[target][propertyName] = data = new PropertyData();
-					data.propertyName = propertyName;
-					data.target = target;
-					rule.append(data);
-				}
-				
 				transitionData = new TransitionData();
+				transitionData.target = target;
+				transitionData.propertyName = propertyName;
 				transitionData.type = type;
 				transitionData.duration = duration;
 				transitionData.delay = delay;
 				transitionData.ease = ease;
+				transitionData.cyclePhase = phase;
+				
 				if (transitionData.type == TransitionType.FROM) {
 					if (child.hasSimpleContent()) {
 						propertyValue = getSimpleValue(child.toString());
@@ -181,7 +179,7 @@ package fritz3.style {
 					}
 					transitionData.from = propertyValue;
 				}
-				data.transitionData = transitionData;
+				rule.append(transitionData);
 			}
 			return rule;
 		}

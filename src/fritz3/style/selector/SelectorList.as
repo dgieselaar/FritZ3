@@ -36,42 +36,40 @@ package fritz3.style.selector {
 				}
 			}
 			
-			for (i = 0; i < l; ++i) {
+			for (i = 0; i < l; i += 2) {
 				selector = match[i];
-				if(i & 1) {
-					switch(selector) {
-						case ">":
-						relationship = SelectorRelationship.CHILD;
-						break;
-						
-						case " ":
-						relationship = SelectorRelationship.DESCENDANT;
-						break;
-						
-						case "+":
-						relationship = SelectorRelationship.FOLLOWING;
-						break;
-						
-						case "~":
-						relationship = SelectorRelationship.FOLLOWING_IMMEDIATELY;
-						break;
-						
-						default:
-						relationship = null;
-						break;
-					}
-				} else {
-					node = new Selector(selector);
-					if (prevNode) {
-						node.prevNode = prevNode;
-						prevNode.nextNode = node;
-					} else {
-						this.firstNode = node;
-					}
-					node.relationship = relationship;
-					this.numSelectors++;
-					prevNode = node;
+				relationship = match[i + 1];
+				switch(relationship) {
+					case ">":
+					relationship = SelectorRelationship.CHILD;
+					break;
+					
+					case " ":
+					relationship = SelectorRelationship.DESCENDANT;
+					break;
+					
+					case "+":
+					relationship = SelectorRelationship.FOLLOWING;
+					break;
+					
+					case "~":
+					relationship = SelectorRelationship.FOLLOWING_IMMEDIATELY;
+					break;
+					
+					default:
+					relationship = null;
+					break;
 				}
+				node = new Selector(selector);
+				if (prevNode) {
+					node.prevNode = prevNode;
+					prevNode.nextNode = node;
+				} else {
+					this.firstNode = node;
+				}
+				node.relationship = relationship;
+				this.numSelectors++;
+				prevNode = node;
 			}
 			this.lastNode = node;
 		}
@@ -93,56 +91,49 @@ package fritz3.style.selector {
 			
 			var relationship:String, match:Boolean;
 			while (node) {
-				if (!objectToMatch) {
-					return false;
-				}
-				match = node.match(objectToMatch);
 				switch(node.relationship) {
 					default:
-					return match;
+					if (!node.match(objectToMatch)) {
+						return false;
+					}
 					break;
 					
 					case SelectorRelationship.CHILD:
-					if (!match) {
+					objectToMatch = currentAddable = currentAddable.parentComponent;
+					if (!objectToMatch || !node.match(objectToMatch)) {
 						return false;
-					} else {
-						node = node.prevNode;
-						objectToMatch = currentAddable = currentAddable.parentComponent;
 					}
 					break;
 					
 					case SelectorRelationship.DESCENDANT:
-					if (!match) {
-						objectToMatch = currentAddable = currentAddable.parentComponent;
-					} else {
-						node = node.prevNode;
+					objectToMatch = currentAddable = currentAddable.parentComponent;
+					if (!objectToMatch) {
+						return false;
+					}
+					if (!node.match(objectToMatch)) {
+						continue;
 					}
 					break;
 					
+					// TODO: implement sibling selectors
+					
 					case SelectorRelationship.PRECEDING:
-					if (!objectCache.cachedAllSiblings) {
-						objectCache.cacheAllSiblings();
-					}
+					return false;
 					break;
 					
 					case SelectorRelationship.PRECEDING_IMMEDIATELY:
-					if (!objectCache.cachedDirectSiblings) {
-						objectCache.cacheDirectSiblings();
-					}
+					return false;
 					break;
 					
 					case SelectorRelationship.FOLLOWING:
-					if (!objectCache.cachedAllSiblings) {
-						objectCache.cacheAllSiblings();
-					}
+					return false;
 					break;
 					
 					case SelectorRelationship.FOLLOWING_IMMEDIATELY:
-					if (!objectCache.cachedDirectSiblings) {
-						objectCache.cacheDirectSiblings();
-					}
+					return false;
 					break;
 				}
+				node = node.prevNode;
 			}
 			
 			return true;
