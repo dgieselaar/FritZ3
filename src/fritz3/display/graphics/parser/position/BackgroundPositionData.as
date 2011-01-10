@@ -1,4 +1,5 @@
 package fritz3.display.graphics.parser.position  {
+	import fritz3.display.core.DisplayValue;
 	/**
 
 	/**
@@ -13,12 +14,10 @@ package fritz3.display.graphics.parser.position  {
 	public class BackgroundPositionData {
 		
 		public var horizontalFloat:String;
-		public var offsetX:Number;
-		public var offsetXValueType:String;
+		public var offsetX:DisplayValue;
 		
 		public var verticalFloat:String;
-		public var offsetY:Number;
-		public var offsetYValueType:String;
+		public var offsetY:DisplayValue;
 		
 		public function BackgroundPositionData (  )  {
 			

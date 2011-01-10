@@ -1,7 +1,8 @@
 package fritz3.display.graphics.parser.size  {
+	import fritz3.base.parser.PropertyParser;
+	import fritz3.display.core.DisplayValue;
 	import fritz3.display.core.DisplayValueType;
 	import fritz3.display.graphics.BackgroundImageScaleMode;
-	import fritz3.style.PropertyParser;
 	/**
 
 	/**
@@ -33,7 +34,7 @@ package fritz3.display.graphics.parser.size  {
 		
 		protected function getSizeData ( value:String ):BackgroundSizeData {
 			var data:BackgroundSizeData = new BackgroundSizeData();
-			var match:Array = value.match(/(((\d+)(px|%)?|auto)\s+((\d+)(px|%)?|auto)?)|^(cover)$|^(contain)$/);
+			var match:Array = value.match(/(((\d+)(px|%)?|auto)\s*((\d+)(px|%)?|auto)?)|^(cover)$|^(contain)$/);
 			var width:Number = 0, height:Number = 0;
 			var widthValueType:String = DisplayValueType.AUTO, heightValueType:String = DisplayValueType.AUTO;
 			var scaleMode:String = BackgroundImageScaleMode.NONE;
@@ -56,16 +57,19 @@ package fritz3.display.graphics.parser.size  {
 								heightValueType = DisplayValueType.PIXEL;
 							}
 						}
-					} 
+					} else {
+						height = width;
+						heightValueType = widthValueType;
+					}
 				}
 			}
 			
+			trace(width, widthValueType, height, heightValueType);
+			
 			data.backgroundImageScaleMode = scaleMode;
 			if (scaleMode == BackgroundImageScaleMode.NONE) {
-				data.backgroundImageWidth = width;
-				data.backgroundImageWidthValueType = widthValueType;
-				data.backgroundImageHeight = height;
-				data.backgroundImageHeightValueType = heightValueType;
+				data.backgroundImageWidth = new DisplayValue(width, widthValueType);
+				data.backgroundImageHeight = new DisplayValue(height, heightValueType);
 			}
 			return data;
 		}

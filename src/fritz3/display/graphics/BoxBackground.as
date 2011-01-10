@@ -18,8 +18,15 @@
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import fritz3.base.injection.Injectable;
-	import fritz3.binding.AccessType;
-	import fritz3.binding.Binding;
+	import fritz3.base.parser.Parsable;
+	import fritz3.base.parser.ParseHelper;
+	import fritz3.base.parser.PropertyParser;
+	import fritz3.base.transition.Transitionable;
+	import fritz3.base.transition.TransitionData;
+	import fritz3.base.transition.TransitionType;
+	import fritz3.display.core.Cyclable;
+	import fritz3.display.core.CyclePhase;
+	import fritz3.display.core.DisplayValue;
 	import fritz3.display.core.DisplayValueType;
 	import fritz3.display.graphics.gradient.GraphicsGradientColor;
 	import fritz3.display.graphics.gradient.GraphicsGradientData;
@@ -30,16 +37,15 @@
 	import fritz3.display.graphics.parser.position.BackgroundPositionParser;
 	import fritz3.display.graphics.parser.repeat.BackgroundRepeatData;
 	import fritz3.display.graphics.parser.repeat.BackgroundRepeatParser;
-	import fritz3.display.graphics.parser.side.SideData;
-	import fritz3.display.graphics.parser.side.SideParser;
 	import fritz3.display.graphics.parser.size.BackgroundSizeData;
 	import fritz3.display.graphics.parser.size.BackgroundSizeParser;
 	import fritz3.display.graphics.utils.getGradientMatrix;
 	import fritz3.display.layout.Align;
+	import fritz3.display.parser.side.SideData;
+	import fritz3.display.parser.side.SideParser;
+	import fritz3.display.parser.size.SizeParser;
 	import fritz3.invalidation.Invalidatable;
-	import fritz3.style.PropertyParser;
-	import fritz3.style.transition.TransitionData;
-	import fritz3.style.transition.TransitionType;
+	import fritz3.style.PropertyData;
 	import fritz3.utils.assets.AssetLoader;
 	import fritz3.utils.assets.image.ImageAssetLoader;
 	import fritz3.utils.assets.image.ImageAssetManager;
@@ -49,18 +55,23 @@
 	import fritz3.utils.object.ObjectPool;
 	import fritz3.utils.tween.hasTween;
 	import fritz3.utils.tween.removeTween;
-	import fritz3.utils.tween.reverseTween;
 	import fritz3.utils.tween.tween;
 	/**
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public class BoxBackground implements RectangularBackground, Injectable {
+	public class BoxBackground implements RectangularBackground, Parsable, Injectable, Transitionable, Cyclable {
 		
 		protected var _drawable:Drawable;
 		protected var _parameters:Object;
 		
+		protected var _parseHelper:ParseHelper;
 		protected var _parsers:Object = { };
+		
+		protected var _transitions:Object = { };
+		
+		protected var _cyclePhase:String = CyclePhase.CONSTRUCTED;
+		protected var _cycle:int;
 		
 		protected var _width:Number;
 		protected var _height:Number;
@@ -77,11 +88,11 @@
 		protected var _bottomLeftCorner:Number = 0;
 		protected var _bottomRightCorner:Number = 0;
 		
-		protected var _border:Border = new Border();
-		protected var _borderLeft:Border = _border.clone();
-		protected var _borderTop:Border = _border.clone();
-		protected var _borderRight:Border = _border.clone();
-		protected var _borderBottom:Border = _border.clone();
+		protected var _border:Border;
+		protected var _borderLeft:Border;
+		protected var _borderTop:Border;
+		protected var _borderRight:Border;
+		protected var _borderBottom:Border;
 		
 		protected var _backgroundImage:DisplayObject;
 		protected var _backgroundImageAlpha:Number = 1;
@@ -89,15 +100,11 @@
 		protected var _backgroundImageHorizontalFloat:String = Align.LEFT;
 		protected var _backgroundImageVerticalFloat:String = Align.TOP;
 		
-		protected var _backgroundImageOffsetX:Number = 0;
-		protected var _backgroundImageOffsetY:Number = 0;
-		protected var _backgroundImageOffsetXValueType:String = DisplayValueType.PIXEL;
-		protected var _backgroundImageOffsetYValueType:String = DisplayValueType.PIXEL;
+		protected var _backgroundImageOffsetX:DisplayValue = new DisplayValue(0);
+		protected var _backgroundImageOffsetY:DisplayValue = new DisplayValue(0);
 		
-		protected var _backgroundImageWidth:Number = 0;
-		protected var _backgroundImageHeight:Number = 0;
-		protected var _backgroundImageWidthValueType:String = DisplayValueType.AUTO;
-		protected var _backgroundImageHeightValueType:String = DisplayValueType.AUTO;
+		protected var _backgroundImageWidth:DisplayValue = new DisplayValue(0, DisplayValueType.AUTO);
+		protected var _backgroundImageHeight:DisplayValue = new DisplayValue(0, DisplayValueType.AUTO);
 		
 		protected var _backgroundImageScaleMode:String = BackgroundImageScaleMode.NONE;
 		
@@ -119,6 +126,7 @@
 		
 		public function BoxBackground ( parameters:Object = null ) {
 			_parameters = parameters;
+			_parseHelper = new ParseHelper();
 			this.setParsers()
 			this.setDefaultProperties();
 			this.applyParameters();
@@ -132,6 +140,14 @@
 			this.addParser("border", BorderParser.parser);
 			this.addParser("borderGradient", GradientParser.parser);
 			this.addParser("roundedCorners", SideParser.parser);
+			this.addParser("topLeftCorner", SizeParser.parser);
+			this.addParser("topRightCorner", SizeParser.parser);
+			this.addParser("bottomLeftCorner", SizeParser.parser);
+			this.addParser("bottomRightCorner", SizeParser.parser);
+			this.addParser("backgroundImageOffsetX", SizeParser.parser);
+			this.addParser("backgroundImageOffsetY", SizeParser.parser);
+			this.addParser("backgroundImageWidth", SizeParser.parser);
+			this.addParser("backgroundImageHeight", SizeParser.parser);
 		}
 		
 		protected function addParser ( propertyName:String, parser:PropertyParser ):void {
@@ -150,18 +166,23 @@
 		}
 		
 		protected function setDefaultProperties ( ):void {
+			_border = new Border();
 			_border.borderSize = 0;
 			_border.borderColor = 0x000000;
 			_border.borderAlpha = 1;
 			_border.borderLineStyle = LineStyle.SOLID;
 			_border.borderPosition = BorderPosition.CENTER;
+			_borderLeft = _border.clone();
+			_borderTop = _border.clone();
+			_borderRight = _border.clone();
+			_borderBottom  = _border.clone();
 		}
 		
 		protected function applyParameters ( ):void {
-			var value:*;
 			for (var name:String in _parameters) {
-				this[name] = _parameters[name];
+				this.parseProperty(name, _parameters[name]);
 			}
+			this.applyParsedProperties();
 		}
 		
 		public function draw ( displayObject:DisplayObject ):void {
@@ -578,13 +599,17 @@
 			graphics.curveTo(cp.x, cp.y, target.x, target.y);
 			
 			if (orient == "horizontal") {
-				from.x = invertX ? from.x - fromSize : from.x + fromSize;
-				to.y = invertY ? to.y - toSize : to.y + toSize;
+				from.x += invertX ? -fromSize : fromSize;
+				to.x += invertX ? -fromSize : fromSize;
+				from.y += invertY ? -toSize : toSize;
+				to.y += invertY ? -toSize : toSize;
 				controlPoint.x = invertX ? controlPoint.x - fromSize : controlPoint.x + fromSize;
 				controlPoint.y = invertY ? controlPoint.y - toSize : controlPoint.y + toSize;
 			} else {
-				from.y = invertY ? from.y - fromSize : from.y + fromSize;
-				to.x = invertX ? to.x - toSize : to.x + toSize;
+				from.x += invertX ? -toSize : toSize;
+				to.x += invertX ? -toSize : toSize;
+				from.y += invertY ? -fromSize : fromSize;
+				to.y += invertY ? -fromSize : fromSize;
 				controlPoint.x = invertX ? controlPoint.x - toSize : controlPoint.x + toSize;
 				controlPoint.y = invertY ? controlPoint.y - fromSize : controlPoint.y + fromSize;
 			}
@@ -948,33 +973,23 @@
 				scale = _width / imageWidth < _height / imageHeight ? _width / imageWidth : _height / imageHeight;
 				width = imageWidth * scale, height = imageHeight * scale;
 			} else {			
-				switch(_backgroundImageWidthValueType) {
+				switch(_backgroundImageWidth.valueType) {
 					default:
+					width = _backgroundImageWidth.getComputedValue(_width);
+					break;
+					
 					case DisplayValueType.AUTO:
 					width = imageWidth;
 					break;
-					
-					case DisplayValueType.PIXEL:
-					width = _backgroundImageWidth;
-					break;
-					
-					case DisplayValueType.PERCENTAGE:
-					width = (_backgroundImageWidth / 100) * _width;
-					break;
 				}
 				
-				switch(_backgroundImageHeightValueType) {
+				switch(_backgroundImageHeight.valueType) {
 					default:
+					height = _backgroundImageHeight.getComputedValue(_height);
+					break;
+					
 					case DisplayValueType.AUTO:
 					height = imageHeight;
-					break;
-					
-					case DisplayValueType.PIXEL:
-					height = _backgroundImageHeight;
-					break;
-					
-					case DisplayValueType.PERCENTAGE:
-					height = (_backgroundImageHeight / 100) * _height;
 					break;
 				}
 
@@ -990,31 +1005,11 @@
 			
 			var spaceToDistribute:Number;
 			
-			var offsetX:Number = 0;
 			spaceToDistribute = Math.max(0, _width - width);
-			switch(_backgroundImageOffsetXValueType) {
-				default:
-				case DisplayValueType.PIXEL:
-				offsetX = _backgroundImageOffsetX;
-				break;
-				
-				case DisplayValueType.PERCENTAGE:
-				offsetX = (_backgroundImageOffsetY / 100) * spaceToDistribute;
-				break;
-			}
+			var offsetX:Number = _backgroundImageOffsetX.getComputedValue(spaceToDistribute);
 			
-			var offsetY:Number = 0;
 			spaceToDistribute = Math.max(0, _height - height);
-			switch(_backgroundImageOffsetYValueType) {
-				default:
-				case DisplayValueType.PIXEL:
-				offsetY = _backgroundImageOffsetY;
-				break;
-				
-				case DisplayValueType.PERCENTAGE:
-				offsetY = (_backgroundImageOffsetY / 100) * spaceToDistribute;
-				break;
-			}
+			var offsetY:Number = _backgroundImageOffsetY.getComputedValue(spaceToDistribute);
 			
 			var x:Number = 0;
 			switch(_backgroundImageHorizontalFloat) {
@@ -1330,34 +1325,34 @@
 			
 		}*/
 		
-		public function setProperty ( propertyName:String, value:*, parameters:Object = null ):void {
+		public function parseProperty ( propertyName:String, value:* ):void {
 			switch(propertyName) {
 				default:
-				this.applyProperty(propertyName, value, parameters);
+				this.cacheParsedProperty(propertyName, value);
 				break;
 				
 				case "background":
-				this.parseBackground(value, parameters);
+				this.parseBackground(value);
 				break;
 				
 				case "backgroundImage":
-				this.parseBackgroundImage(value, parameters);
+				this.parseBackgroundImage(value);
 				break;
 				
 				case "backgroundPosition":
-				this.parseBackgroundPosition(value, parameters);
+				this.parseBackgroundPosition(value);
 				break;
 				
 				case "backgroundSize":
-				this.parseBackgroundSize(value, parameters);
+				this.parseBackgroundSize(value);
 				break;
 				
 				case "backgroundRepeat":
-				this.parseBackgroundRepeat(value, parameters);
+				this.parseBackgroundRepeat(value);
 				break;
 				
 				case "backgroundGradient":
-				this.parseBackgroundGradient(value, parameters);
+				this.parseBackgroundGradient(value);
 				break;
 				
 				case "border":
@@ -1365,7 +1360,7 @@
 				case "borderTop":
 				case "borderRight":
 				case "borderBottom":
-				this.parseBorder(propertyName, value, parameters);
+				this.parseBorder(propertyName, value);
 				break;
 				
 				case "borderGradient":
@@ -1373,21 +1368,139 @@
 				case "borderTopGradient":
 				case "borderRightGradient":
 				case "borderBottomGradient":
-				this.parseBorderGradient(propertyName, value, parameters);
+				this.parseBorderGradient(propertyName, value);
 				break;
 				
 				case "roundedCorners":
-				this.parseRoundedCorners(value, parameters);
+				this.parseRoundedCorners(value);
+				break;
+				
+				case "topLeftCorner":
+				case "topRightCorner":
+				case "bottomLeftCorner":
+				case "bottomRightCorner":
+				case "borderLeftSize":
+				case "borderTopSize":
+				case "borderRightSize":
+				case "borderBottomSize":
+				this.parsePixelValue(propertyName, value);
 				break;
 			}
 		}
 		
-		protected function applyProperty ( propertyName:String, value:*, parameters:Object = null ):void {
-			var transitionData:TransitionData;
-			if (parameters) {
-				transitionData = TransitionData(parameters.transition);
+		protected function cacheParsedProperty ( propertyName:String, value:* ):void {
+			_parseHelper.setProperty(propertyName, value);
+		}
+		
+		public function applyParsedProperties ( ):void {
+			var node:PropertyData = _parseHelper.firstNode;
+			while (node) {
+				this.setProperty(node.propertyName, node.value);
+				node = node.nextNode;
 			}
-			if (!transitionData) {	
+			_parseHelper.reset();
+		}
+		
+		public function setTransition ( propertyName:String, transitionData:TransitionData ):void {
+			switch(propertyName) {
+				default:
+				_transitions[propertyName] = transitionData;
+				break;
+				
+				case "border":
+				_transitions['border'] = transitionData;
+				this.setTransition("borderLeft", transitionData);
+				this.setTransition("borderTop", transitionData);
+				this.setTransition("borderRight", transitionData);
+				this.setTransition("borderBottom", transitionData);
+				break;
+				
+				case "borderAlpha":
+				_transitions['borderAlpha'] = transitionData;
+				this.setTransition("borderLeftAlpha", transitionData);
+				this.setTransition("borderTopAlpha", transitionData);
+				this.setTransition("borderRightAlpha", transitionData);
+				this.setTransition("borderBottomAlpha", transitionData);
+				break;
+				
+				case "borderColor":
+				_transitions['borderColor'] = transitionData;
+				this.setTransition("borderLeftColor", transitionData);
+				this.setTransition("borderTopColor", transitionData);
+				this.setTransition("borderRightColor", transitionData);
+				this.setTransition("borderBottomColor", transitionData);
+				break;
+				
+				case "borderSize":
+				_transitions['borderSize'] = transitionData;
+				this.setTransition("borderLeftSize", transitionData);
+				this.setTransition("borderTopSize", transitionData);
+				this.setTransition("borderBottomSize", transitionData);
+				this.setTransition("borderRightSize", transitionData);
+				break;
+				
+				case "borderGradient":
+				_transitions['borderGradient'] = transitionData;
+				this.setTransition("borderLeftGradient", transitionData);
+				this.setTransition("borderTopGradient", transitionData);
+				this.setTransition("borderRightGradient", transitionData);
+				this.setTransition("borderBottomGradient", transitionData);
+				break;
+				
+				case "borderLeft":
+				_transitions['borderLeft'] = transitionData;
+				this.setTransition("borderLeftAlpha", transitionData);
+				this.setTransition("borderLeftColor", transitionData);
+				this.setTransition("borderLeftSize", transitionData);
+				break;
+				
+				case "borderTop":
+				_transitions['borderTop'] = transitionData;
+				this.setTransition("borderTopAlpha", transitionData);
+				this.setTransition("borderTopColor", transitionData);
+				this.setTransition("borderTopSize", transitionData);
+				break;s
+				
+				case "borderRight":
+				_transitions['borderRight'] = transitionData;
+				this.setTransition("borderRightAlpha", transitionData);
+				this.setTransition("borderRightColor", transitionData);
+				this.setTransition("borderRightSize", transitionData);
+				break;
+				
+				case "borderBottom":
+				_transitions['borderBottom'] = transitionData;
+				this.setTransition("borderBottomAlpha", transitionData);
+				this.setTransition("borderBottomColor", transitionData);
+				this.setTransition("borderBottomSize", transitionData);
+				break;
+				
+				case "roundedCorners":
+				_transitions['roundedCorners'] = transitionData;
+				this.setTransition("topLeftCorner", transitionData);
+				this.setTransition("topRightCorner", transitionData);
+				this.setTransition("leftBottomCorner", transitionData);
+				this.setTransition("rightBottomCorner", transitionData);
+				break;
+				
+				case "backgroundPosition":
+				_transitions['backgroundPosition'] = transitionData;
+				this.setTransition("backgroundImageOffsetX", transitionData);
+				this.setTransition("backgroundImageOffsetY", transitionData);				
+				break;
+				
+				case "backgroundSize":
+				_transitions['backgroundSize' ] = transitionData;
+				this.setTransition("backgroundImageWidth", transitionData);
+				this.setTransition("backgroundImageHeight", transitionData);
+				break;
+				
+			}
+		}
+		
+		public function setProperty ( propertyName:String, value:* ):void {
+			var transitionData:TransitionData = _transitions[propertyName];
+			if (!transitionData || transitionData.cyclePhase != _cyclePhase ) {	
 				if (hasTween(this, propertyName)) {
 					removeTween(this, propertyName);
 				}
@@ -1421,73 +1534,66 @@
 			}
 		}
 		
-		protected function parseBackground ( value:String, parameters:Object = null ):void {
+		protected function parseBackground ( value:String ):void {
 			
 		}
 		
-		protected function parseBackgroundImage ( value:String, parameters:Object = null ):void {
+		protected function parseBackgroundImage ( value:String ):void {
 			var match:Array = value.match(/^(url|resource|none|null)\("?(.*?)"?\)$/);
 			if (!match) {
-				this.backgroundImage = null;
+				this.cacheParsedProperty("backgroundImage", null);
 			}
 			
 			value = match[2];
 			
 			if (match[1] == "url") {
-				this.backgroundImageURL = value;
+				this.cacheParsedProperty("backgroundImageURL", value);
 			} else if (match[1] == "resource") {
-				this.backgroundImage = new (getClass(value));
+				this.cacheParsedProperty("backgroundImage", new (getClass(value)));
 			} else {
-				this.backgroundImage = null;
+				this.cacheParsedProperty("backgroundImage", null)
 			}
 		}
 		
-		protected function parseBackgroundPosition ( value:String, parameters:Object = null ):void {
+		protected function parseBackgroundPosition ( value:String ):void {
 			var parser:PropertyParser = this.getParser("backgroundPosition");
 			if (parser) {
 				var data:BackgroundPositionData = BackgroundPositionData(parser.parseValue(value));
-				this.applyProperty("backgroundImageHorizontalFloat", data.horizontalFloat, parameters);
-				this.applyProperty("backgroundImageOffsetX", data.offsetX, parameters);
-				this.applyProperty("backgroundImageOffsetXValueType", data.offsetXValueType, parameters);
-				
-				this.applyProperty("backgroundImageVerticalFloat", data.verticalFloat, parameters);
-				this.applyProperty("backgroundImageOffsetY", data.offsetY, parameters);
-				this.applyProperty("backgroundImageOffsetYValueType", data.offsetYValueType, parameters);
+				this.cacheParsedProperty("backgroundImageHorizontalFloat", data.horizontalFloat);
+				this.cacheParsedProperty("backgroundImageOffsetX", data.offsetX.clone());
+				this.cacheParsedProperty("backgroundImageVerticalFloat", data.verticalFloat);
+				this.cacheParsedProperty("backgroundImageOffsetY", data.offsetY.clone());
 			}
 		}
 		
-		protected function parseBackgroundSize ( value:String, parameters:Object = null ):void {
+		protected function parseBackgroundSize ( value:String ):void {
 			var parser:PropertyParser = this.getParser("backgroundSize");
 			if (parser) {
 				var data:BackgroundSizeData = BackgroundSizeData(parser.parseValue(value));
-				
-				this.backgroundImageScaleMode = data.backgroundImageScaleMode;
-				this.backgroundImageWidth = data.backgroundImageWidth;
-				this.backgroundImageWidthValueType = data.backgroundImageWidthValueType;
-				
-				this.backgroundImageHeight = data.backgroundImageHeight;
-				this.backgroundImageHeightValueType = data.backgroundImageHeightValueType;
+				this.cacheParsedProperty("backgroundImageScaleMode", data.backgroundImageScaleMode);
+				this.cacheParsedProperty("backgroundImageWidth", data.backgroundImageWidth.clone());
+				this.cacheParsedProperty("backgroundImageHeight", data.backgroundImageHeight.clone());
 			}
 		}
 		
-		protected function parseBackgroundRepeat ( value:String, parameters:Object = null ):void {
+		protected function parseBackgroundRepeat ( value:String ):void {
 			var parser:PropertyParser = this.getParser("backgroundRepeat");
 			if (parser) {
 				var data:BackgroundRepeatData = BackgroundRepeatData(parser.parseValue(value));
-				this.backgroundImageRepeatX = data.repeatX;
-				this.backgroundImageRepeatY = data.repeatY;
+				this.cacheParsedProperty("backgroundImageRepeatX", data.repeatX);
+				this.cacheParsedProperty("backgroundImageRepeatY", data.repeatY);
 			}
 		}
 		
-		protected function parseBackgroundGradient ( value:String, parameters:Object = null ):void {
+		protected function parseBackgroundGradient ( value:String ):void {
 			var parser:PropertyParser = this.getParser("backgroundGradient");
 			if (parser) {
 				var data:GraphicsGradientData = GraphicsGradientData(parser.parseValue(value));
-				this.applyProperty("backgroundGradient", data ? data.clone() : null, parameters);
+				this.cacheParsedProperty("backgroundGradient", data ? data.clone() : null);
 			}
 		}
 		
-		protected function parseBorder ( propertyName:String, value:String, parameters:Object = null ):void {
+		protected function parseBorder ( propertyName:String, value:String ):void {
 			var parser:PropertyParser = this.getParser("border");
 			if (parser) {
 				var data:BorderData = BorderData(parser.parseValue(value));
@@ -1496,76 +1602,97 @@
 					case "border":
 					if (data.border) {
 						border = data.border;
-						this.applyToBorder(border, "", parameters);
+						this.applyToBorder(border.clone(), "Left");
+						this.applyToBorder(border.clone(), "Top");
+						this.applyToBorder(border.clone(), "Right");
+						this.applyToBorder(border.clone(), "Bottom");
 					} else {
 						if ((border = data.borderLeft)) {
-							this.applyToBorder(border, "Left", parameters);
+							this.cacheParsedProperty("borderLeftSize", border.borderSize);
 						}
 						if ((border = data.borderTop)) {
-							this.applyToBorder(border, "Top", parameters);
+							this.cacheParsedProperty("borderTopSize", border.borderSize);
 						}
 						if ((border = data.borderRight)) {
-							this.applyToBorder(border, "Right", parameters);
+							this.cacheParsedProperty("borderRightSize", border.borderSize);
 						}
 						if ((border = data.borderBottom)) {
-							this.applyToBorder(border, "Bottom", parameters);
+							this.cacheParsedProperty("borderBottomSize", border.borderSize);
 						}
 					}
 					break;
 					
 					case "borderLeft":
-					this.applyToBorder(data.border, "Left", parameters);
+					this.applyToBorder(data.border, "Left");
 					break;
 					
 					case "borderTop":
-					this.applyToBorder(data.border, "Top", parameters);
+					this.applyToBorder(data.border, "Top");
 					break;
 					
 					case "borderRight":
-					this.applyToBorder(data.border, "Right", parameters);
+					this.applyToBorder(data.border, "Right");
 					break;
 					
 					case "borderBottom":
-					this.applyToBorder(data.border, "Bottom", parameters);
+					this.applyToBorder(data.border, "Bottom");
 					break;
 				}
 			}
 		}
 		
-		protected function applyToBorder ( border:Border, side:String = "", parameters:Object = null ):void {
-			this.applyProperty("border" + side + "Size", border.borderSize, parameters);
-			this.applyProperty("border" + side + "Color", border.borderColor, parameters);
-			this.applyProperty("border" + side + "Alpha", border.borderAlpha, parameters);
-			this.applyProperty("border" + side + "Position", border.borderPosition, parameters);
-			this.applyProperty("border" + side + "LineStyle", border.borderLineStyle, parameters);
+		protected function applyToBorder ( border:Border, side:String = "" ):void {
+			this.cacheParsedProperty("border" + side + "Size", border.borderSize);
+			this.cacheParsedProperty("border" + side + "Color", border.borderColor);
+			this.cacheParsedProperty("border" + side + "Alpha", border.borderAlpha);
+			this.cacheParsedProperty("border" + side + "Position", border.borderPosition);
+			this.cacheParsedProperty("border" + side + "LineStyle", border.borderLineStyle);
 		}
 		
-		protected function parseBorderGradient ( propertyName:String, value:String, parameters:Object = null ):void {
+		protected function parseBorderGradient ( propertyName:String, value:String ):void {
 			var parser:PropertyParser = this.getParser("borderGradient");
 			if (parser) {
 				var data:GraphicsGradientData = GraphicsGradientData(parser.parseValue(value));
 				if (data) {
 					data = data.clone();
 				}
-				this.applyProperty(propertyName, data, parameters);
-			}
-		}
-		
-		protected function parseRoundedCorners ( value:String, parameters:Object = null ):void {
-			var parser:PropertyParser = this.getParser("roundedCorners");
-			if (parser) {
-				var data:SideData = SideData(parser.parseValue(value));
-				if (data.all) {
-					this.applyProperty("roundedCorners", data.all, parameters);
+				if (propertyName == "borderGradient") {
+					this.cacheParsedProperty("borderLeftGradient", data);
+					this.cacheParsedProperty("borderTopGradient", data ? data.clone() : null);
+					this.cacheParsedProperty("borderBottomGradient", data ? data.clone() : null);
+					this.cacheParsedProperty("borderRightGradient", data ? data.clone() : null);
 				} else {
-					this.applyProperty("topLeftCorner", data.first, parameters);
-					this.applyProperty("topRightCorner", data.second, parameters);
-					this.applyProperty("bottomLeftCorner", data.third, parameters);
-					this.applyProperty("bottomRightCorner", data.fourth, parameters);
+					this.cacheParsedProperty(propertyName, data);
 				}
 			}
 		}
 		
+		protected function parseRoundedCorners ( value:String ):void {
+			var parser:PropertyParser = this.getParser("roundedCorners");
+			if (parser) {
+				var data:SideData = SideData(parser.parseValue(value));
+				if (data.all) {
+					var val:Number = data.all.value;
+					this.cacheParsedProperty("topLeftCorner", val);
+					this.cacheParsedProperty("topRightCorner", val);
+					this.cacheParsedProperty("bottomLeftCorner", val);
+					this.cacheParsedProperty("bottomRightCorner", val);
+				} else {
+					this.cacheParsedProperty("topLeftCorner", data.first.value);
+					this.cacheParsedProperty("topRightCorner", data.second.value);
+					this.cacheParsedProperty("bottomLeftCorner", data.third.value);
+					this.cacheParsedProperty("bottomRightCorner", data.fourth.value);
+				}
+			}
+		}
+		
+		protected function parsePixelValue ( propertyName:String, value:String ):void {
+			var parser:PropertyParser = this.getParser(propertyName);
+			if (parser) {
+				var displayValue:DisplayValue = DisplayValue(parser.parseValue(value));
+				this.cacheParsedProperty(propertyName, displayValue.value);
+			}
+		}
 		
 		protected function setBackgroundImage ( displayObject:DisplayObject ):void {
 			_backgroundImage = displayObject;
@@ -1941,34 +2068,20 @@
 			}
 		}
 		
-		public function get backgroundImageOffsetX ( ):Number { return _backgroundImageOffsetX; }
-		public function set backgroundImageOffsetX ( value:Number ):void {
-			if (_backgroundImageOffsetX != value) {
+		public function get backgroundImageOffsetX ( ):DisplayValue { return _backgroundImageOffsetX; }
+		public function set backgroundImageOffsetX ( value:DisplayValue ):void {
+			if (_backgroundImageOffsetX.invalidated || !_backgroundImageOffsetX.assertEquals(value)) {
 				_backgroundImageOffsetX = value;
+				_backgroundImageOffsetX.invalidated = false;
 				this.invalidate();
 			}
 		}
 		
-		public function get backgroundImageOffsetY ( ):Number { return _backgroundImageOffsetY; }	
-		public function set backgroundImageOffsetY ( value:Number ):void {
-			if (_backgroundImageOffsetY != value) {
+		public function get backgroundImageOffsetY ( ):DisplayValue { return _backgroundImageOffsetY; }
+		public function set backgroundImageOffsetY ( value:DisplayValue ):void {
+			if (_backgroundImageOffsetY.invalidated || !_backgroundImageOffsetY.assertEquals(value)) {
 				_backgroundImageOffsetY = value;
-				this.invalidate();
-			}
-		}
-		
-		public function get backgroundImageOffsetXValueType ( ):String { return _backgroundImageOffsetXValueType; }
-		public function set backgroundImageOffsetXValueType ( value:String ):void {
-			if (_backgroundImageOffsetXValueType != value) {
-				_backgroundImageOffsetXValueType = value;
-				this.invalidate();
-			}
-		}
-		
-		public function get backgroundImageOffsetYValueType ( ):String { return _backgroundImageOffsetYValueType; }
-		public function set backgroundImageOffsetYValueType ( value:String ):void {
-			if (_backgroundImageOffsetYValueType != value) {
-				_backgroundImageOffsetYValueType = value;
+				_backgroundImageOffsetY.invalidated = false;
 				this.invalidate();
 			}
 		}
@@ -2028,34 +2141,20 @@
 			}
 		}
 		
-		public function get backgroundImageWidth ( ):Number { return _backgroundImageWidth; }
-		public function set backgroundImageWidth ( value:Number ):void {
-			if (_backgroundImageWidth != value) {
+		public function get backgroundImageWidth ( ):DisplayValue { return _backgroundImageWidth; }
+		public function set backgroundImageWidth ( value:DisplayValue ):void {
+			if (_backgroundImageWidth.invalidated || !_backgroundImageWidth.assertEquals(value)) {
 				_backgroundImageWidth = value;
+				_backgroundImageWidth.invalidated = false;
 				this.invalidate();
 			}
 		}
 		
-		public function get backgroundImageHeight ( ):Number { return _backgroundImageHeight; }
-		public function set backgroundImageHeight ( value:Number ):void {
-			if (_backgroundImageHeight != value) {
+		public function get backgroundImageHeight ( ):DisplayValue { return _backgroundImageWidth; }
+		public function set backgroundImageHeight ( value:DisplayValue ):void {
+			if (_backgroundImageHeight.invalidated || !_backgroundImageHeight.assertEquals(value)) {
 				_backgroundImageHeight = value;
-				this.invalidate();
-			}
-		}
-		
-		public function get backgroundImageWidthValueType ( ):String { return _backgroundImageWidthValueType; }
-		public function set backgroundImageWidthValueType ( value:String ):void {
-			if (_backgroundImageWidthValueType != value) {
-				_backgroundImageWidthValueType = value;
-				this.invalidate();
-			}
-		}
-		
-		public function get backgroundImageHeightValueType ( ):String { return _backgroundImageHeightValueType; }
-		public function set backgroundImageHeightValueType ( value:String ):void {
-			if (_backgroundImageHeightValueType != value) {
-				_backgroundImageHeightValueType = value;
+				_backgroundImageHeight.invalidated = false;
 				this.invalidate();
 			}
 		}
@@ -2066,6 +2165,16 @@
 				_backgroundImageScaleMode = value;
 				this.invalidate();
 			}
+		}
+		
+		public function get cyclePhase ( ):String { return _cyclePhase; }
+		public function set cyclePhase ( value:String ):void {
+			_cyclePhase = value;
+		}
+		
+		public function get cycle ( ):int { return _cycle; }
+		public function set cycle ( value:int ):void {
+			_cycle = value;
 		}
 	}
 

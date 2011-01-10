@@ -3,16 +3,18 @@
 	import flash.display.Sprite;
 	import flash.utils.Dictionary;
 	import fritz3.base.injection.Injectable;
-	import fritz3.binding.Binding;
+	import fritz3.base.parser.Parsable;
+	import fritz3.base.parser.ParseHelper;
+	import fritz3.base.parser.PropertyParser;
+	import fritz3.base.transition.Transitionable;
+	import fritz3.base.transition.TransitionData;
+	import fritz3.base.transition.TransitionType;
 	import fritz3.invalidation.Invalidatable;
 	import fritz3.invalidation.InvalidationHelper;
 	import fritz3.invalidation.InvalidationManager;
-	import fritz3.style.PropertyParser;
-	import fritz3.style.transition.TransitionData;
-	import fritz3.style.transition.TransitionType;
+	import fritz3.style.PropertyData;
 	import fritz3.utils.tween.hasTween;
 	import fritz3.utils.tween.removeTween;
-	import fritz3.utils.tween.reverseTween;
 	import fritz3.utils.tween.tween;
 	import org.osflash.signals.IDispatcher;
 	import org.osflash.signals.ISignal;
@@ -21,7 +23,7 @@
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public class InvalidatableDisplayComponent extends Sprite implements Invalidatable, Injectable, Addable {
+	public class InvalidatableDisplayComponent extends Sprite implements Invalidatable, Parsable, Injectable, Addable, Transitionable, Cyclable {
 		
 		protected var _invalidationHelper:InvalidationHelper;
 		protected var _priority:int;
@@ -30,9 +32,15 @@
 		
 		protected var _properties:Object = { };
 		
-		protected var _propertyParsers:Object = {};
+		protected var _parseHelper:ParseHelper;
+		protected var _propertyParsers:Object = { };
+		
+		protected var _transitions:Object = { };
 		
 		protected var _parentComponent:Addable;
+		
+		protected var _cyclePhase:String = CyclePhase.CONSTRUCTED;
+		protected var _cycle:int = 1;
 		
 		public function InvalidatableDisplayComponent ( parameters:Object = null ) {
 			super();
@@ -46,41 +54,23 @@
 			this.setParsers();
 			this.setDefaultProperties();
 			this.applyParameters();
-		}
-		
-		public function setProperty ( propertyName:String, value:*, parameters:Object = null ):void {
-			this.applyProperty(propertyName, value, parameters);
-		}
-		
-		protected function applyProperty ( propertyName:String, value:*, parameters:Object = null ):void {
-			_properties[propertyName] = value;
-			var transitionData:TransitionData;
-			if (parameters) {
-				transitionData = TransitionData(parameters.transition);
-			}
-			if (!transitionData) {
-				if (hasTween(this, propertyName)) {
-					reverseTween(this, propertyName);
-				} 
-				this[propertyName] = value;
-			} else {
-				if (transitionData.type == TransitionType.TO) {
-					transitionData.value = value;
-				}
-				tween(this, propertyName, transitionData);
-			}
+			this.setCyclePhase(CyclePhase.INITIALIZED);
 		}
 		
 		public function onAdd ( ):void {
-			
+			if (_cyclePhase == CyclePhase.REMOVED) {
+				this.setCycle(_cycle + 1);
+			}
+			this.setCyclePhase(CyclePhase.ADDED);
 		}
 		
 		public function onRemove ( ):void {
-			
+			this.setCyclePhase(CyclePhase.REMOVED);
 		}
 		
 		protected function initializeDependencies ( ):void {
 			this.initializeInvalidation();
+			this.initializeParseHelper();
 		}
 		
 		protected function setInvalidationMethodOrder ( ):void {
@@ -95,14 +85,64 @@
 			
 		}
 		
+		protected function setCyclePhase ( cyclePhase:String ):void {
+			_cyclePhase = cyclePhase;
+		}
+		
+		protected function setCycle ( cycle:int ):void {
+			_cycle = cycle;
+		}
+		
 		protected function initializeInvalidation ( ):void {
 			_invalidationHelper = new InvalidationHelper();
 		}
 		
+		protected function initializeParseHelper ( ):void {
+			_parseHelper = new ParseHelper();
+		}
+		
+		public function parseProperty ( propertyName:String, value:* ):void {
+			this.cacheParsedProperty(propertyName, value);
+		}
+		
+		protected function cacheParsedProperty ( propertyName:String, value:* ):void {
+			_parseHelper.setProperty(propertyName, value);
+		}
+		
+		public function applyParsedProperties ( ):void {
+			var node:PropertyData = _parseHelper.firstNode;
+			while (node) {
+				this.setProperty(node.propertyName, node.value);
+				node = node.nextNode;
+			}
+			_parseHelper.reset();
+		}
+		
+		public function setProperty ( propertyName:String, value:* ):void {
+			_properties[propertyName] = value;
+			var transitionData:TransitionData = _transitions[propertyName]; 
+			if (!transitionData || transitionData.cyclePhase != _cyclePhase) {
+				if (hasTween(this, propertyName)) {
+					removeTween(this, propertyName);
+				} 
+				this[propertyName] = value;
+			} else {
+				if (transitionData.type == TransitionType.TO) {
+					transitionData.value = value;
+				}
+				tween(this, propertyName, transitionData);
+			}
+		}
+		
+		public function setTransition ( propertyName:String, transitionData:TransitionData ):void {
+			_transitions[propertyName] = transitionData;
+		}
+		
 		protected function applyParameters ( ):void {
 			for (var name:String in _parameters) {
-				this.setProperty(name, _parameters[name]);
+				this.parseProperty(name, _parameters[name]);
 			}
+			this.applyParsedProperties();
 		}
 		
 		protected function addParser ( propertyName:String, parser:PropertyParser ):void {
@@ -144,6 +184,16 @@
 			if (_parentComponent != value) {
 				this.setParentComponent(value);
 			}
+		}
+		
+		public function get cyclePhase ( ):String { return _cyclePhase; }
+		public function set cyclePhase ( value:String ):void {
+			_cyclePhase = value;
+		}
+		
+		public function get cycle ( ):int { return _cycle; }
+		public function set cycle ( value:int ):void {
+			_cycle = value;
 		}
 	}
 

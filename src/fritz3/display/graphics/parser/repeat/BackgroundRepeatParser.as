@@ -1,6 +1,6 @@
 package fritz3.display.graphics.parser.repeat {
+	import fritz3.base.parser.PropertyParser;
 	import fritz3.display.graphics.BackgroundImageRepeat;
-	import fritz3.style.PropertyParser;
 	/**
 	 * ...
 	 * @author Dario Gieselaar

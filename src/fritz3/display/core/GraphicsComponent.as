@@ -10,11 +10,6 @@ package fritz3.display.core {
 	public class GraphicsComponent extends PositionableDisplayComponent implements Drawable {
 		
 		protected var _background:Background;
-		protected var _width:Number = 0;
-		protected var _height:Number = 0;
-		
-		protected var _dispatchedWidth:Number = 0;
-		protected var _dispatchedHeight:Number = 0;
 		
 		public function GraphicsComponent ( properties:Object = null ) {
 			super(properties);
@@ -23,6 +18,20 @@ package fritz3.display.core {
 		override protected function initializeDependencies():void {
 			super.initializeDependencies();
 			this.initializeBackground();
+		}
+		
+		override protected function setCyclePhase ( cyclePhase:String ):void {
+			super.setCyclePhase(cyclePhase);
+			if (_background && _background is Cyclable) {
+				Cyclable(_background).cyclePhase = cyclePhase;
+			}
+		}
+		
+		override protected function setCycle ( cycle:int ):void {
+			super.setCycle(cycle);
+			if (_background && _background is Cyclable) {
+				Cyclable(_background).cycle = cycle;
+			}
 		}
 		
 		override protected function setInvalidationMethodOrder():void {
@@ -38,19 +47,13 @@ package fritz3.display.core {
 			this.background = new BoxBackground();
 		}
 		
-		protected function applyWidth ( ):void {
-			if (_width != _dispatchedWidth) {
-				this.invalidateDisplay();
-			}
+		override protected function applyWidth ( ):void {
 			if (_background is RectangularBackground) {
 				RectangularBackground(_background).width = _width;
 			}
 		}
 		
-		protected function applyHeight ( ):void {
-			if (_height != _dispatchedHeight) {
-				this.invalidateDisplay();
-			}
+		override protected function applyHeight ( ):void {
 			if (_background is RectangularBackground) {
 				RectangularBackground(_background).height = _height;
 			}
@@ -70,12 +73,11 @@ package fritz3.display.core {
 					RectangularBackground(_background).width = _width;
 					RectangularBackground(_background).height = _height;
 				}
+				if (_background is Cyclable) {
+					Cyclable(_background).cyclePhase = _cyclePhase;
+					Cyclable(_background).cycle = _cycle;
+				}
 			}
-		}
-		
-		override protected function dispatchDisplayInvalidation():void {
-			super.dispatchDisplayInvalidation();
-			_dispatchedWidth = _width, _dispatchedHeight = _height;
 		}
 		
 		public function invalidateGraphics ( ):void {
@@ -86,22 +88,6 @@ package fritz3.display.core {
 		public function set background ( value:Background ):void {
 			if (_background != value) {
 				this.setBackground(value);
-			}
-		}
-		
-		override public function get width ( ):Number { return _width; }
-		override public function set width ( value:Number ):void {
-			if (_width != value) {
-				_width = value;
-				this.applyWidth();
-			}
-		}
-		
-		override public function get height ( ):Number { return _height; }
-		override public function set height ( value:Number ):void {
-			if (_height != value) {
-				_height = value;
-				this.applyHeight();
 			}
 		}
 		

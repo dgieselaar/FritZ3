@@ -4,13 +4,14 @@ package fritz3.display.text.layout {
 	import flash.text.TextField;
 	import fritz3.display.layout.Align;
 	import fritz3.display.layout.Layout;
+	import fritz3.display.layout.PaddableLayout;
 	import fritz3.display.layout.Rearrangable;
 	import fritz3.display.layout.RectangularLayout;
 	/**
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public class TextLayout implements RectangularLayout {
+	public class TextLayout implements PaddableLayout {
 		
 		protected var _parameters:Object;
 		protected var _rearrangable:Rearrangable;
@@ -53,42 +54,38 @@ package fritz3.display.text.layout {
 		public function rearrange ( container:DisplayObjectContainer, items:Array ):void {
 			var textField:DisplayObject = items[0];
 			var x:Number = _paddingLeft, y:Number = _paddingTop;
-			if (!_autoWidth) {
-				var childWidth:Number = textField.width;
-				var availableWidth:Number = _width - _paddingLeft - _paddingBottom;
-				switch(_horizontalAlign) {
-					default:
-					case Align.LEFT:
-					x = _paddingLeft;
-					break;
-					
-					case Align.CENTER:
-					x = _paddingLeft + availableWidth / 2 - childWidth / 2;
-					break;
-					
-					case Align.RIGHT:
-					x = _paddingLeft + availableWidth - childWidth;
-					break;
-				}
+			var childWidth:Number = textField.width;
+			var availableWidth:Number = _width - _paddingLeft - _paddingRight;
+			switch(_horizontalAlign) {
+				default:
+				case Align.LEFT:
+				x = _paddingLeft;
+				break;
+				
+				case Align.CENTER:
+				x = _paddingLeft + availableWidth / 2 - childWidth / 2;
+				break;
+				
+				case Align.RIGHT:
+				x = _paddingLeft + availableWidth - childWidth;
+				break;
 			}
 			
-			if (!_autoHeight) {
-				var childHeight:Number = textField.height;
-				var availableHeight:Number = _height - _paddingTop - _paddingBottom;
-				switch(_verticalAlign) {
-					default:
-					case Align.TOP:
-					y = _paddingTop;
-					break;
-					
-					case Align.CENTER:
-					y = _paddingTop + availableHeight / 2 - childHeight / 2;
-					break;
-					
-					case Align.BOTTOM:
-					y = _paddingTop + availableHeight - childHeight;
-					break;
-				}
+			var childHeight:Number = textField.height;
+			var availableHeight:Number = _height - _paddingTop - _paddingBottom;
+			switch(_verticalAlign) {
+				default:
+				case Align.TOP:
+				y = _paddingTop;
+				break;
+				
+				case Align.CENTER:
+				y = _paddingTop + availableHeight / 2 - childHeight / 2;
+				break;
+				
+				case Align.BOTTOM:
+				y = _paddingTop + availableHeight - childHeight;
+				break;
 			}
 			textField.x = x, textField.y = y;
 		}

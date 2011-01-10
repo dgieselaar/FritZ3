@@ -23,8 +23,6 @@ package fritz3.display.core  {
 		protected var _className:String;
 		protected var _name:String;
 		
-		protected var _init:Boolean = true;
-		
 		public function StylableDisplayComponent ( properties:Object = null )  {
 			super(properties);
 		}
@@ -55,8 +53,8 @@ package fritz3.display.core  {
 		
 		protected function getStyle ( ):void {
 			_styleSheetCollector.getStyle();
-			if (_init) {
-				_init = false;
+			if (_cyclePhase == CyclePhase.ADDED) {
+				this.setCyclePhase(CyclePhase.LIVE);
 			}
 		}
 		
@@ -68,7 +66,6 @@ package fritz3.display.core  {
 		
 		override public function onRemove ( ):void {
 			super.onRemove();
-			_init = true;
 		}
 		
 		public function invalidateStyle ( ):void {
@@ -127,8 +124,6 @@ package fritz3.display.core  {
 				this.applyName();
 			}
 		}
-		
-		public function get init ( ):Boolean { return _init; }
 		
 		/*override public function toString():String {
 			return "[object " + (super.toString().match(/\[object (.*?)\]/)[1]) + " { id: "+_id+", className: "+_className+", name: "+_name+" } ]";

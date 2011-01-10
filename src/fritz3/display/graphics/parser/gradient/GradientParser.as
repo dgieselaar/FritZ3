@@ -1,9 +1,9 @@
 package fritz3.display.graphics.parser.gradient {
 	import flash.display.GraphicsGradientFill;
+	import fritz3.base.parser.PropertyParser;
 	import fritz3.display.core.DisplayValueType;
 	import fritz3.display.graphics.gradient.GraphicsGradientColor;
 	import fritz3.display.graphics.gradient.GraphicsGradientData;
-	import fritz3.style.PropertyParser;
 	/**
 	 * ...
 	 * @author Dario Gieselaar
@@ -28,7 +28,7 @@ package fritz3.display.graphics.parser.gradient {
 		
 		public function getGradientData ( value:String ):GraphicsGradientData {
 			var data:GraphicsGradientData;
-			var match:Array = value.match(/(linear|radial)(\s+(-?[0-9]{1,3}))?(\s+(\d+)(%|px)?)?\s*\((.+)\)/);
+			var match:Array = value ? value.match(/(linear|radial)(\s+(-?[0-9]{1,3}))?(\s+(\d+)(%|px)?)?\s*\((.+)\)/) : null;
 			if (match) {
 				data = new GraphicsGradientData();
 				data.type = match[1];

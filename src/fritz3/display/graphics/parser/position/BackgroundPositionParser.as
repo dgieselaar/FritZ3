@@ -1,7 +1,8 @@
 package fritz3.display.graphics.parser.position  {
+	import fritz3.base.parser.PropertyParser;
+	import fritz3.display.core.DisplayValue;
 	import fritz3.display.core.DisplayValueType;
 	import fritz3.display.layout.Align;
-	import fritz3.style.PropertyParser;
 	/**
 
 	/**
@@ -92,12 +93,10 @@ package fritz3.display.graphics.parser.position  {
 			}
 			
 			data.horizontalFloat = horizontalFloat;
-			data.offsetX = offsetX;
-			data.offsetXValueType = offsetXValueType;
+			data.offsetX = new DisplayValue(offsetX, offsetXValueType);
 			
 			data.verticalFloat = verticalFloat;
-			data.offsetY = offsetY;
-			data.offsetYValueType = offsetYValueType;
+			data.offsetY = new DisplayValue(offsetY, offsetYValueType);
 			return data;
 		}
 		

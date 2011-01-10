@@ -7,28 +7,31 @@
 	import flash.geom.Rectangle;
 	import fritz3.base.collection.ArrayItemCollection;
 	import fritz3.base.collection.ItemCollection;
+	import fritz3.base.parser.PropertyParser;
+	import fritz3.base.transition.TransitionData;
 	import fritz3.display.graphics.Background;
 	import fritz3.display.graphics.BoxBackground;
 	import fritz3.display.graphics.Drawable;
-	import fritz3.display.graphics.parser.side.SideData;
-	import fritz3.display.graphics.parser.side.SideParser;
 	import fritz3.display.graphics.RectangularBackground;
 	import fritz3.display.layout.flexiblebox.FlexibleBoxLayout;
 	import fritz3.display.layout.InvalidatablePositionable;
 	import fritz3.display.layout.Layout;
+	import fritz3.display.layout.PaddableLayout;
 	import fritz3.display.layout.Rearrangable;
 	import fritz3.display.layout.RectangularLayout;
+	import fritz3.display.parser.side.SideData;
+	import fritz3.display.parser.side.SideParser;
+	import fritz3.display.parser.size.SizeParser;
 	import fritz3.invalidation.Invalidatable;
 	import fritz3.invalidation.InvalidationHelper;
 	import fritz3.invalidation.InvalidationPriorityTreshold;
-	import fritz3.style.PropertyParser;
 	import fritz3.utils.signals.MonoSignal;
 	import org.osflash.signals.IDispatcher;
 	/**
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public class DisplayComponentContainer extends PositionableDisplayComponent implements ItemCollection, Drawable, Rearrangable, InvalidatablePositionable {
+	public class DisplayComponentContainer extends MeasurableDisplayComponent implements ItemCollection, Drawable, Rearrangable, InvalidatablePositionable {
 		
 		protected var _childInvalidationHelper:InvalidationHelper;
 		protected var _displayList:DisplayObjectContainer;
@@ -41,20 +44,11 @@
 		protected var _useScrollRect:Boolean;
 		protected var _scrollRect:Rectangle;
 		
-		protected var _width:Number = 0;
-		protected var _height:Number = 0;
-		
-		protected var _measuredWidth:Number = 0;
-		protected var _measuredHeight:Number = 0;
-		
-		protected var _autoWidth:Boolean = true;
-		protected var _autoHeight:Boolean = true;
-		
-		protected var _padding:Number = 0;
-		protected var _paddingLeft:Number = 0;
-		protected var _paddingTop:Number = 0;
-		protected var _paddingRight:Number = 0;
-		protected var _paddingBottom:Number = 0;
+		protected var _padding:DisplayValue = new DisplayValue(0);
+		protected var _paddingLeft:DisplayValue = new DisplayValue(0);
+		protected var _paddingTop:DisplayValue = new DisplayValue(0);
+		protected var _paddingRight:DisplayValue = new DisplayValue(0);
+		protected var _paddingBottom:DisplayValue = new DisplayValue(0);
 		
 		public function DisplayComponentContainer ( parameters:Object = null ) {
 			super(parameters);
@@ -102,53 +96,86 @@
 			this.layout = new FlexibleBoxLayout();
 		}
 		
-		override protected function setParsers():void {
-			super.setParsers();
-			this.addParser("padding", SideParser.parser);
+		override protected function setCyclePhase ( cyclePhase:String ):void {
+			super.setCyclePhase(cyclePhase);
+			if (_background && _background is Cyclable) {
+				Cyclable(_background).cyclePhase = cyclePhase;
+			}
+			if (_layout && _layout is Cyclable) {
+				Cyclable(_layout).cyclePhase = cyclePhase;
+			}
 		}
 		
-		override public function setProperty(propertyName:String, value:*, parameters:Object = null):void {
+		override protected function setCycle ( cycle:int ):void {
+			super.setCycle(cycle);
+			if (_background && _background is Cyclable) {
+				Cyclable(_background).cycle = cycle;
+			}
+			if (_layout && _layout is Cyclable) {
+				Cyclable(_layout).cycle = cycle;
+			}
+		}
+		
+		override protected function setParsers ( ):void {
+			super.setParsers();
+			this.addParser("padding", SideParser.parser);
+			this.addParser("paddingLeft", SizeParser.parser);
+			this.addParser("paddingTop", SizeParser.parser);
+			this.addParser("paddingRight", SizeParser.parser);
+			this.addParser("paddingBottom", SizeParser.parser);
+		}
+		
+		override public function parseProperty ( propertyName:String, value:* ):void {
 			switch(propertyName) {
 				default:
-				super.setProperty(propertyName, value, parameters);
-				break;
-				
-				case "width":
-				if (value == "auto") {
-					this.autoWidth = true;
-				} else {
-					this.autoWidth = false;
-					super.setProperty(propertyName, value, parameters);
-				}
-				break;
-				
-				case "height":
-				if (value == "auto") {
-					this.autoHeight = true;
-				} else {
-					this.autoHeight = false;
-					super.setProperty(propertyName, value, parameters);
-				}
+				super.parseProperty(propertyName, value);
 				break;
 				
 				case "padding":
-				this.parsePadding(propertyName, value, parameters);
+				this.parsePadding(propertyName, value);
+				break;
+				
+				case "paddingLeft":
+				case "paddingTop":
+				case "paddingRight":
+				case "paddingBottom":
+				this.parseSize(propertyName, value);
 				break;
 			}
 		}
 		
-		protected function parsePadding ( propertyName:String, value:String, parameters:Object = null ):void {
+		protected function parsePadding ( propertyName:String, value:String ):void {
 			var parser:PropertyParser = this.getParser("padding");
 			if (parser) {
 				var sideData:SideData = SideData(parser.parseValue(value));
-				if (!isNaN(sideData.all)) {
-					this.applyProperty("padding", sideData.all, parameters);
+				if (sideData.all) {
+					var all:DisplayValue = sideData.all;
+					this.cacheParsedProperty("paddingLeft", all.clone());
+					this.cacheParsedProperty("paddingTop", all.clone());
+					this.cacheParsedProperty("paddingRight", all.clone());
+					this.cacheParsedProperty("paddingBottom", all.clone());
 				} else {
-					this.applyProperty("paddingLeft", sideData.first, parameters);
-					this.applyProperty("paddingTop", sideData.second, parameters);
-					this.applyProperty("paddingRight", sideData.third, parameters);
-					this.applyProperty("paddingBottom", sideData.fourth, parameters);
+					this.cacheParsedProperty("paddingLeft", sideData.first.clone());
+					this.cacheParsedProperty("paddingTop", sideData.second.clone());
+					this.cacheParsedProperty("paddingRight", sideData.third.clone());
+					this.cacheParsedProperty("paddingBottom", sideData.fourth.clone());
 				}
+			}
+		}
+		
+		override public function setTransition(propertyName:String, transitionData:TransitionData):void {
+			switch(propertyName) {
+				default:
+				super.setTransition(propertyName, transitionData);
+				break;
+				
+				case "padding":
+				super.setTransition("padding", transitionData);
+				super.setTransition("paddingLeft", transitionData);
+				super.setTransition("paddingTop", transitionData);
+				super.setTransition("paddingBottom", transitionData);
+				super.setTransition("paddingRight", transitionData);
+				break;
 			}
 		}
 		
@@ -187,6 +214,10 @@
 			_background = background;
 			if (_background) {
 				_background.drawable = this;
+				if (_background is Cyclable) {
+					Cyclable(_background).cyclePhase = _cyclePhase;
+					Cyclable(_background).cycle = _cycle;
+				}
 			}
 		}
 		
@@ -199,15 +230,16 @@
 				_layout.rearrangable = this;
 				if (_layout is RectangularLayout) {
 					var rectLayout:RectangularLayout = RectangularLayout(_layout);
-					rectLayout.autoWidth = _autoWidth;
-					rectLayout.autoHeight = _autoHeight;
-					if (!_autoWidth) {
-						rectLayout.width = _width;
-					}
-					if (!_autoHeight) {
-						rectLayout.height = _height;
-					}
-				
+					var autoWidth:Boolean = _preferredWidth.valueType == DisplayValueType.AUTO, autoHeight:Boolean = _preferredHeight.valueType == DisplayValueType.AUTO;
+					rectLayout.autoWidth = autoWidth;
+					rectLayout.autoHeight = autoHeight;
+					rectLayout.width = _width;
+					rectLayout.height = _height;
+				}
+				this.setLayoutPadding();
+				if (_layout is Cyclable) {
+					Cyclable(_layout).cyclePhase = _cyclePhase;
+					Cyclable(_layout).cycle = _cycle;
 				}
 			}
 		}
@@ -226,50 +258,36 @@
 			}
 		}
 		
-		protected function measureDimensions ( ):void {
+		override protected function getMeasuredWidth ( ):Number {
+			var measuredWidth:Number;
 			if (_layout && _layout is FlexibleBoxLayout) {
 				var layout:FlexibleBoxLayout = FlexibleBoxLayout(layout);
-				_measuredWidth = layout.measuredWidth, _measuredHeight = layout.measuredHeight;
+				measuredWidth = layout.measuredWidth;
 			} else {
 				if (_useScrollRect) {
 					var bounds:Rectangle = this.displayList.transform.pixelBounds;
-				_measuredWidth = bounds.width + _paddingLeft + _paddingRight, _measuredHeight = bounds.height + _paddingTop + _paddingBottom;
+					measuredWidth = bounds.width + _paddingLeft.getComputedValue(_width) + _paddingRight.getComputedValue(_width);
 				} else {
-					_measuredWidth = _displayList.width + _paddingLeft + _paddingRight, _measuredHeight = _displayList.height + _paddingTop + _paddingBottom;
+					measuredWidth = _displayList.width + _paddingLeft.getComputedValue(_width) + _paddingRight.getComputedValue(_width);
 				}
 			}
-			
-			if (_autoWidth) {
-				var width:Number = _measuredWidth;
-				if (!isNaN(_minimumWidth)) {
-					width = Math.max(_minimumWidth, width);
-				}
-				if (!isNaN(_maximumWidth)) {
-					width = Math.min(_maximumWidth, width);
-				}
-				if (width != _width) {
-					_width = width;
-					this.invalidateDisplay();
-					this.applyScrollRect();
-					this.setDependenciesWidth();
-				}
-			}
-			
-			if (_autoHeight) {
-				var height:Number = _measuredHeight;
-				if (!isNaN(_minimumHeight)) {
-					height = Math.max(_minimumHeight, width);
-				}
-				if (!isNaN(_maximumHeight)) {
-					height = Math.min(_maximumHeight, height);
-				}
-				if (height != _height) {
-					_height = height;
-					this.invalidateDisplay();
-					this.applyScrollRect();
-					this.setDependenciesHeight();
+			return measuredWidth;
+		}
+		
+		override protected function getMeasuredHeight ( ):Number {
+			var measuredHeight:Number;
+			if (_layout && _layout is FlexibleBoxLayout) {
+				var layout:FlexibleBoxLayout = FlexibleBoxLayout(layout);
+				measuredHeight = layout.measuredHeight;
+			} else {
+				if (_useScrollRect) {
+					var bounds:Rectangle = this.displayList.transform.pixelBounds;
+					measuredHeight = bounds.height + _paddingTop.getComputedValue(_height) + _paddingBottom.getComputedValue(_height);
+				} else {
+					measuredHeight = _displayList.height + _paddingTop.getComputedValue(_height) + _paddingBottom.getComputedValue(_height);
 				}
 			}
+			return measuredHeight;
 		}
 		
 		protected function invalidateChildStates ( ):void {
@@ -283,70 +301,18 @@
 			}
 		}
 		
-		protected function applyWidth ( ):void {
+		override protected function applyWidth ( ):void {
+			super.applyWidth();
 			this.applyScrollRect();
-			this.invalidateDisplay();
 			this.setDependenciesWidth();
+			this.setLayoutPadding();
 		}
 		
-		protected function applyHeight ( ):void {
+		override protected function applyHeight ( ):void {
+			super.applyHeight();
 			this.applyScrollRect();
-			this.invalidateDisplay();
 			this.setDependenciesHeight();
-		}
-		
-		override protected function applyMinimumWidth ( ):void {
-			if (!isNaN(_minimumWidth)) {
-				this.width = Math.max(_minimumWidth, _width);
-			}
-		}
-		
-		override protected function applyMaximumWidth ( ):void {
-			if (!isNaN(_maximumWidth)) {
-				this.width = Math.min(_maximumWidth, _width);
-			}
-		}
-		
-		override protected function applyMinimumHeight ( ):void {
-			if (!isNaN(_minimumHeight)) {
-				this.height = Math.max(_minimumHeight, _height);
-			}
-		}
-		
-		override protected function applyMaximumHeight ( ):void {
-			if (!isNaN(_maximumHeight)) {
-				this.height = Math.min(_maximumHeight, _height);
-			}
-		}
-		
-		protected function applyAutoWidth ( ):void {
-			if (_autoWidth) {
-				var width:Number = _measuredWidth;
-				if (!isNaN(_minimumWidth)) {
-					width = Math.max(_minimumWidth, width);
-				}
-				if (!isNaN(_maximumWidth)) {
-					width = Math.min(_maximumWidth, width);
-				}
-				this.width = width;
-			}
-			
-			this.setDependenciesWidth();
-		}
-		
-		protected function applyAutoHeight ( ):void {
-			if (_autoHeight) {
-				var height:Number = _measuredHeight;
-				if (!isNaN(_minimumHeight)) {
-					height = Math.max(_minimumHeight, height);
-				}
-				if (!isNaN(_maximumHeight)) {
-					height = Math.min(_maximumHeight, height);
-				}
-				this.height = height;
-			}
-			
-			this.setDependenciesHeight();
+			this.setLayoutPadding();
 		}
 		
 		protected function applyScrollRect ( ):void {
@@ -362,24 +328,26 @@
 		}
 		
 		protected function applyPadding ( ):void {
-			if (_layout && _layout is FlexibleBoxLayout) {
-				var layout:FlexibleBoxLayout = FlexibleBoxLayout(_layout);
-				layout.padding = _padding;
-				layout.paddingLeft = _paddingLeft;
-				layout.paddingTop = _paddingTop;
-				layout.paddingRight = _paddingRight;
-				layout.paddingBottom = _paddingBottom;
-			}
+			this.setLayoutPadding();
 			_invalidationHelper.invalidateMethod(this.measureDimensions);
+		}
+		
+		protected function setLayoutPadding ( ):void {
+			if (_layout && _layout is PaddableLayout) {
+				var layout:PaddableLayout = PaddableLayout(_layout);
+				layout.paddingLeft = _paddingLeft.getComputedValue(_width);
+				layout.paddingTop = _paddingTop.getComputedValue(_height);
+				layout.paddingRight = _paddingRight.getComputedValue(_width);
+				layout.paddingBottom = _paddingBottom.getComputedValue(_height);
+			}
 		}
 		
 		protected function setDependenciesWidth ( ):void {
 			if (_layout && _layout is RectangularLayout) { 
 				var layout:RectangularLayout = RectangularLayout(_layout);
-				layout.autoWidth = _autoWidth;
-				if (!_autoWidth) {
-					layout.width = _width;
-				}
+				var autoWidth:Boolean = _preferredWidth.valueType == DisplayValueType.AUTO;
+				layout.autoWidth = autoWidth;
+				layout.width = _width;
 			}
 			if (_background && _background is RectangularBackground) {
 				var background:RectangularBackground = RectangularBackground(_background);
@@ -390,10 +358,9 @@
 		protected function setDependenciesHeight ( ):void {
 			if (_layout && _layout is RectangularLayout) { 
 				var layout:RectangularLayout = RectangularLayout(_layout);
-				layout.autoHeight = _autoHeight;
-				if (!_autoHeight) {
-					layout.height = _height;
-				}
+				var autoHeight:Boolean = _preferredHeight.valueType == DisplayValueType.AUTO;
+				layout.height = _height;
+				layout.autoHeight = autoHeight;
 			}
 			if (_background && _background is RectangularBackground) {
 				var background:RectangularBackground = RectangularBackground(_background);
@@ -569,38 +536,6 @@
 			}
 		}
 		
-		override public function get width ( ):Number { return _width; }
-		override public function set width ( value:Number ):void {
-			if (_width != value) {
-				_width = value;
-				this.applyWidth();
-			}
-		}
-		
-		override public function get height ( ):Number { return _height; }
-		override public function set height ( value:Number ):void {
-			if (_height != value) {
-				_height = value;
-				this.applyHeight();
-			}
-		}
-		
-		public function get autoWidth ( ):Boolean { return _autoWidth; }
-		public function set autoWidth ( value:Boolean ):void {
-			if (_autoWidth != value) {
-				_autoWidth = value;
-				this.applyAutoWidth();
-			}
-		}
-		
-		public function get autoHeight ( ):Boolean { return _autoHeight; }
-		public function set autoHeight ( value:Boolean ):void {
-			if (_autoHeight != value) {
-				_autoHeight = value;
-				this.applyAutoHeight();
-			}
-		}
-		
 		public function get useScrollRect ( ):Boolean { return _useScrollRect; }
 		public function set useScrollRect ( value:Boolean ):void {
 			if (_useScrollRect != value) {
@@ -616,44 +551,50 @@
 			}
 		}
 		
-		public function get padding ( ):Number { return _padding; }
-		public function set padding ( value:Number ):void {
+		public function get padding ( ):DisplayValue { return _padding; }
+		public function set padding ( value:DisplayValue ):void {
 			_padding = value;
-			this.paddingLeft = this.paddingTop = this.paddingRight = this.paddingBottom = value;
+			this.paddingLeft = value.clone();
+			this.paddingTop = value.clone();
+			this.paddingRight = value.clone();
+			this.paddingBottom = value.clone();
 		}
 		
-		public function get paddingLeft ( ):Number { return _paddingLeft; }
-		public function set paddingLeft ( value:Number ):void {
-			if (_paddingLeft != value) {
+		public function get paddingLeft ( ):DisplayValue { return _paddingLeft; }
+		public function set paddingLeft ( value:DisplayValue ):void {
+			if (_paddingLeft.invalidated || !_paddingLeft.assertEquals(value)) {
 				_paddingLeft = value;
+				_paddingLeft.invalidated = false;
 				this.applyPadding();
 			}
 		}
 		
-		public function get paddingTop ( ):Number { return _paddingTop; }
-		public function set paddingTop ( value:Number ):void {
-			if (_paddingTop != value) {
+		public function get paddingTop ( ):DisplayValue { return _paddingTop; }
+		public function set paddingTop ( value:DisplayValue ):void {
+			if (_paddingTop.invalidated || !_paddingTop.assertEquals(value)) {
 				_paddingTop = value;
+				_paddingTop.invalidated = false;
 				this.applyPadding();
 			}
 		}
 		
-		public function get paddingRight ( ):Number { return _paddingRight; }
-		public function set paddingRight ( value:Number ):void {
-			if (_paddingRight != value) {
+		public function get paddingRight ( ):DisplayValue { return _paddingRight; }
+		public function set paddingRight ( value:DisplayValue ):void {
+			if (_paddingRight.invalidated || !_paddingRight.assertEquals(value)) {
 				_paddingRight = value;
+				_paddingRight.invalidated = false;
 				this.applyPadding();
 			}
 		}
 		
-		public function get paddingBottom ( ):Number { return _paddingBottom; }
-		public function set paddingBottom ( value:Number ):void {
-			if (_paddingBottom != value) {
+		public function get paddingBottom ( ):DisplayValue { return _paddingBottom; }
+		public function set paddingBottom ( value:DisplayValue ):void {
+			if (_paddingBottom.invalidated || !_paddingBottom.assertEquals(value)) {
 				_paddingBottom = value;
+				_paddingBottom.invalidated = false;
 				this.applyPadding();
 			}
 		}
-		
 	}
 
 }

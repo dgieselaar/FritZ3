@@ -1,4 +1,5 @@
 package fritz3.display.graphics.parser.size  {
+	import fritz3.display.core.DisplayValue;
 	/**
 
 	/**
@@ -12,11 +13,8 @@ package fritz3.display.graphics.parser.size  {
 	
 	public class BackgroundSizeData {
 		
-		public var backgroundImageWidth:Number;
-		public var backgroundImageWidthValueType:String;
-		
-		public var backgroundImageHeight:Number;
-		public var backgroundImageHeightValueType:String;
+		public var backgroundImageWidth:DisplayValue;
+		public var backgroundImageHeight:DisplayValue;
 		
 		public var backgroundImageScaleMode:String
 		

@@ -10,40 +10,35 @@ package fritz3.display.text {
 	import flash.text.TextFieldType;
 	import flash.text.TextFormat;
 	import flash.text.TextFormatAlign;
+	import fritz3.base.parser.PropertyParser;
+	import fritz3.base.transition.TransitionData;
+	import fritz3.display.core.Cyclable;
+	import fritz3.display.core.DisplayValue;
+	import fritz3.display.core.DisplayValueType;
+	import fritz3.display.core.MeasurableDisplayComponent;
 	import fritz3.display.core.PositionableDisplayComponent;
 	import fritz3.display.graphics.Background;
 	import fritz3.display.graphics.BoxBackground;
 	import fritz3.display.graphics.Drawable;
-	import fritz3.display.graphics.parser.side.SideData;
-	import fritz3.display.graphics.parser.side.SideParser;
 	import fritz3.display.graphics.RectangularBackground;
 	import fritz3.display.layout.Layout;
+	import fritz3.display.layout.PaddableLayout;
 	import fritz3.display.layout.Rearrangable;
 	import fritz3.display.layout.RectangularLayout;
+	import fritz3.display.parser.side.SideData;
+	import fritz3.display.parser.side.SideParser;
+	import fritz3.display.parser.size.SizeParser;
 	import fritz3.display.text.layout.TextLayout;
 	import fritz3.style.invalidation.InvalidatableStyleSheetCollector;
-	import fritz3.style.PropertyParser;
 	/**
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public class TextComponent extends PositionableDisplayComponent implements Drawable, Rearrangable {
+	public class TextComponent extends MeasurableDisplayComponent implements Drawable, Rearrangable {
 		
 		protected var _background:Background;
 		protected var _layout:Layout;
 		protected var _textField:TextField;
-		
-		protected var _width:Number = 0;
-		protected var _height:Number = 0;
-		
-		protected var _dispatchedWidth:Number = 0;
-		protected var _dispatchedHeight:Number = 0;
-		
-		protected var _autoWidth:Boolean = true;
-		protected var _autoHeight:Boolean = true;
-		
-		protected var _measuredWidth:Number = 0;
-		protected var _measuredHeight:Number = 0;
 		
 		protected var _measuredTextWidth:Number = 0;
 		protected var _measuredTextHeight:Number = 0;
@@ -53,11 +48,11 @@ package fritz3.display.text {
 		protected var _textFormat:TextFormat;
 		protected var _styleSheet:StyleSheet;
 		
-		protected var _padding:Number = 0;
-		protected var _paddingTop:Number = 0;
-		protected var _paddingLeft:Number = 0;
-		protected var _paddingBottom:Number = 0;
-		protected var _paddingRight:Number = 0;
+		protected var _padding:DisplayValue = new DisplayValue(0);
+		protected var _paddingTop:DisplayValue = new DisplayValue(0);
+		protected var _paddingLeft:DisplayValue = new DisplayValue(0);
+		protected var _paddingBottom:DisplayValue = new DisplayValue(0);
+		protected var _paddingRight:DisplayValue = new DisplayValue(0);
 		
 		protected var _textStyleType:String = TextStyleType.TEXTFORMAT;
 		
@@ -107,9 +102,33 @@ package fritz3.display.text {
 			this.initializeStyleSheetObject();
 		}
 		
-		override protected function setParsers():void {
+		override protected function setCyclePhase ( cyclePhase:String ):void {
+			super.setCyclePhase(cyclePhase);
+			if (_background && _background is Cyclable) {
+				Cyclable(_background).cyclePhase = cyclePhase;
+			}
+			if (_layout && _layout is Cyclable) {
+				Cyclable(_layout).cyclePhase = cyclePhase;
+			}
+		}
+		
+		override protected function setCycle ( cycle:int ):void {
+			super.setCycle(cycle);
+			if (_background && _background is Cyclable) {
+				Cyclable(_background).cycle = cycle;
+			}
+			if (_layout && _layout is Cyclable) {
+				Cyclable(_layout).cycle = cycle;
+			}
+		}
+		
+		override protected function setParsers ( ):void {
 			super.setParsers();
 			this.addParser("padding", SideParser.parser);
+			this.addParser("paddingLeft", SizeParser.parser);
+			this.addParser("paddingTop", SizeParser.parser);
+			this.addParser("paddingRight", SizeParser.parser);
+			this.addParser("paddingBottom", SizeParser.parser);
 		}
 		
 		protected function initializeLayout ( ):void {
@@ -149,49 +168,56 @@ package fritz3.display.text {
 			this.multiline = true;
 		}
 		
-		override public function setProperty(propertyName:String, value:*, parameters:Object = null):void {
+		override public function parseProperty ( propertyName:String, value:* ):void {
 			switch(propertyName) {
 				default:
-				super.setProperty(propertyName, value, parameters);
-				break;
-				
-				case "width":
-				if (value == "auto") {
-					this.autoWidth = true;
-				} else {
-					this.autoWidth = false;
-					super.setProperty(propertyName, value, parameters);
-				}
-				break;
-				
-				case "height":
-				if (value == "auto") {
-					this.autoHeight = true;
-				} else {
-					this.autoHeight = false;
-					super.setProperty(propertyName, value, parameters);
-				}
+				super.parseProperty(propertyName, value);
 				break;
 				
 				case "padding":
-				this.parsePadding(propertyName, value, parameters);
+				this.parsePadding(propertyName, value);
+				break;
+				
+				case "paddingLeft":
+				case "paddingTop":
+				case "paddingRight":
+				case "paddingBottom":
+				this.parseSize(propertyName, value);
 				break;
 			}
 		}
 		
-		protected function parsePadding ( propertyName:String, value:String, parameters:Object = null ):void {
+		override public function setTransition(propertyName:String, transitionData:TransitionData):void {
+			switch(propertyName) {
+				default:
+				super.setTransition(propertyName, transitionData);
+				break;
+				
+				case "padding":
+				super.setTransition("padding", transitionData);
+				super.setTransition("paddingLeft", transitionData);
+				super.setTransition("paddingTop", transitionData);
+				super.setTransition("paddingBottom", transitionData);
+				super.setTransition("paddingRight", transitionData);
+				break;
+			}
+		}
+		
+		protected function parsePadding ( propertyName:String, value:String ):void {
 			var parser:PropertyParser = this.getParser("padding");
-			// TODO: fix tweening bug which occurs when .padding 
-			// returns value which doesn't correctly reflect state
 			if (parser) {
 				var sideData:SideData = SideData(parser.parseValue(value));
-				if (!isNaN(sideData.all)) {
-					this.applyProperty("padding", sideData.all, parameters);
+				if (sideData.all) {
+					var all:DisplayValue = sideData.all;
+					this.cacheParsedProperty("paddingLeft", all.clone());
+					this.cacheParsedProperty("paddingTop", all.clone());
+					this.cacheParsedProperty("paddingRight", all.clone());
+					this.cacheParsedProperty("paddingBottom", all.clone());
 				} else {
-					this.applyProperty("paddingLeft", sideData.first, parameters);
-					this.applyProperty("paddingTop", sideData.second, parameters);
-					this.applyProperty("paddingRight", sideData.third, parameters);
-					this.applyProperty("paddingBottom", sideData.fourth, parameters);
+					this.cacheParsedProperty("paddingLeft", sideData.first.clone());
+					this.cacheParsedProperty("paddingTop", sideData.second.clone());
+					this.cacheParsedProperty("paddingRight", sideData.third.clone());
+					this.cacheParsedProperty("paddingBottom", sideData.fourth.clone());
 				}
 			}
 		}
@@ -210,6 +236,11 @@ package fritz3.display.text {
 					RectangularBackground(_background).width = _width;
 					RectangularBackground(_background).height = _height;
 				}
+				
+				if (_background is Cyclable) {
+					Cyclable(_background).cyclePhase = _cyclePhase;
+					Cyclable(_background).cycle = _cycle;
+				}
 			}
 		}
 		
@@ -224,9 +255,13 @@ package fritz3.display.text {
 				if (_layout is RectangularLayout) {
 					RectangularLayout(_layout).width = _width;
 					RectangularLayout(_layout).height = _height;
-					RectangularLayout(_layout).autoWidth = _autoWidth;
-					RectangularLayout(_layout).autoHeight = _autoHeight;
-					this.applyPadding();
+					RectangularLayout(_layout).autoWidth = _preferredWidth.valueType == DisplayValueType.AUTO;
+					RectangularLayout(_layout).autoHeight = _preferredHeight.valueType == DisplayValueType.AUTO;
+				}
+				this.setLayoutPadding();
+				if (_layout is Cyclable) {
+					Cyclable(_layout).cyclePhase = _cyclePhase;
+					Cyclable(_layout).cycle = _cycle;
 				}
 			}
 		}
@@ -262,37 +297,26 @@ package fritz3.display.text {
 		protected function formatTextField ( ):void {
 			_textField.htmlText = this.getFormattedString();
 			
-			if (!_autoWidth) {
-				var availableWidth:Number = _width - _paddingLeft - _paddingRight;
-				if (_wordWrap) {
-					_textField.wordWrap = false;
-					_textField.width = Math.min(_textField.textWidth + 4, availableWidth);
-					_textField.wordWrap = true;
-				} else {
-					_textField.width = Math.min(_textField.textWidth + 4, availableWidth);
-				}
+			// TODO: use _width if available
+			
+			var availableWidth:Number = Math.max(0, _width - _paddingLeft.getComputedValue(_width) - _paddingRight.getComputedValue(_width));
+			if (_wordWrap) {
+				_textField.wordWrap = false;
+				_textField.width = Math.min(_textField.textWidth + 4, availableWidth);
+				_textField.wordWrap = true;
 			} else {
-				if (_wordWrap) {
-					_textField.wordWrap = false;
-					_textField.width = _textField.textWidth + 4;
-					_textField.wordWrap = true;
-				} else {
-					_textField.width = _textField.textWidth + 4;
-				}
+				_textField.width = Math.min(_textField.textWidth + 4, availableWidth);
 			}
 			
-			if(!_autoHeight) {
-				var availableHeight:Number = _height - _paddingTop - _paddingBottom;
-				_textField.height = Math.min(_textField.textHeight + 6, availableHeight);
-			} else {
-				_textField.height = _textField.textHeight + 6;
-			}
+			var availableHeight:Number = _height - _paddingTop.getComputedValue(_height) - _paddingBottom.getComputedValue(_height);
+			_textField.height = Math.min(_textField.textHeight + 6, availableHeight);
 			
 			var textWidth:Number = _textField.textWidth, textHeight:Number = _textField.textHeight;
 			if (textWidth != _measuredTextHeight || textHeight != _measuredTextHeight) {
 				_invalidationHelper.invalidateMethod(this.rearrange);
 				_invalidationHelper.invalidateMethod(this.measureDimensions);
 			}
+			
 			_measuredTextWidth = textWidth;
 			_measuredTextHeight = textHeight;
 		}
@@ -301,25 +325,12 @@ package fritz3.display.text {
 			_layout.rearrange(this, _textFieldArray);
 		}
 		
-		protected function measureDimensions ( ):void {
-			var measuredWidth:Number = _textField.textWidth + 4 + _paddingLeft + _paddingRight;
-			var measuredHeight:Number = _textField.textHeight + 6 + _paddingTop + _paddingBottom;
-			
-			if (_autoWidth) {
-				if (_width != measuredWidth) {
-					_width = measuredWidth;
-					this.setDependenciesWidth();
-					_invalidationHelper.invalidateMethod(this.dispatchDisplayInvalidation);
-				}
-			}
-			
-			if (_autoHeight) {
-				if (_height != measuredHeight) {
-					_height = measuredHeight;
-					this.setDependenciesHeight();
-					_invalidationHelper.invalidateMethod(this.dispatchDisplayInvalidation);
-				}
-			}
+		override protected function getMeasuredWidth ( ):Number {
+			return _textField.textWidth + 4 + _paddingLeft.getComputedValue(_width) + _paddingRight.getComputedValue(_width);
+		}
+		
+		override protected function getMeasuredHeight ( ):Number {
+			return _textField.textHeight + 6 + _paddingTop.getComputedValue(_height) + _paddingBottom.getComputedValue(_height);
 		}
 		
 		protected function draw ( ):void {
@@ -345,11 +356,6 @@ package fritz3.display.text {
 			return formattedString;
 		}
 		
-		override protected function dispatchDisplayInvalidation ( ):void {
-			super.dispatchDisplayInvalidation();
-			_dispatchedWidth = _width, _dispatchedHeight = _height;
-		}
-		
 		public function invalidateGraphics ( ):void {
 			_invalidationHelper.invalidateMethod(this.draw);
 		}
@@ -360,10 +366,9 @@ package fritz3.display.text {
 		
 		protected function setDependenciesWidth ( ):void {
 			if (_layout && _layout is RectangularLayout) {
-				RectangularLayout(_layout).autoWidth = _autoWidth;
-				if (!_autoWidth) {
-					RectangularLayout(_layout).width = _width;
-				}
+				var autoWidth:Boolean = _preferredWidth.valueType == DisplayValueType.AUTO;
+				RectangularLayout(_layout).autoWidth = autoWidth;
+				RectangularLayout(_layout).width = _width;
 			}
 			
 			if (_background && _background is RectangularBackground) {
@@ -373,10 +378,9 @@ package fritz3.display.text {
 		
 		protected function setDependenciesHeight ( ):void {
 			if (_layout && _layout is RectangularLayout) {
-				RectangularLayout(_layout).autoHeight = _autoHeight;
-				if (!_autoHeight) {
-					RectangularLayout(_layout).height = _height;
-				}
+				var autoHeight:Boolean = _preferredHeight.valueType == DisplayValueType.AUTO;
+				RectangularLayout(_layout).autoHeight = autoHeight;
+				RectangularLayout(_layout).height = _height;
 			}
 			
 			if (_background && _background is RectangularBackground) {
@@ -384,45 +388,33 @@ package fritz3.display.text {
 			}
 		}
 		
-		protected function applyWidth ( ):void {
-			_invalidationHelper.invalidateMethod(this.formatTextField);
-			if (_width != _dispatchedWidth) {
-		 		this.invalidateDisplay();
-			}
-			
-			this.setDependenciesWidth();
-		}
-		
-		protected function applyHeight ( ):void {
-			_invalidationHelper.invalidateMethod(this.formatTextField);
-			if (_height != _dispatchedHeight) {
-				this.invalidateDisplay();
-			}
-			
-			this.setDependenciesHeight();
-		}
-		
-		protected function applyAutoWidth ( ):void {
+		override protected function applyWidth ( ):void {
+			super.applyWidth();
 			_invalidationHelper.invalidateMethod(this.formatTextField);
 			this.setDependenciesWidth();
 		}
 		
-		protected function applyAutoHeight ( ):void {
+		override protected function applyHeight ( ):void {
+			super.applyHeight();
 			_invalidationHelper.invalidateMethod(this.formatTextField);
+			
 			this.setDependenciesHeight();
 		}
 		
 		protected function applyPadding ( ):void {
-			if (_layout is TextLayout) {
-				var layout:TextLayout = TextLayout(_layout);
-				layout.padding = _padding;
-				layout.paddingTop = _paddingTop;
-				layout.paddingLeft = _paddingLeft;
-				layout.paddingBottom = _paddingBottom;
-				layout.paddingRight = _paddingRight;
-			}
+			this.setLayoutPadding();
 			_invalidationHelper.invalidateMethod(this.measureDimensions);
 		}
+
+		protected function setLayoutPadding ( ):void {
+			if (_layout && _layout is PaddableLayout) {
+				var layout:PaddableLayout = PaddableLayout(_layout);
+				layout.paddingLeft = _paddingLeft.getComputedValue(_width);
+				layout.paddingTop = _paddingTop.getComputedValue(_height);
+				layout.paddingRight = _paddingRight.getComputedValue(_width);
+				layout.paddingBottom = _paddingBottom.getComputedValue(_height);
+			}
+		}		
 		
 		protected function applyAntiAliasType ( ):void {
 			_textField.antiAliasType = _antiAliasType;
@@ -762,40 +754,47 @@ package fritz3.display.text {
 			}
 		}
 		
-		public function get padding ( ):Number { return _padding; }
-		public function set padding ( value:Number ):void {
+		public function get padding ( ):DisplayValue { return _padding; }
+		public function set padding ( value:DisplayValue ):void {
 			_padding = value;
-			this.paddingLeft = this.paddingTop = this.paddingRight = this.paddingBottom = value;
+			this.paddingLeft = value.clone();
+			this.paddingTop = value.clone();
+			this.paddingRight = value.clone();
+			this.paddingBottom = value.clone();
 		}
 		
-		public function get paddingTop ( ):Number { return _paddingTop; }
-		public function set paddingTop ( value:Number ):void {
-			if (_paddingTop != value) {
-				_paddingTop = value;
-				this.applyPadding();
-			}
-		}
-		
-		public function get paddingLeft ( ):Number { return _paddingLeft; }
-		public function set paddingLeft ( value:Number ):void {
-			if (_paddingLeft != value) {
+		public function get paddingLeft ( ):DisplayValue { return _paddingLeft; }
+		public function set paddingLeft ( value:DisplayValue ):void {
+			if (_paddingLeft.invalidated || !_paddingLeft.assertEquals(value)) {
 				_paddingLeft = value;
+				_paddingLeft.invalidated = false;
 				this.applyPadding();
 			}
 		}
 		
-		public function get paddingBottom ( ):Number { return _paddingBottom; }
-		public function set paddingBottom ( value:Number ):void {
-			if (_paddingBottom != value) {
-				_paddingBottom = value;
+		public function get paddingTop ( ):DisplayValue { return _paddingTop; }
+		public function set paddingTop ( value:DisplayValue ):void {
+			if (_paddingTop.invalidated || !_paddingTop.assertEquals(value)) {
+				_paddingTop = value;
+				_paddingTop.invalidated = false;
 				this.applyPadding();
 			}
 		}
 		
-		public function get paddingRight ( ):Number { return _paddingRight; }
-		public function set paddingRight ( value:Number ):void {
-			if (_paddingRight != value) {
+		public function get paddingRight ( ):DisplayValue { return _paddingRight; }
+		public function set paddingRight ( value:DisplayValue ):void {
+			if (_paddingRight.invalidated || ! _paddingRight.assertEquals(value)) {
 				_paddingRight = value;
+				_paddingRight.invalidated = false;
+				this.applyPadding();
+			}
+		}
+		
+		public function get paddingBottom ( ):DisplayValue { return _paddingBottom; }
+		public function set paddingBottom ( value:DisplayValue ):void {
+			if (_paddingBottom.invalidated || !_paddingBottom.assertEquals(value)) {
+				_paddingBottom = value;
+				_paddingBottom.invalidated = false;
 				this.applyPadding();
 			}
 		}
@@ -1048,21 +1047,6 @@ package fritz3.display.text {
 			}
 		}
 		
-		public function get autoWidth ( ):Boolean { return _autoWidth; }
-		public function set autoWidth ( value:Boolean ):void {
-			if (_autoWidth != value) {
-				_autoWidth = value;
-				this.applyAutoWidth();
-			}
-		}
-		
-		public function get autoHeight ( ):Boolean { return _autoHeight; }
-		public function set autoHeight ( value:Boolean ):void {
-			if (_autoHeight != value) {
-				_autoHeight = value;
-				this.applyAutoHeight();
-			}
-		}
 	}
 
 }

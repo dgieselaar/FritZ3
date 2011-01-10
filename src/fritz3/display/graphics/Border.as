@@ -1,4 +1,5 @@
 package fritz3.display.graphics {
+	import fritz3.display.core.DisplayValue;
 	import fritz3.display.graphics.gradient.GraphicsGradientData;
 	/**
 	 * ...
