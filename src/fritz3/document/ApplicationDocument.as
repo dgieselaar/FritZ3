@@ -13,6 +13,8 @@ package fritz3.document  {
 	import flash.utils.getDefinitionByName;
 	import flash.utils.getQualifiedClassName;
 	import fritz3.display.core.DisplayComponentContainer;
+	import fritz3.display.core.DisplayValue;
+	import fritz3.display.core.DisplayValueType;
 	import fritz3.invalidation.InvalidationManager;
 	import fritz3.style.invalidation.InvalidatableStyleSheetCollector;
 	import fritz3.style.StyleManager;
@@ -56,16 +58,26 @@ package fritz3.document  {
 			super.initializeComponent();
 		}
 		
+		override protected function setDefaultProperties():void {
+			super.setDefaultProperties();
+			this.preferredWidth = new DisplayValue(100, DisplayValueType.PERCENTAGE);
+			this.preferredHeight = new DisplayValue(100, DisplayValueType.PERCENTAGE);
+		}
+		
+		override protected function setInvalidationMethodOrder():void {
+			super.setInvalidationMethodOrder();
+			_invalidationHelper.insertBefore(this.setDimensions, this.rearrange);
+		}
+		
 		protected function onStageAdd ( e:Event ):void {
 			this.removeEventListener(Event.ADDED_TO_STAGE, this.onStageAdd);
-			
+			this.initStage();
 		}
 		
 		protected function initStage ( ):void {
 			InvalidationManager.init(stage);
 			stage.align = StageAlign.TOP_LEFT;
 			stage.scaleMode = StageScaleMode.NO_SCALE;
-			this.width = stage.stageWidth, this.height = stage.stageHeight;
 			stage.addEventListener(Event.RESIZE, this.onStageResize);
 			this.onAdd();
 		}
@@ -77,10 +89,36 @@ package fritz3.document  {
 					InvalidatableStyleSheetCollector(_styleSheetCollector).invalidateCollector();
 				}
 			}
+			_invalidationHelper.invalidateMethod(this.setDimensions);
 		}
 		
 		protected function onStageResize ( e:Event ):void {
-			
+			this.setDimensions();
+		}
+		
+		protected function setDimensions ( ):void {
+			var availableWidth:Number = stage.stageWidth - _marginLeft.getComputedValue(stage.stageWidth) - _marginRight.getComputedValue(stage.stageHeight);
+			var availableHeight:Number = stage.stageHeight - _marginTop.getComputedValue(stage.stageHeight) - _marginBottom.getComputedValue(stage.stageHeight);
+			var width:Number = _preferredWidth.getComputedValue(availableWidth);
+			var height:Number = _preferredHeight.getComputedValue(availableHeight);
+			if (!isNaN(_minimumWidth.value)) {
+				width = Math.max(_minimumWidth.getComputedValue(availableWidth), width);
+			}
+			if (!isNaN(_maximumWidth.value)) {
+				width = Math.min(_maximumWidth.getComputedValue(availableWidth), width);
+			}
+			if (!isNaN(_minimumHeight.value)) {
+				height = Math.max(_minimumWidth.getComputedValue(availableHeight), height);
+			}
+			if (!isNaN(_maximumHeight.value)) {
+				height = Math.min(_maximumHeight.getComputedValue(availableHeight), height);
+			}
+			this.width = width; this.height = height;
+		}
+		
+		override public function invalidateLayout():void {
+			super.invalidateLayout();
+			_invalidationHelper.invalidateMethod(this.setDimensions);
 		}
 		
 		protected function getClassDefinitions ( ):void {
@@ -114,6 +152,36 @@ package fritz3.document  {
 					
 				}
 			}
+		}
+		
+		override protected function applyPreferredHeight ( ):void {
+			super.applyPreferredHeight();
+			_invalidationHelper.invalidateMethod(this.setDimensions);
+		}
+		
+		override protected function applyPreferredWidth ( ):void {
+			super.applyPreferredWidth();
+			_invalidationHelper.invalidateMethod(this.setDimensions);
+		}
+		
+		override protected function applyMinimumHeight ( ):void {
+			super.applyMinimumHeight();
+			_invalidationHelper.invalidateMethod(this.setDimensions);
+		}
+		
+		override protected function applyMaximumHeight ( ):void {
+			super.applyMaximumHeight();
+			_invalidationHelper.invalidateMethod(this.setDimensions);
+		}
+		
+		override protected function applyMinimumWidth ( ):void {
+			super.applyMinimumWidth();
+			_invalidationHelper.invalidateMethod(this.setDimensions);
+		}
+		
+		override protected function applyMaximumWidth ( ):void {
+			super.applyMaximumWidth();
+			_invalidationHelper.invalidateMethod(this.setDimensions);
 		}
 		
 		protected function getNativeDefinitions ( ):Array {
