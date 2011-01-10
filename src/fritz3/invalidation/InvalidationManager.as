@@ -66,6 +66,7 @@
 				FTweener.render();
 			}
 			
+			var i:int;
 			for each(priority in _priorities) {
 				node = _firstNodeByPriority[priority];
 				while (node) {
@@ -77,9 +78,9 @@
 						}
 						methodNode = methodNode.nextNode;
 					}
+					node.marked = false;
 					nextNode = node.nextNode;
 					node.nextNode = node.prevNode = null;
-					node.marked = false;
 					node = nextNode;
 				}
 				delete _firstNodeByPriority[priority];
