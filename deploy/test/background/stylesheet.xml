@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<data>
+	
+	<rule where="ApplicationDocument">
+		<property name="width">100%</property>
+		<property name="height">100%</property>
+		<property name="layout.orient">vertical</property>
+		<property name="layout.pack">center</property>
+		<property name="layout.align">center</property>
+		<property name="background.backgroundGradient">linear (0xCCCCCC, 0xBBBBBB)</property>
+	</rule>
+	
+	<rule where="GraphicsComponent">
+		<property name="width">28</property>
+		<property name="height">22</property>
+		<property name="background.backgroundColor">0x00B4FF</property>
+		<property name="background.backgroundGradient">linear (0xFFFFFF 40%, 0xFFFFFF 0%)</property>
+		<property name="background.roundedCorners">4</property>
+		<property name="background.border">1px 1px 1px 6px</property>
+		<property name="background.borderPosition">inside</property>
+		<property name="background.borderColor">0x00B4FF</property>
+		<property name="background.borderGradient">linear -90 (0x000000 20% 0px, 0x000000 10% 1px, 0xFFFFFF 30% 2px)</property>
+		<!--property name="background.borderColor">0xFFFFFF</property>
+		<property name="background.borderGradient">none</property-->
+		<property name="filters">
+			<Array>
+				<DropShadowFilter distance="1" blurX="2" blurY="2" alpha="0.5"/>
+			</Array>
+		</property>
+	</rule>
+
+</data>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<data>
+	
+	<DisplayComponentContainer id="first">
+		<TextComponent id="description" text="This is a layout demo. And this is just a long bit of text to showcase some word-wrapping stuff."/>
+		<DisplayComponentContainer className="button_holder">
+			<TextButton text="Button 1"/>
+			<TextButton text="Button 2"/>
+			<TextButton text="Button 3"/>
+			<TextButton text="Button 4"/>
+			<TextButton text="Button 5"/>
+		</DisplayComponentContainer>
+	</DisplayComponentContainer>
+	
+	<DisplayComponentContainer id="second">
+		<DisplayComponentContainer className="button_holder">
+			<TextButton text="Button 1"/>
+			<TextButton text="Button 2"/>
+			<TextButton text="Button 3"/>
+			<TextButton text="Button 4"/>
+			<TextButton text="Button 5"/>
+		</DisplayComponentContainer>
+		<DisplayComponentContainer className="button_holder">
+			<TextButton text="Button 1"/>
+			<TextButton text="Button 2" selected="1"/>
+			<TextButton text="Button 3"/>
+			<TextButton text="Button 4"/>
+			<TextButton text="Button 5"/>
+		</DisplayComponentContainer>
+		<TextButton text="This is a very, very ugly button."/>
+	</DisplayComponentContainer>
+	
+</data>
