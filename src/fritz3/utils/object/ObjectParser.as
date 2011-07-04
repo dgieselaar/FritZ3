@@ -14,10 +14,11 @@ package fritz3.utils.object {
 			var parent:Object = new (getClass(xml.name()))();
 			var i:int, l:int;
 			var attributes:XMLList = xml.attributes();
-			var child:XML;
+			var child:XML, value:Object;
 			for (i = 0, l = attributes.length(); i < l; ++i) {
 				child = attributes[i];
-				parent[child.name().toString()] = child;
+				value = getSimpleValue(child.toString());
+				parent[child.name().toString()] = value;
 			}
 			
 			if (!(parent is ItemCollection || parent is Array)) {
@@ -26,6 +27,44 @@ package fritz3.utils.object {
 			
 			return parseXMLChildren(parent, xml.children());
 			
+		}
+		
+		private static function getSimpleValue ( val:String ):Object {
+			var value:Object;
+			switch(val) {
+				default:
+				value = val;
+				break;
+				
+				case "NaN": case "Number.NaN":
+				value = NaN;
+				break;
+				
+				case "true":
+				value = true;
+				break;
+				
+				case "false":
+				value = false;
+				break;
+				
+				case "Number.MIN_VALUE":
+				value = Number.MIN_VALUE;
+				break;
+				
+				case "Number.MAX_VALUE":
+				value = Number.MAX_VALUE;
+				break;
+				
+				case "Number.NEGATIVE_INFINITY":
+				value = Number.NEGATIVE_INFINITY;
+				break;
+				
+				case "Number.POSITIVE_INFINITY":
+				value = Number.POSITIVE_INFINITY;
+				break;
+			}
+			return value;
 		}
 		
 		public static function parseXMLChildren ( parent:Object, list:XMLList ):* {

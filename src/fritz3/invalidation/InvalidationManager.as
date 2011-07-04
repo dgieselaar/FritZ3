@@ -2,6 +2,8 @@
 	import flash.display.Stage;
 	import flash.events.Event;
 	import fritz3.tween.core.FTweener;
+	import fritz3.utils.log.log;
+	import fritz3.utils.log.LogLevel;
 	import fritz3.utils.tween.ftween.FTweenEngine;
 	import fritz3.utils.tween.Tweener;
 	/**
@@ -66,7 +68,6 @@
 				FTweener.render();
 			}
 			
-			var i:int;
 			for each(priority in _priorities) {
 				node = _firstNodeByPriority[priority];
 				while (node) {
@@ -74,7 +75,11 @@
 					while (methodNode) {
 						if (methodNode.invalidated) {
 							hasExecutedNodes = true;
-							methodNode.execute();
+							try {
+								methodNode.execute();
+							} catch ( error:Error ) {
+								log(LogLevel.ERROR, methodNode, "Failed to execute invalidated method");
+							}
 						}
 						methodNode = methodNode.nextNode;
 					}

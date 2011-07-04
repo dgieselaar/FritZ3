@@ -7,6 +7,8 @@ package fritz3.style {
 	import fritz3.style.invalidation.InvalidatableStyleSheetCollector;
 	import fritz3.style.selector.ObjectCache;
 	import fritz3.style.Stylable;
+	import fritz3.utils.log.log;
+	import fritz3.utils.log.LogLevel;
 	import fritz3.utils.object.ObjectParser;
 	/**
 	 * ...
@@ -175,24 +177,35 @@ package fritz3.style {
 			var object:Object, target:Object, parsable:Parsable, transitionable:Transitionable;
 			var stylable:Stylable = _stylable;
 			var value:*;
-			var isParsable:Object = { }, toParse:Array = [];
+			var isParsable:Object = { }, toParse:Array = [], nextNode:PropertyData;;
 			while (node) {
-				target = node.target == null ? stylable : stylable[node.target];
+				nextNode = node.nextNode;
+				try {
+					target = node.target == null ? stylable : stylable[node.target];
+				} catch ( error:Error ) {
+					log(LogLevel.WARN, stylable, error);
+					node = nextNode;
+					continue;
+				}
 				value = node.value;
-				if (node is TransitionData) {
-					if (target is Transitionable) {
-						Transitionable(target).setTransition(node.propertyName, TransitionData(node.clone(getPropertyDataObject(node))));
-					}
-				} else if (value != undefined) {
-					if (target is Parsable) {
-						Parsable(target).parseProperty(node.propertyName, value);
-						if (!isParsable[target]) {
-							isParsable[target] = true;
-							toParse[toParse.length] = target;
+				try {
+					if (node is TransitionData) {
+						if (target is Transitionable) {
+							Transitionable(target).setTransition(node.propertyName, TransitionData(node.clone(getPropertyDataObject(node))));
 						}
-					} else {
-						target[node.propertyName] = value;
+					} else if (value != undefined) {
+						if (target is Parsable) {
+							Parsable(target).parseProperty(node.propertyName, value);
+							if (!isParsable[target]) {
+								isParsable[target] = true;
+								toParse[toParse.length] = target;
+							}
+						} else {
+							target[node.propertyName] = value;
+						}
 					}
+				} catch ( error:Error ) {
+					log(LogLevel.WARN, target, error);
 				}
 				node = node.nextNode;
 			}
