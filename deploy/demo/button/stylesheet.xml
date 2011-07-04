@@ -56,7 +56,7 @@
 	
 	<rule where=".rogie_button">
 		<property name="marginLeft">5px</property>
-		<property name="padding">10px 3px 10px 6px</property>
+		<property name="padding">10px 3px 10px 5px</property>
 		<property name="background.backgroundColor">0x00B4FF</property>
 		<property name="background.backgroundGradient">linear (0xFFFFFF 40%, 0xFFFFFF 0%)</property>
 		<property name="background.roundedCorners">4</property>

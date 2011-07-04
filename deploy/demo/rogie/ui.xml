@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<data>
+	
+	<DisplayComponentContainer className="button_holder">
+		<TextComponent id="introduction" text="This is an attempt to mimick &lt;a href='http://dribbble.com/shots/33550-Mad-Elements'&gt;Rogie's wonderful Mad Elements&lt;/a&gt; (they're not an exact match, but you get the idea). The UI description is available &lt;a href='ui.xml'&gt;here&lt;/a&gt; and you can find the stylesheet &lt;a href='stylesheet.xml'&gt;here&lt;/a&gt;.&lt;br/&gt;&lt;br/&gt;The files are not embedded in the swf, so go ahead and download the swf + xml files and make your own buttons :)."/>
+	</DisplayComponentContainer>
+	
+	
+	<DisplayComponentContainer id="rogie" className="button_holder">
+		<TextButton text="Home" className="rogie_button"/>
+		<TextButton text="About us" className="rogie_button"/>
+		<TextButton text="Portfolio" className="rogie_button"/>
+		<TextButton text="Pricing" className="rogie_button"/>
+		<TextButton text="Contact" className="rogie_button"/>
+	</DisplayComponentContainer>
+	
+</data>

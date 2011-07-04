@@ -64,8 +64,6 @@ package fritz3.display.graphics.parser.size  {
 				}
 			}
 			
-			trace(width, widthValueType, height, heightValueType);
-			
 			data.backgroundImageScaleMode = scaleMode;
 			if (scaleMode == BackgroundImageScaleMode.NONE) {
 				data.backgroundImageWidth = new DisplayValue(width, widthValueType);

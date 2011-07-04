@@ -1,0 +1,41 @@
+<html><head>
+
+   <title>FritZ3 - TextButton demo</title>
+   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <meta name="language" content="en">
+   <meta name="description" content="">
+   <meta name="keywords" content="">
+
+   <script src="js/swfobject.js" type="text/javascript"></script>
+
+   <script type="text/javascript">
+      var flashvars = {
+         
+      };
+      var params = {
+         menu: "true",
+         scale: "noScale",
+         allowFullscreen: "true"
+      };
+      swfobject.embedSWF("button-demo.swf", "altContent", "800", "200", "9.0.0", "expressInstall.swf", flashvars, params);
+   </script>
+   <style>
+      html, body { height:100%; margin: 20px }
+		#description {
+		width: 400px;
+		padding: 10px;
+		font-family: Helvetica, Arial;
+		font-size: 11px;
+		}
+   </style>
+</head>
+
+<body>
+	<div id="description">
+		This is a crude demo showcasing the possibilities of our FritZ3 framework.
+		The stylesheet is located <a href="stylesheet.xml">here</a>. 
+		I'll upload a demo later which enables you to edit the stylesheet yourself.
+	</div>
+	<div id="altContent"></div>
+</body>
+</html>

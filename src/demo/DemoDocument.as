@@ -49,11 +49,11 @@ package demo {
 		}
 		
 		protected function getEmbeddedStyleSheetURL ( ):String {
-			return "demo/layout/stylesheet.xml";
+			return "demo/rogie/stylesheet.xml";
 		}
 		
 		protected function getEmbeddedUIURL ( ):String {
-			return "demo/layout/ui.xml";
+			return "demo/rogie/ui.xml";
 		}
 		
 	}

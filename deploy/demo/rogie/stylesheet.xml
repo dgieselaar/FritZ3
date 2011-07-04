@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<data>
+	
+	<rule where="ApplicationDocument">
+		<property name="width">100%</property>
+		<property name="height">100%</property>
+		<property name="layout.orient">vertical</property>
+		<property name="layout.pack">center</property>
+		<property name="layout.align">center</property>
+		<property name="background.backgroundGradient">linear (0xCCCCCC, 0xBBBBBB)</property>
+	</rule>
+	
+	<rule where=".button_holder">
+		<property name="background.backgroundColor">0xFFFFFF</property>
+		<property name="background.border">1px 0xAAAAAA inside</property>
+		<property name="width">600px</property>
+		<property name="padding">10px</property>
+		<property name="layout.align">stretch</property>
+		<property name="marginBottom">10px</property>
+		<property name="filters">
+			<Array>
+				<DropShadowFilter blurX="3" blurY="3" distance="0" alpha="0.5" angle="90"/>
+			</Array>
+		</property>
+	</rule>
+	
+	<rule where=".button_holder:last-child">
+		<property name="marginBottom">0px</property>
+	</rule>
+	
+	<rule where="TextComponent">
+		<property name="embedFonts">false</property>
+		<property name="fontFamily">Helvetica</property>
+		<property name="fontSize">14</property>
+	</rule>
+	
+	<rule where="#introduction">
+		<property name="boxFlex">1</property>
+		<property name="wordWrap">true</property>
+		<property name="css">
+			p { fontFamily: Helvetica; fontSize: 12; }
+			a { color: #00B4FF; text-decoration: none; }
+			a:hover { text-decoration: underline; }
+		</property>
+	</rule>
+	
+	<rule where="TextButton">
+		<property name="fontWeight">bold</property>
+		<property name="layout.horizontalAlign">center</property>
+		<property name="layout.verticalAlign">center</property>
+	</rule>
+	
+	<rule where="#rogie">
+		<property name="layout.align">end</property>
+	</rule>
+	
+	<rule where=".rogie_button">
+		<property name="marginLeft">5px</property>
+		<property name="padding">15px 5px 15px 7px</property>
+		<property name="background.backgroundColor">0x00B4FF</property>
+		<property name="background.backgroundGradient">linear (0xFFFFFF 40%, 0xFFFFFF 0%)</property>
+		<property name="background.roundedCorners">6</property>
+		<property name="background.border">1px 1px 1px 5px</property>
+		<property name="background.borderPosition">inside</property>
+		<property name="background.borderColor">0x00B4FF</property>
+		<property name="background.borderGradient">linear -90 (0x000000 20% 1px, 0xFFFFFF 30% 2px)</property>
+		<property name="color">0x004B6C</property>
+		<property name="filters">
+			<Array>
+				<DropShadowFilter distance="1" blurX="2" blurY="2" alpha="0.5"/>
+			</Array>
+		</property>
+		<property name="textField.filters">
+			<Array>
+				<DropShadowFilter distance="1" blurX="1" blurY="1" alpha="0.5" color="0x000000" inner="true" />
+				<DropShadowFilter distance="1" blurX="1" blurY="1" alpha="1" color="0xFFFFFF" />
+			</Array>
+		</property>
+		<transition name="background.backgroundGradient" duration="0.25"/>
+		<transition name="background.border" duration="0.10"/>
+	</rule>
+	
+	<rule where=".rogie_button:first-child">
+		<property name="marginLeft">0</property>
+	</rule>
+	
+	<rule where=".rogie_button:highlighted">
+		<property name="background.backgroundGradient">linear (0xFFFFFF 50%, 0xFFFFFF 20%)</property>
+	</rule>
+	
+	<rule where=".rogie_button:pressed">
+		<property name="background.border">1px 1px 1px 1px</property>
+		<property name="padding">15px 5px</property>
+		<transition name="y" duration="0.10"/>
+		<transition name="height" duration="0.10"/>
+	</rule>
+	
+	<rule where=".rogie_button:nth-child(2)">
+		<property name="background.borderColor">0xF2F200</property>
+		<property name="background.backgroundColor">0xF2F200</property>
+		<property name="color">0x656565</property>
+		<property name="textField.filters">
+			<Array>
+				<DropShadowFilter distance="1" blurX="1" blurY="1" alpha="0.25" color="0x000000" inner="true"/>
+			</Array>
+		</property>
+	</rule>
+	
+	<rule where=".rogie_button:nth-child(3)">
+		<property name="background.borderColor">0xBB0000</property>
+		<property name="background.backgroundColor">0xBB0000</property>
+		<property name="color">0x1c1c1c</property>
+		<property name="textField.filters">
+			<Array>
+				<DropShadowFilter distance="1" blurX="1" blurY="1" alpha="0.25" color="0x000000" inner="true"/>
+				<DropShadowFilter distance="1" blurX="1" blurY="1" alpha="0.5" color="0xFFFFFF" />
+			</Array>
+		</property>
+	</rule>
+	
+	<rule where=".rogie_button:nth-child(4)">
+		<property name="background.borderColor">0x8000FF</property>
+		<property name="background.backgroundColor">0x8000FF</property>
+		<property name="color">0xFFFFFF</property>
+		<property name="textField.filters">
+			<Array>
+				<DropShadowFilter distance="1" blurX="1" blurY="1" alpha="0.25" color="0x000000" inner="true"/>
+				<GlowFilter strength="2" blurX="2" blurY="2" alpha="0.25" color="0x000000"/>
+			</Array>
+		</property>
+	</rule>
+	
+	<rule where=".rogie_button:nth-child(5)">
+		<property name="background.borderColor">0xFF9300</property>
+		<property name="background.backgroundColor">0xFF9300</property>
+		<property name="color">0xFFECD2</property>
+		<property name="textField.filters">
+			<Array>
+				<DropShadowFilter distance="1" blurX="0" blurY="0" angle="45" alpha="1" color="0xAA6200"/>
+			</Array>
+		</property>
+	</rule>
+	
+</data>
