@@ -75,10 +75,15 @@
 					while (methodNode) {
 						if (methodNode.invalidated) {
 							hasExecutedNodes = true;
+							CONFIG::release {
 							try {
+									methodNode.execute();
+								} catch ( error:Error ) {
+									log(LogLevel.ERROR, methodNode, "Failed to execute invalidated method: " + error);
+								}
+							}
+							CONFIG::debug {
 								methodNode.execute();
-							} catch ( error:Error ) {
-								log(LogLevel.ERROR, methodNode, "Failed to execute invalidated method");
 							}
 						}
 						methodNode = methodNode.nextNode;
