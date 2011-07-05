@@ -2,6 +2,12 @@ package demo {
 	import flash.events.Event;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
+	import flash.text.CSMSettings;
+	import flash.text.Font;
+	import flash.text.FontStyle;
+	import flash.text.TextColorType;
+	import flash.text.TextDisplayMode;
+	import flash.text.TextRenderer;
 	import fritz3.display.button.TextButton;
 	import fritz3.display.core.GraphicsComponent;
 	import fritz3.document.ApplicationDocument;
@@ -14,6 +20,18 @@ package demo {
 	 * @author Dario Gieselaar
 	 */
 	public class DemoDocument extends ApplicationDocument {
+		
+		[Embed(source = '../../assets/fonts/HelveticaLTStd-Roman.otf', fontName = 'Helvetica', embedAsCFF = 'false', mimeType = 'application/x-font')]
+		protected static var Regular:Class;
+		
+		[Embed(source = '../../assets/fonts/HelveticaLTStd-Bold.otf', fontName = 'Helvetica', embedAsCFF = 'false', fontWeight = 'bold', mimeType = 'application/x-font')]
+		protected static var Bold:Class;
+		
+		{
+			Font.registerFont(Regular);
+			Font.registerFont(Bold);
+			TextRenderer.setAdvancedAntiAliasingTable("Helvetica", FontStyle.BOLD, TextColorType.LIGHT_COLOR, [ new CSMSettings(16, 0.45,-0.45) ]);
+		}
 		
 		public function DemoDocument ( parameters:Object = null ) {
 			super(parameters);
@@ -49,11 +67,11 @@ package demo {
 		}
 		
 		protected function getEmbeddedStyleSheetURL ( ):String {
-			return "demo/rogie/stylesheet.xml";
+			return "demo/casper/stylesheet.xml";
 		}
 		
 		protected function getEmbeddedUIURL ( ):String {
-			return "demo/rogie/ui.xml";
+			return "demo/casper/ui.xml";
 		}
 		
 	}
