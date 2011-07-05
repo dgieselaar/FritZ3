@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<data>
+	
+	<DisplayComponentContainer id="panel">
+		<DisplayComponentContainer id="casper_menu_holder"/>
+		<DisplayComponentContainer id="top_bar">
+			<DisplayComponentContainer id="date_holder" className="top_bar_holder">
+				<TextComponent id="casper_time" className="top_text">
+					<text><![CDATA[22<FONT COLOR="#80C2DE">:</FONT>14<FONT COLOR="#80C2DE">:</FONT>56]]></text>
+				</TextComponent>
+				<TextComponent id="casper_date" className="top_text">
+					<text>8 jun 2011</text>
+				</TextComponent>
+			</DisplayComponentContainer>
+		</DisplayComponentContainer>
+	</DisplayComponentContainer>
+	
+</data>

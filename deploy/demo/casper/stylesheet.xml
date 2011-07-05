@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<data>
+	
+	<rule where="ApplicationDocument">
+		<property name="width">100%</property>
+		<property name="height">100%</property>
+		<property name="background.backgroundGradient">linear (0xCCCCCC, 0xBBBBBB)</property>
+	</rule>
+	
+	<rule where="TextComponent">
+		<property name="fontFamily">Helvetica</property>
+		<property name="sharpness">0</property>
+		<property name="thickness">0</property>
+	</rule>
+	
+	<rule where="#panel">
+		<property name="width">300px</property>
+		<property name="height">100%</property>
+		<property name="background.backgroundColor">0xFFFFFF</property>
+		<property name="layout.orient">vertical</property>
+		<property name="layout.align">stretch</property>
+		<property name="filters">
+			<Array>
+				<DropShadowFilter distance="1" blurX="2" blurY="2" alpha="0.5"/>
+			</Array>
+		</property>
+	</rule>
+	
+	<rule where="#casper_menu_holder">
+		<property name="height">26px</property>
+		<property name="background.backgroundGradient">linear (0x00B4FF, 0x00ACF5)</property>
+		<property name="background.border">1px 0x0089bf solid inside</property>
+		<property name="background.borderBottomColor">0x008BC6</property>
+	</rule>
+	
+	<rule where="#top_bar">
+		<property name="height">auto</property>
+		<property name="background.backgroundGradient">linear (0x00ABF3, 0x0098D9)</property>
+		<property name="background.border">1px 0x0089bf solid inside</property>
+		<property name="background.borderTopColor">0x80D5F9</property>
+		<property name="padding">8px</property>
+	</rule>
+	
+	<rule where=".top_bar_holder">
+		<property name="background.roundedCorners">5px</property>
+		<property name="padding">5px 2px</property>
+		<property name="background.backgroundColor">0xFFFFFF</property>
+		<property name="background.backgroundGradient">linear (0x007db2, 0x008fcc)</property>
+		<property name="layout.orient">horizontal</property>
+		<property name="layout.align">center</property>
+		<property name="filters">
+			<Array>
+				<DropShadowFilter color="0xFFFFFF" distance="1" blurX="1" blurY="1" angle="90" alpha="0.5"/>
+				<DropShadowFilter color="0x000000" distance="1" blurX="1" blurY="1" angle="90" alpha="0.25" inner="true" />
+			</Array>
+		</property>
+	</rule>
+	
+	<rule where=".top_text">
+		<property name="fontSize">16</property>
+		<property name="color">0xFFFFFF</property>
+		<property name="fontWeight">bold</property>
+		<property name="filters">
+			<Array>
+				<DropShadowFilter color="0x006b99" distance="1" blurX="1" blurY="1" angle="90" alpha="1"/>
+			</Array>
+		</property>
+		<property name="selectable">false</property>
+	</rule>
+	
+	<!--rule where="#casper_time">
+		<property name="letterSpacing">1</property>
+	</rule-->
+	
+	<rule where="#casper_date">
+		<property name="fontSize">10</property>
+		<property name="upperCase">true</property>
+		<property name="marginLeft">3px</property>
+	</rule>
+	
+</data>
