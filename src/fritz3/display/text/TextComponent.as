@@ -67,6 +67,7 @@ package fritz3.display.text {
 		protected var _restrict:String = null;
 		protected var _scrollH:int;
 		protected var _scrollV:int;
+		protected var _selectable:Boolean = true;
 		protected var _sharpness:Number = 0;
 		protected var _text:String = null;
 		protected var _thickness:Number = 0;
@@ -86,6 +87,7 @@ package fritz3.display.text {
 		protected var _tabStops:Array = null;
 		protected var _target:String = null;
 		protected var _url:String = null;
+		protected var _upperCase:Boolean = false;
 		protected var _textAlign:String = TextFormatAlign.LEFT;
 		protected var _textDecoration:String = TextDecoration.NONE;
 		
@@ -166,6 +168,7 @@ package fritz3.display.text {
 			this.antiAliasType = AntiAliasType.ADVANCED;
 			this.embedFonts = true;
 			this.multiline = true;
+			this.selectable = false;
 		}
 		
 		override public function parseProperty ( propertyName:String, value:* ):void {
@@ -349,7 +352,7 @@ package fritz3.display.text {
 		}
 		
 		protected function getFormattedString ( ):String {
-			var formattedString:String = _text;
+			var formattedString:String = _upperCase ? _text.toUpperCase() : _text;
 			if (_textStyleType == TextStyleType.STYLESHEET) {
 				formattedString = "<p>" + formattedString + "</p>";
 			}
@@ -494,6 +497,10 @@ package fritz3.display.text {
 		
 		protected function applyScrollV ( ):void {
 			_textField.scrollV = _scrollV;
+		}
+		
+		protected function applySelectable ( ):void {
+			_textField.selectable = _selectable;
 		}
 		
 		protected function applySharpness ( ):void {
@@ -683,6 +690,10 @@ package fritz3.display.text {
 				_invalidationHelper.invalidateMethod(this.applyStyle);
 				_invalidationHelper.invalidateMethod(this.formatTextField);
 			}
+		}
+		
+		protected function applyUpperCase ( ):void {
+			_invalidationHelper.invalidateMethod(this.formatTextField);
 		}
 		
 		protected function applyTextAlign ( ):void {
@@ -887,6 +898,14 @@ package fritz3.display.text {
 			}
 		}
 		
+		public function get selectable ( ):Boolean { return _selectable; }
+		public function set selectable ( value:Boolean ):void {
+			if (_selectable != value) {
+				_selectable = value;
+				this.applySelectable();
+			}
+		}
+		
 		public function get sharpness ( ):Number { return _sharpness; }
 		public function set sharpness ( value:Number ):void {
 			if (_sharpness != value) {
@@ -1020,6 +1039,14 @@ package fritz3.display.text {
 			if (_target != value) {
 				_target = value;
 				this.applyTarget();
+			}
+		}
+		
+		public function get upperCase ( ):Boolean { return _upperCase; }
+		public function set upperCase ( value:Boolean ):void {
+			if (_upperCase != value) {
+				_upperCase = value;
+				this.applyUpperCase();
 			}
 		}
 		
