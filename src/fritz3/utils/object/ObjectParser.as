@@ -1,5 +1,6 @@
 package fritz3.utils.object {
 	import fritz3.base.collection.ItemCollection;
+	import fritz3.base.injection.Injectable;
 	/**
 	 * ...
 	 * @author Dario Gieselaar
@@ -18,14 +19,33 @@ package fritz3.utils.object {
 			for (i = 0, l = attributes.length(); i < l; ++i) {
 				child = attributes[i];
 				value = getSimpleValue(child.toString());
-				parent[child.name().toString()] = value;
+				if (parent is Injectable) {
+					Injectable(parent).setProperty(child.name().toString(), value);
+				} else {
+					parent[child.name().toString()] = value;
+				}
+			}
+			var children:XMLList = xml.children();
+			for (i = 0, l = children.length(); i < l; ++i) {
+				child = children[i];
+				if (parent.hasOwnProperty(child.name().toString())) {
+					value = getSimpleValue(child.toString());
+					if (parent is Injectable) {
+						Injectable(parent).setProperty(child.name().toString(), value);
+					} else {
+						parent[child.name().toString()] = value;
+					}
+					delete children[i];
+					i--;
+					l--;
+				}
 			}
 			
 			if (!(parent is ItemCollection || parent is Array)) {
 				return parent;
 			}
 			
-			return parseXMLChildren(parent, xml.children());
+			return parseXMLChildren(parent, children);
 			
 		}
 		
