@@ -2,7 +2,11 @@
 <data>
 	
 	<DisplayComponentContainer className="button_holder">
-		<TextComponent id="introduction" text="This is a small button demo of FritZ3. The UI description is available &lt;a href='ui.xml'&gt;here&lt;/a&gt; and you can find the stylesheet &lt;a href='stylesheet.xml'&gt;here&lt;/a&gt;.&lt;br/&gt;&lt;br/&gt;The files are not embedded in the swf, so go ahead and download the swf + xml files and make your own buttons :)."/>
+		<TextComponent id="introduction">
+			<text>
+				<![CDATA[This is a small button demo of FritZ3. The UI description is available <a href="ui.xml">here</a> and you can find the stylesheet <a href="stylesheet.xml">here</a>.<br/><br/>The files are not embedded in the swf, so go ahead and download the swf + xml files and make your own buttons :)]]>
+			</text>
+		</TextComponent>
 	</DisplayComponentContainer>
 	
 	
