@@ -7,7 +7,7 @@
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public class InvalidationHelper implements Invalidatable {
+	public class InvalidationHelper implements IInvalidatable {
 		
 		protected var _data:InvalidationData;
 		protected var _methods:Dictionary;

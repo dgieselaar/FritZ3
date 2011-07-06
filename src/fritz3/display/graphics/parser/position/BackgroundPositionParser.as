@@ -1,5 +1,5 @@
 package fritz3.display.graphics.parser.position  {
-	import fritz3.base.parser.PropertyParser;
+	import fritz3.base.parser.IPropertyParser;
 	import fritz3.display.core.DisplayValue;
 	import fritz3.display.core.DisplayValueType;
 	import fritz3.display.layout.Align;
@@ -14,7 +14,7 @@ package fritz3.display.graphics.parser.position  {
 	 * [Description]
 	*/
 	
-	public class BackgroundPositionParser implements PropertyParser {
+	public class BackgroundPositionParser implements IPropertyParser {
 		
 		protected static var _parser:BackgroundPositionParser
 		

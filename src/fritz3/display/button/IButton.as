@@ -4,7 +4,7 @@ package fritz3.display.button {
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public interface Button {
+	public interface IButton {
 		
 		function get highlighted ( ):Boolean
 		function set highlighted ( value:Boolean ):void 

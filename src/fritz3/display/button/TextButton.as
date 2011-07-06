@@ -2,13 +2,13 @@ package fritz3.display.button {
 	import flash.events.MouseEvent;
 	import fritz3.display.text.TextComponent;
 	import fritz3.state.SingleState;
-	import fritz3.state.State;
-	import fritz3.state.ValueState;
+	import fritz3.state.IState;
+	import fritz3.state.IValueState;
 	/**
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public class TextButton extends TextComponent implements StateButton {
+	public class TextButton extends TextComponent implements IStateButton {
 		
 		protected var _statesByID:Object = { };
 		
@@ -52,7 +52,7 @@ package fritz3.display.button {
 			this.disabled ? this.disable() : this.enable();
 		}
 		
-		protected function onStateChange ( state:State, oldValue:*, newValue:* ):void {
+		protected function onStateChange ( state:IState, oldValue:*, newValue:* ):void {
 			this.invalidateCollector();
 			
 			switch(state.id) {
@@ -134,12 +134,12 @@ package fritz3.display.button {
 			this.pressed = false;
 		}
 		
-		public function getStateObject ( stateID:String ):ValueState {
+		public function getStateObject ( stateID:String ):IValueState {
 			return _statesByID[stateID];
 		}
 		
-		public function setStateObject ( stateID:String, state:ValueState ):void {
-			var oldState:ValueState = _statesByID[stateID];
+		public function setStateObject ( stateID:String, state:IValueState ):void {
+			var oldState:IValueState = _statesByID[stateID];
 			if (oldState) {
 				oldState.onChange.remove(this.onStateChange);
 			}
@@ -149,24 +149,24 @@ package fritz3.display.button {
 			}
 		}
 		
-		public function get highlighted ( ):Boolean { return ValueState(this.getStateObject(ButtonState.HIGHLIGHTED)).value; }
+		public function get highlighted ( ):Boolean { return IValueState(this.getStateObject(ButtonState.HIGHLIGHTED)).value; }
 		public function set highlighted ( value:Boolean ):void {
-			ValueState(this.getStateObject(ButtonState.HIGHLIGHTED)).value = value;
+			IValueState(this.getStateObject(ButtonState.HIGHLIGHTED)).value = value;
 		}
 		
-		public function get selected ( ):Boolean { return ValueState(this.getStateObject(ButtonState.SELECTED)).value; }
+		public function get selected ( ):Boolean { return IValueState(this.getStateObject(ButtonState.SELECTED)).value; }
 		public function set selected ( value:Boolean ):void {
-			ValueState(this.getStateObject(ButtonState.SELECTED)).value = value;
+			IValueState(this.getStateObject(ButtonState.SELECTED)).value = value;
 		}
 		
-		public function get pressed ( ):Boolean { return ValueState(this.getStateObject(ButtonState.PRESSED)).value; }
+		public function get pressed ( ):Boolean { return IValueState(this.getStateObject(ButtonState.PRESSED)).value; }
 		public function set pressed ( value:Boolean ):void {
-			ValueState(this.getStateObject(ButtonState.PRESSED)).value = value;
+			IValueState(this.getStateObject(ButtonState.PRESSED)).value = value;
 		}
 		
-		public function get disabled ( ):Boolean { return ValueState(this.getStateObject(ButtonState.DISABLED)).value; }
+		public function get disabled ( ):Boolean { return IValueState(this.getStateObject(ButtonState.DISABLED)).value; }
 		public function set disabled ( value:Boolean ):void {
-			ValueState(this.getStateObject(ButtonState.DISABLED)).value = value;
+			IValueState(this.getStateObject(ButtonState.DISABLED)).value = value;
 		}
 		
 	}

@@ -1,5 +1,5 @@
 package fritz3.display.graphics.parser.size  {
-	import fritz3.base.parser.PropertyParser;
+	import fritz3.base.parser.IPropertyParser;
 	import fritz3.display.core.DisplayValue;
 	import fritz3.display.core.DisplayValueType;
 	import fritz3.display.graphics.BackgroundImageScaleMode;
@@ -14,7 +14,7 @@ package fritz3.display.graphics.parser.size  {
 	 * [Description]
 	*/
 	
-	public class BackgroundSizeParser implements PropertyParser {
+	public class BackgroundSizeParser implements IPropertyParser {
 		
 		protected static var _parser:BackgroundSizeParser;
 		protected static var _cachedData:Object;

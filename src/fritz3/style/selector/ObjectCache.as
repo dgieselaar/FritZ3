@@ -1,7 +1,7 @@
 package fritz3.style.selector {
 	import flash.utils.Dictionary;
-	import fritz3.base.collection.ItemCollection;
-	import fritz3.display.core.Addable;
+	import fritz3.base.collection.IItemCollection;
+	import fritz3.display.core.IAddable;
 	/**
 	 * ...
 	 * @author Dario Gieselaar
@@ -21,7 +21,7 @@ package fritz3.style.selector {
 		public var properties:Object = { };
 		
 		public var cachedChildProperties:Boolean;
-		public var parentCollection:ItemCollection;
+		public var parentCollection:IItemCollection;
 		public var onlyChild:Boolean;
 		public var childIndex:int = -1;
 		public var nthLastChild:int = -1;
@@ -98,10 +98,10 @@ package fritz3.style.selector {
 		}
 		
 		public function cacheChildProperties ( ):void {
-			if (this.object is Addable) {
-				var parent:Addable = Addable(object).parentComponent;
-				if (parent && parent is ItemCollection) {
-					this.parentCollection = ItemCollection(parent);
+			if (this.object is IAddable) {
+				var parent:IAddable = IAddable(object).parentComponent;
+				if (parent && parent is IItemCollection) {
+					this.parentCollection = IItemCollection(parent);
 					this.parentNumChildren = this.parentCollection.numItems;
 					this.onlyChild = (this.parentNumChildren == 1);
 					this.childIndex = this.parentCollection.getItemIndex(this.object);
@@ -111,8 +111,8 @@ package fritz3.style.selector {
 					this.lastChild = (this.childIndex == this.parentNumChildren - 1);
 				}
 			}
-			if (this.object is ItemCollection) {
-				if (ItemCollection(this.object).numItems == 0) {
+			if (this.object is IItemCollection) {
+				if (IItemCollection(this.object).numItems == 0) {
 					this.empty = true;
 				}
 			}

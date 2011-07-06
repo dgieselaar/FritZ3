@@ -3,11 +3,11 @@ package fritz3.style {
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public interface StyleSheetCollector {
+	public interface IStyleSheetCollector {
 		
 		function getStyle ( ):void
 		
-		function set stylable ( value:Stylable ):void 
+		function set stylable ( value:IStylable ):void 
 	}
 
 }

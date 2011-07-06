@@ -8,12 +8,12 @@ package fritz3.utils.tween.gtween {
 	import fritz3.utils.tween.gtween.plugins.ArrayTweenPlugin;
 	import fritz3.utils.tween.gtween.plugins.ColorTweenPlugin;
 	import fritz3.utils.tween.gtween.plugins.gradient.GradientTweenPlugin;
-	import fritz3.utils.tween.TweenEngine;
+	import fritz3.utils.tween.ITweenEngine;
 	/**
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public class GTweenEngine implements TweenEngine {
+	public class GTweenEngine implements ITweenEngine {
 		
 		protected var _easeFunctions:String;
 		

@@ -6,7 +6,7 @@ package fritz3.utils.signals {
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public interface SignalDispatcher extends ISignal, IDispatcher {
+	public interface ISignalDispatcher extends ISignal, IDispatcher {
 		
 	}
 	

@@ -5,7 +5,7 @@
 	import flash.utils.setTimeout;
 	import fritz3.utils.signals.fast.FastSignal;
 	import fritz3.utils.signals.fast.FastSignalListenerData;
-	import fritz3.utils.signals.SignalDispatcher;
+	import fritz3.utils.signals.ISignalDispatcher;
 	import org.osflash.signals.IDispatcher;
 	import org.osflash.signals.ISignal;
 	import org.osflash.signals.Signal;
@@ -18,7 +18,7 @@
 		protected static const _numFunctions:int = 10000;
 		
 		protected function runFastSignalTest ( ):void {
-			var signal:SignalDispatcher = new FastSignal();
+			var signal:ISignalDispatcher = new FastSignal();
 			var t:int = getTimer();
 			trace("Running test #" + Number((_iteration++)+1));
 			for (var i:int, l:int = _numFunctions; i < l; ++i) {

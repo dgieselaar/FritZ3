@@ -4,24 +4,24 @@ package fritz3.display.layout.flexiblebox {
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.utils.Dictionary;
-	import fritz3.base.injection.Injectable;
+	import fritz3.base.injection.IInjectable;
 	import fritz3.display.core.DisplayValueType;
 	import fritz3.display.layout.Align;
 	import fritz3.display.layout.Direction;
-	import fritz3.display.layout.Layout;
+	import fritz3.display.layout.ILayout;
 	import fritz3.display.layout.Orientation;
-	import fritz3.display.layout.PaddableLayout;
-	import fritz3.display.layout.Positionable;
-	import fritz3.display.layout.Rearrangable;
-	import fritz3.display.layout.RectangularLayout;
+	import fritz3.display.layout.IPaddableLayout;
+	import fritz3.display.layout.IPositionable;
+	import fritz3.display.layout.IRearrangable;
+	import fritz3.display.layout.IRectangularLayout;
 	import fritz3.display.layout.Registration;
 	/**
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public class FlexibleBoxLayout implements PaddableLayout {
+	public class FlexibleBoxLayout implements IPaddableLayout {
 		
-		protected var _rearrangable:Rearrangable;
+		protected var _rearrangable:IRearrangable;
 		
 		protected var _width:Number = 0;
 		protected var _height:Number = 0;
@@ -58,7 +58,7 @@ package fritz3.display.layout.flexiblebox {
 			}
 		}
 		
-		protected function setRearrangable ( rearrangable:Rearrangable ):void {
+		protected function setRearrangable ( rearrangable:IRearrangable ):void {
 			_rearrangable = rearrangable;
 			if (_rearrangable) {
 				_rearrangable.invalidateLayout();
@@ -84,7 +84,7 @@ package fritz3.display.layout.flexiblebox {
 			var availableWidth:Number = Math.max(0, _width - _paddingLeft - _paddingRight);
 			var availableHeight:Number = Math.max(0, _height - _paddingTop - _paddingBottom);
 			
-			var i:int, l:int, child:DisplayObject, positionable:Positionable, boxElement:FlexibleBoxElement;
+			var i:int, l:int, child:DisplayObject, positionable:IPositionable, boxElement:IFlexibleBoxElement;
 			var x:Number, y:Number, width:Number, height:Number;
 			
 			
@@ -96,14 +96,14 @@ package fritz3.display.layout.flexiblebox {
 			
 			for (i = 0, l = items.length; i < l; ++i) {
 				child = items[i] as DisplayObject;
-				if (child is Collapsable && Collapsable(child).collapsed) {
+				if (child is ICollapsable && ICollapsable(child).collapsed) {
 					child.x = 0, child.y = 0;
 					continue;
 				}
 				
 				childDimensions[child] = childDimension = new Rectangle(NaN, NaN, NaN, NaN);
 				toPosition[toPosition.length] = child;
-				positionable = child as Positionable;
+				positionable = child as IPositionable;
 				if (positionable) {
 					if (positionable.left.value || positionable.top.value || positionable.right.value || positionable.bottom.value) {
 						fixedChildren[fixedChildren.length] = child;
@@ -111,7 +111,7 @@ package fritz3.display.layout.flexiblebox {
 					} 
 				}
 				
-				boxElement = child as FlexibleBoxElement;
+				boxElement = child as IFlexibleBoxElement;
 				inlineChildren[inlineChildren.length] = child;
 				if (boxElement) {
 					if (boxElement.boxFlex) {
@@ -135,7 +135,7 @@ package fritz3.display.layout.flexiblebox {
 			var maxChildIntrinsicHeight:Number = 0, maxChildBoundsHeight:Number = 0;
 			for (i = 0, l = inlineChildren.length; i < l; ++i) {
 				child = inlineChildren[i];
-				positionable = child as Positionable;
+				positionable = child as IPositionable;
 				if (positionable) {
 					horizontalMargin = positionable.marginLeft.getComputedValue(availableWidth) + positionable.marginRight.getComputedValue(availableWidth); 
 					preferredWidth = positionable.preferredWidth.getComputedValue(availableWidth);
@@ -240,7 +240,7 @@ package fritz3.display.layout.flexiblebox {
 				for (i = 0, l = group.length; i < l; ++i) {
 					child = group[i];
 					childDimension = childDimensions[child];
-					positionable = child as Positionable;
+					positionable = child as IPositionable;
 					if (positionable) {
 						marginLeft = positionable.marginLeft.getComputedValue(availableWidth);
 						marginTop = positionable.marginTop.getComputedValue(availableHeight);
@@ -310,7 +310,7 @@ package fritz3.display.layout.flexiblebox {
 			var availableWidth:Number = Math.max(0, _width - _paddingLeft - _paddingRight);
 			var availableHeight:Number = Math.max(0, _height - _paddingTop - _paddingBottom);
 			
-			var i:int, l:int, child:DisplayObject, positionable:Positionable, boxElement:FlexibleBoxElement;
+			var i:int, l:int, child:DisplayObject, positionable:IPositionable, boxElement:IFlexibleBoxElement;
 			var x:Number, y:Number, width:Number, height:Number;
 			
 			var preferredWidth:Number, preferredHeight:Number, minWidth:Number, maxWidth:Number, minHeight:Number, maxHeight:Number;
@@ -321,14 +321,14 @@ package fritz3.display.layout.flexiblebox {
 			
 			for (i = 0, l = items.length; i < l; ++i) {
 				child = items[i] as DisplayObject;
-				if (child is Collapsable && Collapsable(child).collapsed) {
+				if (child is ICollapsable && ICollapsable(child).collapsed) {
 					child.x = 0, child.y = 0;
 					continue;
 				}
 				
 				childDimensions[child] = childDimension = new Rectangle(NaN, NaN, NaN, NaN);
 				toPosition[toPosition.length] = child;
-				positionable = child as Positionable;
+				positionable = child as IPositionable;
 				if (positionable) {
 					if (positionable.left.value || positionable.top.value || positionable.right.value || positionable.bottom.value) {
 						fixedChildren[fixedChildren.length] = child;
@@ -336,7 +336,7 @@ package fritz3.display.layout.flexiblebox {
 					} 
 				}
 				
-				boxElement = child as FlexibleBoxElement;
+				boxElement = child as IFlexibleBoxElement;
 				inlineChildren[inlineChildren.length] = child;
 				if (boxElement) {
 					if (boxElement.boxFlex) {
@@ -360,7 +360,7 @@ package fritz3.display.layout.flexiblebox {
 			var maxChildIntrinsicWidth:Number = 0, maxChildBoundsWidth:Number = 0;
 			for (i = 0, l = inlineChildren.length; i < l; ++i) {
 				child = inlineChildren[i];
-				positionable = child as Positionable;
+				positionable = child as IPositionable;
 				if (positionable) {
 					verticalMargin = positionable.marginTop.getComputedValue(availableHeight) + positionable.marginBottom.getComputedValue(availableHeight); 
 					preferredHeight = positionable.preferredHeight.getComputedValue(availableHeight);
@@ -467,7 +467,7 @@ package fritz3.display.layout.flexiblebox {
 				for (i = 0, l = group.length; i < l; ++i) {
 					child = group[i];
 					childDimension = childDimensions[child];
-					positionable = child as Positionable;
+					positionable = child as IPositionable;
 					if (positionable) {
 						marginLeft = positionable.marginLeft.getComputedValue(availableWidth);
 						marginTop = positionable.marginTop.getComputedValue(availableHeight);
@@ -538,7 +538,7 @@ package fritz3.display.layout.flexiblebox {
 			var child:DisplayObject, dimension:Rectangle;
 			var x:Number, y:Number, width:Number, height:Number;
 			var childWidth:Number, childHeight:Number;
-			var injectable:Injectable;
+			var injectable:IInjectable;
 			for (var obj:Object in dimensions) {
 				child = DisplayObject(obj);
 				dimension = dimensions[obj];
@@ -546,8 +546,8 @@ package fritz3.display.layout.flexiblebox {
 				childWidth = width = dimension.width;
 				childHeight = height = dimension.height;
 				
-				if (child is Injectable) {
-					injectable = Injectable(child);
+				if (child is IInjectable) {
+					injectable = IInjectable(child);
 					injectable.setProperty("x", x);
 					injectable.setProperty("y", y);
 					if (width == width) {
@@ -614,8 +614,8 @@ package fritz3.display.layout.flexiblebox {
 				y -= height;
 				break;
 			}
-			if (child is Positionable) {
-				var positionable:Positionable = Positionable(child);
+			if (child is IPositionable) {
+				var positionable:IPositionable = IPositionable(child);
 				x += positionable.marginLeft;
 				y += positionable.marginTop;
 				width += positionable.marginRight;
@@ -625,7 +625,7 @@ package fritz3.display.layout.flexiblebox {
 			return _childBounds;
 		}
 		
-		protected function sortByMinimumWidth ( childA:FlexibleBoxElement, childB:FlexibleBoxElement ):int {
+		protected function sortByMinimumWidth ( childA:IFlexibleBoxElement, childB:IFlexibleBoxElement ):int {
 			var valueA:Number = childA.minimumWidth.getComputedValue(_availableWidth);
 			var valueB:Number = childB.minimumWidth.getComputedValue(_availableWidth);
 			if (isNaN(valueA)) {
@@ -645,7 +645,7 @@ package fritz3.display.layout.flexiblebox {
 			return result;
 		}
 		
-		protected function sortByMaximumWidth ( childA:FlexibleBoxElement, childB:FlexibleBoxElement ):int {
+		protected function sortByMaximumWidth ( childA:IFlexibleBoxElement, childB:IFlexibleBoxElement ):int {
 			var valueA:Number = childA.maximumWidth.getComputedValue(_availableWidth);
 			var valueB:Number = childB.maximumWidth.getComputedValue(_availableWidth);
 			if (isNaN(valueA)) {
@@ -665,7 +665,7 @@ package fritz3.display.layout.flexiblebox {
 			return result;
 		}
 		
-		protected function sortByMinimumHeight ( childA:FlexibleBoxElement, childB:FlexibleBoxElement ):int {
+		protected function sortByMinimumHeight ( childA:IFlexibleBoxElement, childB:IFlexibleBoxElement ):int {
 			var valueA:Number = childA.minimumHeight.getComputedValue(_availableHeight);
 			var valueB:Number = childB.minimumHeight.getComputedValue(_availableHeight);
 			if (isNaN(valueA)) {
@@ -685,7 +685,7 @@ package fritz3.display.layout.flexiblebox {
 			return result;
 		}
 		
-		protected function sortByMaximumHeight ( childA:FlexibleBoxElement, childB:FlexibleBoxElement ):int {
+		protected function sortByMaximumHeight ( childA:IFlexibleBoxElement, childB:IFlexibleBoxElement ):int {
 			var valueA:Number = childA.maximumHeight.getComputedValue(_availableHeight);
 			var valueB:Number = childB.maximumHeight.getComputedValue(_availableHeight);
 			if (isNaN(valueA)) {
@@ -705,8 +705,8 @@ package fritz3.display.layout.flexiblebox {
 			return result;
 		}
 		
-		public function get rearrangable ( ):Rearrangable { return _rearrangable; }
-		public function set rearrangable ( value:Rearrangable ):void {
+		public function get rearrangable ( ):IRearrangable { return _rearrangable; }
+		public function set rearrangable ( value:IRearrangable ):void {
 			if (_rearrangable != value) {
 				this.setRearrangable(value);
 			}

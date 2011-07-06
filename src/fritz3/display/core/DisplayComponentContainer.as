@@ -6,23 +6,23 @@
 	import flash.display.Sprite;
 	import flash.geom.Rectangle;
 	import fritz3.base.collection.ArrayItemCollection;
-	import fritz3.base.collection.ItemCollection;
-	import fritz3.base.parser.PropertyParser;
+	import fritz3.base.collection.IItemCollection;
+	import fritz3.base.parser.IPropertyParser;
 	import fritz3.base.transition.TransitionData;
-	import fritz3.display.graphics.Background;
+	import fritz3.display.graphics.IBackground;
 	import fritz3.display.graphics.BoxBackground;
-	import fritz3.display.graphics.Drawable;
-	import fritz3.display.graphics.RectangularBackground;
+	import fritz3.display.graphics.IDrawable;
+	import fritz3.display.graphics.IRectangularBackground;
 	import fritz3.display.layout.flexiblebox.FlexibleBoxLayout;
-	import fritz3.display.layout.InvalidatablePositionable;
-	import fritz3.display.layout.Layout;
-	import fritz3.display.layout.PaddableLayout;
-	import fritz3.display.layout.Rearrangable;
-	import fritz3.display.layout.RectangularLayout;
+	import fritz3.display.layout.IInvalidatablePositionable;
+	import fritz3.display.layout.ILayout;
+	import fritz3.display.layout.IPaddableLayout;
+	import fritz3.display.layout.IRearrangable;
+	import fritz3.display.layout.IRectangularLayout;
 	import fritz3.display.parser.side.SideData;
 	import fritz3.display.parser.side.SideParser;
 	import fritz3.display.parser.size.SizeParser;
-	import fritz3.invalidation.Invalidatable;
+	import fritz3.invalidation.IInvalidatable;
 	import fritz3.invalidation.InvalidationHelper;
 	import fritz3.invalidation.InvalidationPriorityTreshold;
 	import fritz3.utils.signals.MonoSignal;
@@ -31,13 +31,13 @@
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public class DisplayComponentContainer extends MeasurableDisplayComponent implements ItemCollection, Drawable, Rearrangable, InvalidatablePositionable {
+	public class DisplayComponentContainer extends MeasurableDisplayComponent implements IItemCollection, IDrawable, IRearrangable, IInvalidatablePositionable {
 		
 		protected var _childInvalidationHelper:InvalidationHelper;
 		protected var _displayList:DisplayObjectContainer;
-		protected var _collection:ItemCollection;
-		protected var _background:Background;
-		protected var _layout:Layout;
+		protected var _collection:IItemCollection;
+		protected var _background:IBackground;
+		protected var _layout:ILayout;
 		
 		protected var _backgroundShape:Shape;
 		
@@ -98,21 +98,21 @@
 		
 		override protected function setCyclePhase ( cyclePhase:String ):void {
 			super.setCyclePhase(cyclePhase);
-			if (_background && _background is Cyclable) {
-				Cyclable(_background).cyclePhase = cyclePhase;
+			if (_background && _background is ICyclable) {
+				ICyclable(_background).cyclePhase = cyclePhase;
 			}
-			if (_layout && _layout is Cyclable) {
-				Cyclable(_layout).cyclePhase = cyclePhase;
+			if (_layout && _layout is ICyclable) {
+				ICyclable(_layout).cyclePhase = cyclePhase;
 			}
 		}
 		
 		override protected function setCycle ( cycle:int ):void {
 			super.setCycle(cycle);
-			if (_background && _background is Cyclable) {
-				Cyclable(_background).cycle = cycle;
+			if (_background && _background is ICyclable) {
+				ICyclable(_background).cycle = cycle;
 			}
-			if (_layout && _layout is Cyclable) {
-				Cyclable(_layout).cycle = cycle;
+			if (_layout && _layout is ICyclable) {
+				ICyclable(_layout).cycle = cycle;
 			}
 		}
 		
@@ -145,7 +145,7 @@
 		}
 		
 		protected function parsePadding ( propertyName:String, value:String ):void {
-			var parser:PropertyParser = this.getParser("padding");
+			var parser:IPropertyParser = this.getParser("padding");
 			if (parser) {
 				var sideData:SideData = SideData(parser.parseValue(value));
 				if (sideData.all) {
@@ -193,7 +193,7 @@
 			}
 		}
 		
-		protected function setCollection ( collection:ItemCollection ):void {
+		protected function setCollection ( collection:IItemCollection ):void {
 			if (_collection && collection) {
 				for (var i:int, l:int = _collection.numItems; i < l; ++i) {
 					collection.add(_collection.removeItemAt(0));
@@ -207,29 +207,29 @@
 			_collection = collection;
 		}
 		
-		protected function setBackground ( background:Background ):void {
+		protected function setBackground ( background:IBackground ):void {
 			if (_background) {
 				_background.drawable = null;
 			}
 			_background = background;
 			if (_background) {
 				_background.drawable = this;
-				if (_background is Cyclable) {
-					Cyclable(_background).cyclePhase = _cyclePhase;
-					Cyclable(_background).cycle = _cycle;
+				if (_background is ICyclable) {
+					ICyclable(_background).cyclePhase = _cyclePhase;
+					ICyclable(_background).cycle = _cycle;
 				}
 			}
 		}
 		
-		protected function setLayout ( layout:Layout ):void {
+		protected function setLayout ( layout:ILayout ):void {
 			if (_layout) {
 				_layout.rearrangable = null;
 			}
 			_layout = layout;
 			if (_layout) {
 				_layout.rearrangable = this;
-				if (_layout is RectangularLayout) {
-					var rectLayout:RectangularLayout = RectangularLayout(_layout);
+				if (_layout is IRectangularLayout) {
+					var rectLayout:IRectangularLayout = IRectangularLayout(_layout);
 					var autoWidth:Boolean = _preferredWidth.valueType == DisplayValueType.AUTO, autoHeight:Boolean = _preferredHeight.valueType == DisplayValueType.AUTO;
 					rectLayout.autoWidth = autoWidth;
 					rectLayout.autoHeight = autoHeight;
@@ -237,9 +237,9 @@
 					rectLayout.height = _height;
 				}
 				this.setLayoutPadding();
-				if (_layout is Cyclable) {
-					Cyclable(_layout).cyclePhase = _cyclePhase;
-					Cyclable(_layout).cycle = _cycle;
+				if (_layout is ICyclable) {
+					ICyclable(_layout).cyclePhase = _cyclePhase;
+					ICyclable(_layout).cycle = _cycle;
 				}
 			}
 		}
@@ -292,9 +292,9 @@
 		
 		protected function invalidateChildStates ( ):void {
 			var items:Array = _collection.getItems();
-			var item:InvalidatableDisplayChild;
+			var item:IInvalidatableDisplayChild;
 			for (var i:int, l:int = items.length; i < l; ++i) {
-				item = items[i] as InvalidatableDisplayChild;
+				item = items[i] as IInvalidatableDisplayChild;
 				if (item) {
 					item.invalidateChildState();
 				}
@@ -333,8 +333,8 @@
 		}
 		
 		protected function setLayoutPadding ( ):void {
-			if (_layout && _layout is PaddableLayout) {
-				var layout:PaddableLayout = PaddableLayout(_layout);
+			if (_layout && _layout is IPaddableLayout) {
+				var layout:IPaddableLayout = IPaddableLayout(_layout);
 				layout.paddingLeft = _paddingLeft.getComputedValue(_width);
 				layout.paddingTop = _paddingTop.getComputedValue(_height);
 				layout.paddingRight = _paddingRight.getComputedValue(_width);
@@ -343,27 +343,27 @@
 		}
 		
 		protected function setDependenciesWidth ( ):void {
-			if (_layout && _layout is RectangularLayout) { 
-				var layout:RectangularLayout = RectangularLayout(_layout);
+			if (_layout && _layout is IRectangularLayout) { 
+				var layout:IRectangularLayout = IRectangularLayout(_layout);
 				var autoWidth:Boolean = _preferredWidth.valueType == DisplayValueType.AUTO;
 				layout.autoWidth = autoWidth;
 				layout.width = _width;
 			}
-			if (_background && _background is RectangularBackground) {
-				var background:RectangularBackground = RectangularBackground(_background);
+			if (_background && _background is IRectangularBackground) {
+				var background:IRectangularBackground = IRectangularBackground(_background);
 				background.width = _width;
 			}
 		}
 		
 		protected function setDependenciesHeight ( ):void {
-			if (_layout && _layout is RectangularLayout) { 
-				var layout:RectangularLayout = RectangularLayout(_layout);
+			if (_layout && _layout is IRectangularLayout) { 
+				var layout:IRectangularLayout = IRectangularLayout(_layout);
 				var autoHeight:Boolean = _preferredHeight.valueType == DisplayValueType.AUTO;
 				layout.height = _height;
 				layout.autoHeight = autoHeight;
 			}
-			if (_background && _background is RectangularBackground) {
-				var background:RectangularBackground = RectangularBackground(_background);
+			if (_background && _background is IRectangularBackground) {
+				var background:IRectangularBackground = IRectangularBackground(_background);
 				background.height = _height;
 			}
 		}
@@ -375,16 +375,16 @@
 				
 		public function add ( item:Object ):Object {
 			
-			if (item is Invalidatable) {
-				this.addInvalidatable(Invalidatable(item));
+			if (item is IInvalidatable) {
+				this.addInvalidatable(IInvalidatable(item));
 			}
 			
-			if (item is Addable) {
-				this.addAddable(Addable(item));
+			if (item is IAddable) {
+				this.addAddable(IAddable(item));
 			}
 			
-			if (item is InvalidatablePositionable) {
-				this.addInvalidatablePositionable(InvalidatablePositionable(item));
+			if (item is IInvalidatablePositionable) {
+				this.addInvalidatablePositionable(IInvalidatablePositionable(item));
 			}
 			
 			if (item is DisplayObject) {
@@ -405,16 +405,16 @@
 				this.removeDisplayObject(DisplayObject(item));
 			}
 			
-			if (item is InvalidatablePositionable) {
-				this.removeInvalidatablePositionable(InvalidatablePositionable(item));
+			if (item is IInvalidatablePositionable) {
+				this.removeInvalidatablePositionable(IInvalidatablePositionable(item));
 			}
 			
-			if (item is Addable) {
-				this.removeAddable(Addable(item));
+			if (item is IAddable) {
+				this.removeAddable(IAddable(item));
 			}
 			
-			if (item is Invalidatable) {
-				this.removeInvalidatable(Invalidatable(item));
+			if (item is IInvalidatable) {
+				this.removeInvalidatable(IInvalidatable(item));
 			}
 			
 			_collection.remove(item);
@@ -464,29 +464,29 @@
 			return _collection.getItems();
 		}
 		
-		protected function addInvalidatable ( invalidatable:Invalidatable ):void { 
+		protected function addInvalidatable ( invalidatable:IInvalidatable ):void { 
 			invalidatable.priority = this.priority + 1;
 		}
 		
-		protected function removeInvalidatable ( invalidatable:Invalidatable ):void {
+		protected function removeInvalidatable ( invalidatable:IInvalidatable ):void {
 			invalidatable.priority = 0;
 		}
 		
-		protected function addAddable ( addable:Addable ):void {
+		protected function addAddable ( addable:IAddable ):void {
 			addable.parentComponent = this;
 			addable.onAdd();
 		}
 		
-		protected function removeAddable ( addable:Addable ):void {
+		protected function removeAddable ( addable:IAddable ):void {
 			addable.onRemove();
 			addable.parentComponent = null;
 		}
 		
-		protected function addInvalidatablePositionable ( invalidatablePositionable:InvalidatablePositionable ):void {
+		protected function addInvalidatablePositionable ( invalidatablePositionable:IInvalidatablePositionable ):void {
 			invalidatablePositionable.onDisplayInvalidation.add(this.onChildDisplayInvalidation);
 		}
 		
-		protected function removeInvalidatablePositionable ( invalidatablePositionable:InvalidatablePositionable ):void {
+		protected function removeInvalidatablePositionable ( invalidatablePositionable:IInvalidatablePositionable ):void {
 			invalidatablePositionable.onDisplayInvalidation.remove(this.onChildDisplayInvalidation);
 		}
 		
@@ -502,7 +502,7 @@
 			_childInvalidationHelper.invalidateMethod(this.invalidateChildStates);
 		}
 		
-		protected function onChildDisplayInvalidation ( child:InvalidatablePositionable ):void {
+		protected function onChildDisplayInvalidation ( child:IInvalidatablePositionable ):void {
 			this.invalidateLayout();
 		}
 		
@@ -522,15 +522,15 @@
 			}
 		}
 		
-		public function get background ( ):Background { return _background; }
-		public function set background ( value:Background ):void {
+		public function get background ( ):IBackground { return _background; }
+		public function set background ( value:IBackground ):void {
 			if (_background != value) {
 				this.setBackground(value);
 			}
 		}
 		
-		public function get collection ( ):ItemCollection { return _collection; }
-		public function set collection ( value:ItemCollection ):void {
+		public function get collection ( ):IItemCollection { return _collection; }
+		public function set collection ( value:IItemCollection ):void {
 			if (_collection != value) {
 				this.setCollection(value);
 			}
@@ -544,8 +544,8 @@
 			}
 		}
 		
-		public function get layout ( ):Layout { return _layout; }
-		public function set layout ( value:Layout ):void {
+		public function get layout ( ):ILayout { return _layout; }
+		public function set layout ( value:ILayout ):void {
 			if(_layout != value) {
 				this.setLayout(value);
 			}

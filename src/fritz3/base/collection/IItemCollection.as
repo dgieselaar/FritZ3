@@ -3,7 +3,7 @@
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public interface ItemCollection {
+	public interface IItemCollection {
 		
 		function add ( item:Object ):Object
 		function remove ( item:Object ):Object

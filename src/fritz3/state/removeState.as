@@ -10,7 +10,7 @@ package fritz3.state  {
 	 * [Description]
 	*/
 	
-	public function removeState ( state:State ):void {
+	public function removeState ( state:IState ):void {
 		return StateManager.singleton().removeState(state);
 	}
 

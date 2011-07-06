@@ -1,9 +1,9 @@
 package fritz3.display.core  {
-	import fritz3.display.core.Addable;
-	import fritz3.style.invalidation.InvalidatableStyleSheetCollector;
+	import fritz3.display.core.IAddable;
+	import fritz3.style.invalidation.IInvalidatableStyleSheetCollector;
 	import fritz3.style.StandardStyleSheetCollector;
-	import fritz3.style.Stylable;
-	import fritz3.style.StyleSheetCollector;
+	import fritz3.style.IStylable;
+	import fritz3.style.IStyleSheetCollector;
 	/**
 
 	/**
@@ -15,9 +15,9 @@ package fritz3.display.core  {
 	 * [Description]
 	*/
 	
-	public class StylableDisplayComponent extends InvalidatableDisplayComponent implements Stylable, InvalidatableDisplayChild {
+	public class StylableDisplayComponent extends InvalidatableDisplayComponent implements IStylable, IInvalidatableDisplayChild {
 		
-		protected var _styleSheetCollector:StyleSheetCollector;
+		protected var _styleSheetCollector:IStyleSheetCollector;
 		
 		protected var _id:String;
 		protected var _className:String;
@@ -41,7 +41,7 @@ package fritz3.display.core  {
 			this.styleSheetCollector = new StandardStyleSheetCollector();
 		}
 		
-		protected function setStyleSheetCollector ( styleSheetCollector:StyleSheetCollector ):void {
+		protected function setStyleSheetCollector ( styleSheetCollector:IStyleSheetCollector ):void {
 			if (_styleSheetCollector) {
 				_styleSheetCollector.stylable = null;
 			}
@@ -73,8 +73,8 @@ package fritz3.display.core  {
 		}
 		
 		protected function invalidateCollector ( ):void {
-			if (_styleSheetCollector && _styleSheetCollector is InvalidatableStyleSheetCollector) {
-				InvalidatableStyleSheetCollector(_styleSheetCollector).invalidateCollector();
+			if (_styleSheetCollector && _styleSheetCollector is IInvalidatableStyleSheetCollector) {
+				IInvalidatableStyleSheetCollector(_styleSheetCollector).invalidateCollector();
 			}
 		}
 		
@@ -94,8 +94,8 @@ package fritz3.display.core  {
 			this.invalidateCollector();
 		}
 		
-		public function get styleSheetCollector ( ):StyleSheetCollector { return _styleSheetCollector; }
-		public function set styleSheetCollector ( value:StyleSheetCollector ):void {
+		public function get styleSheetCollector ( ):IStyleSheetCollector { return _styleSheetCollector; }
+		public function set styleSheetCollector ( value:IStyleSheetCollector ):void {
 			if (_styleSheetCollector != value) {
 				this.setStyleSheetCollector(value);
 			}

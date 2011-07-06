@@ -10,7 +10,7 @@ package fritz3.display.layout.flexiblebox  {
 	 * [Description]
 	*/
 	
-	public interface Collapsable {
+	public interface ICollapsable {
 		
 		function get collapsed ( ):Boolean
 		

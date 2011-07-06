@@ -7,7 +7,7 @@ package fritz3.state {
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public class CollectionState implements State {
+	public class CollectionState implements IState {
 		
 		private var _id:String;
 		

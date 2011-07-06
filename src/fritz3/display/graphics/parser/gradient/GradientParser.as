@@ -1,6 +1,6 @@
 package fritz3.display.graphics.parser.gradient {
 	import flash.display.GraphicsGradientFill;
-	import fritz3.base.parser.PropertyParser;
+	import fritz3.base.parser.IPropertyParser;
 	import fritz3.display.core.DisplayValueType;
 	import fritz3.display.graphics.gradient.GraphicsGradientColor;
 	import fritz3.display.graphics.gradient.GraphicsGradientData;
@@ -8,7 +8,7 @@ package fritz3.display.graphics.parser.gradient {
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public class GradientParser implements PropertyParser {
+	public class GradientParser implements IPropertyParser {
 		
 		protected static var _parser:GradientParser;
 		protected static var _cachedData:Object;

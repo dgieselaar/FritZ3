@@ -2,14 +2,14 @@
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
 	import flash.utils.Dictionary;
-	import fritz3.base.injection.Injectable;
-	import fritz3.base.parser.Parsable;
+	import fritz3.base.injection.IInjectable;
+	import fritz3.base.parser.IParsable;
 	import fritz3.base.parser.ParseHelper;
-	import fritz3.base.parser.PropertyParser;
-	import fritz3.base.transition.Transitionable;
+	import fritz3.base.parser.IPropertyParser;
+	import fritz3.base.transition.ITransitionable;
 	import fritz3.base.transition.TransitionData;
 	import fritz3.base.transition.TransitionType;
-	import fritz3.invalidation.Invalidatable;
+	import fritz3.invalidation.IInvalidatable;
 	import fritz3.invalidation.InvalidationHelper;
 	import fritz3.invalidation.InvalidationManager;
 	import fritz3.style.PropertyData;
@@ -23,7 +23,7 @@
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public class InvalidatableDisplayComponent extends Sprite implements Invalidatable, Parsable, Injectable, Addable, Transitionable, Cyclable {
+	public class InvalidatableDisplayComponent extends Sprite implements IInvalidatable, IParsable, IInjectable, IAddable, ITransitionable, ICyclable {
 		
 		protected var _invalidationHelper:InvalidationHelper;
 		protected var _priority:int;
@@ -37,7 +37,7 @@
 		
 		protected var _transitions:Object = { };
 		
-		protected var _parentComponent:Addable;
+		protected var _parentComponent:IAddable;
 		
 		protected var _cyclePhase:String = CyclePhase.CONSTRUCTED;
 		protected var _cycle:int = 1;
@@ -145,11 +145,11 @@
 			this.applyParsedProperties();
 		}
 		
-		protected function addParser ( propertyName:String, parser:PropertyParser ):void {
+		protected function addParser ( propertyName:String, parser:IPropertyParser ):void {
 			_propertyParsers[propertyName] = parser;
 		}
 		
-		protected function getParser ( propertyName:String ):PropertyParser {
+		protected function getParser ( propertyName:String ):IPropertyParser {
 			return _propertyParsers[propertyName];
 		}
 		
@@ -162,7 +162,7 @@
 			_invalidationHelper.priority = value;
 		}
 		
-		protected function setParentComponent ( parentComponent:Addable ):void {
+		protected function setParentComponent ( parentComponent:IAddable ):void {
 			_parentComponent = parentComponent;
 		}
 		
@@ -179,8 +179,8 @@
 		
 		public function get properties ( ):Object { return _properties; }
 		
-		public function get parentComponent ( ):Addable { return _parentComponent; }
-		public function set parentComponent ( value:Addable ):void {
+		public function get parentComponent ( ):IAddable { return _parentComponent; }
+		public function set parentComponent ( value:IAddable ):void {
 			if (_parentComponent != value) {
 				this.setParentComponent(value);
 			}

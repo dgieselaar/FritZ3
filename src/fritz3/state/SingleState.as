@@ -12,7 +12,7 @@
 	 * @package casper.system
 	 */
 	
-	public class SingleState implements ValueState {
+	public class SingleState implements IValueState {
 		
 		protected var _id:String;
 		protected var _value:*;

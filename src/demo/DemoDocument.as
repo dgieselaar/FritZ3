@@ -12,7 +12,7 @@ package demo {
 	import fritz3.display.core.GraphicsComponent;
 	import fritz3.document.ApplicationDocument;
 	import fritz3.state.SingleState;
-	import fritz3.state.State;
+	import fritz3.state.IState;
 	import fritz3.style.StyleManager;
 	import fritz3.utils.object.ObjectParser;
 	/**

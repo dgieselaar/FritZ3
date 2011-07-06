@@ -18,12 +18,12 @@ package fritz3.utils.tween.ftween {
 	import fritz3.tween.plugins.displayvalue.DisplayValueTweenPlugin;
 	import fritz3.tween.plugins.gradient.GradientTweenPlugin;
 	import fritz3.utils.object.getClass;
-	import fritz3.utils.tween.TweenEngine;
+	import fritz3.utils.tween.ITweenEngine;
 	/**
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public class FTweenEngine implements TweenEngine {
+	public class FTweenEngine implements ITweenEngine {
 		
 		protected var _defaultEase:Function = Cubic.easeOut;
 		protected var _easeFunctions:Object = { };

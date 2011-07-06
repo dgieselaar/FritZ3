@@ -1,11 +1,11 @@
 package fritz3.display.graphics.parser.repeat {
-	import fritz3.base.parser.PropertyParser;
+	import fritz3.base.parser.IPropertyParser;
 	import fritz3.display.graphics.BackgroundImageRepeat;
 	/**
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public class BackgroundRepeatParser implements PropertyParser {
+	public class BackgroundRepeatParser implements IPropertyParser {
 		
 		protected static var _parser:BackgroundRepeatParser;
 		protected static var _cachedData:Object;

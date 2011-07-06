@@ -1,6 +1,6 @@
 package fritz3.display.graphics.parser.border {
 	import flash.utils.Dictionary;
-	import fritz3.base.parser.PropertyParser;
+	import fritz3.base.parser.IPropertyParser;
 	import fritz3.display.core.DisplayValue;
 	import fritz3.display.graphics.Border;
 	import fritz3.display.graphics.BorderPosition;
@@ -11,7 +11,7 @@ package fritz3.display.graphics.parser.border {
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public class BorderParser implements PropertyParser {
+	public class BorderParser implements IPropertyParser {
 		
 		protected static var _parser:BorderParser;
 		protected static var _cachedData:Object;

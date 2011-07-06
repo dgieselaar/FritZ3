@@ -10,34 +10,34 @@ package fritz3.display.text {
 	import flash.text.TextFieldType;
 	import flash.text.TextFormat;
 	import flash.text.TextFormatAlign;
-	import fritz3.base.parser.PropertyParser;
+	import fritz3.base.parser.IPropertyParser;
 	import fritz3.base.transition.TransitionData;
-	import fritz3.display.core.Cyclable;
+	import fritz3.display.core.ICyclable;
 	import fritz3.display.core.DisplayValue;
 	import fritz3.display.core.DisplayValueType;
 	import fritz3.display.core.MeasurableDisplayComponent;
 	import fritz3.display.core.PositionableDisplayComponent;
-	import fritz3.display.graphics.Background;
+	import fritz3.display.graphics.IBackground;
 	import fritz3.display.graphics.BoxBackground;
-	import fritz3.display.graphics.Drawable;
-	import fritz3.display.graphics.RectangularBackground;
-	import fritz3.display.layout.Layout;
-	import fritz3.display.layout.PaddableLayout;
-	import fritz3.display.layout.Rearrangable;
-	import fritz3.display.layout.RectangularLayout;
+	import fritz3.display.graphics.IDrawable;
+	import fritz3.display.graphics.IRectangularBackground;
+	import fritz3.display.layout.ILayout;
+	import fritz3.display.layout.IPaddableLayout;
+	import fritz3.display.layout.IRearrangable;
+	import fritz3.display.layout.IRectangularLayout;
 	import fritz3.display.parser.side.SideData;
 	import fritz3.display.parser.side.SideParser;
 	import fritz3.display.parser.size.SizeParser;
 	import fritz3.display.text.layout.TextLayout;
-	import fritz3.style.invalidation.InvalidatableStyleSheetCollector;
+	import fritz3.style.invalidation.IInvalidatableStyleSheetCollector;
 	/**
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public class TextComponent extends MeasurableDisplayComponent implements Drawable, Rearrangable {
+	public class TextComponent extends MeasurableDisplayComponent implements IDrawable, IRearrangable {
 		
-		protected var _background:Background;
-		protected var _layout:Layout;
+		protected var _background:IBackground;
+		protected var _layout:ILayout;
 		protected var _textField:TextField;
 		
 		protected var _measuredTextWidth:Number = 0;
@@ -106,21 +106,21 @@ package fritz3.display.text {
 		
 		override protected function setCyclePhase ( cyclePhase:String ):void {
 			super.setCyclePhase(cyclePhase);
-			if (_background && _background is Cyclable) {
-				Cyclable(_background).cyclePhase = cyclePhase;
+			if (_background && _background is ICyclable) {
+				ICyclable(_background).cyclePhase = cyclePhase;
 			}
-			if (_layout && _layout is Cyclable) {
-				Cyclable(_layout).cyclePhase = cyclePhase;
+			if (_layout && _layout is ICyclable) {
+				ICyclable(_layout).cyclePhase = cyclePhase;
 			}
 		}
 		
 		override protected function setCycle ( cycle:int ):void {
 			super.setCycle(cycle);
-			if (_background && _background is Cyclable) {
-				Cyclable(_background).cycle = cycle;
+			if (_background && _background is ICyclable) {
+				ICyclable(_background).cycle = cycle;
 			}
-			if (_layout && _layout is Cyclable) {
-				Cyclable(_layout).cycle = cycle;
+			if (_layout && _layout is ICyclable) {
+				ICyclable(_layout).cycle = cycle;
 			}
 		}
 		
@@ -207,7 +207,7 @@ package fritz3.display.text {
 		}
 		
 		protected function parsePadding ( propertyName:String, value:String ):void {
-			var parser:PropertyParser = this.getParser("padding");
+			var parser:IPropertyParser = this.getParser("padding");
 			if (parser) {
 				var sideData:SideData = SideData(parser.parseValue(value));
 				if (sideData.all) {
@@ -225,7 +225,7 @@ package fritz3.display.text {
 			}
 		}
 		
-		protected function setBackground ( background:Background ):void {
+		protected function setBackground ( background:IBackground ):void {
 			if (_background) {
 				_background.drawable = null;
 			}
@@ -235,19 +235,19 @@ package fritz3.display.text {
 			_background = background;
 			if (_background) {
 				_background.drawable = this;
-				if (_background is RectangularBackground) {
-					RectangularBackground(_background).width = _width;
-					RectangularBackground(_background).height = _height;
+				if (_background is IRectangularBackground) {
+					IRectangularBackground(_background).width = _width;
+					IRectangularBackground(_background).height = _height;
 				}
 				
-				if (_background is Cyclable) {
-					Cyclable(_background).cyclePhase = _cyclePhase;
-					Cyclable(_background).cycle = _cycle;
+				if (_background is ICyclable) {
+					ICyclable(_background).cyclePhase = _cyclePhase;
+					ICyclable(_background).cycle = _cycle;
 				}
 			}
 		}
 		
-		protected function setLayout ( layout:Layout ):void {
+		protected function setLayout ( layout:ILayout ):void {
 			if (_layout) {
 				_layout.rearrangable = null;
 			}
@@ -255,16 +255,16 @@ package fritz3.display.text {
 			_layout = layout;
 			if (_layout) {
 				_layout.rearrangable = this;
-				if (_layout is RectangularLayout) {
-					RectangularLayout(_layout).width = _width;
-					RectangularLayout(_layout).height = _height;
-					RectangularLayout(_layout).autoWidth = _preferredWidth.valueType == DisplayValueType.AUTO;
-					RectangularLayout(_layout).autoHeight = _preferredHeight.valueType == DisplayValueType.AUTO;
+				if (_layout is IRectangularLayout) {
+					IRectangularLayout(_layout).width = _width;
+					IRectangularLayout(_layout).height = _height;
+					IRectangularLayout(_layout).autoWidth = _preferredWidth.valueType == DisplayValueType.AUTO;
+					IRectangularLayout(_layout).autoHeight = _preferredHeight.valueType == DisplayValueType.AUTO;
 				}
 				this.setLayoutPadding();
-				if (_layout is Cyclable) {
-					Cyclable(_layout).cyclePhase = _cyclePhase;
-					Cyclable(_layout).cycle = _cycle;
+				if (_layout is ICyclable) {
+					ICyclable(_layout).cyclePhase = _cyclePhase;
+					ICyclable(_layout).cycle = _cycle;
 				}
 			}
 		}
@@ -368,26 +368,26 @@ package fritz3.display.text {
 		}
 		
 		protected function setDependenciesWidth ( ):void {
-			if (_layout && _layout is RectangularLayout) {
+			if (_layout && _layout is IRectangularLayout) {
 				var autoWidth:Boolean = _preferredWidth.valueType == DisplayValueType.AUTO;
-				RectangularLayout(_layout).autoWidth = autoWidth;
-				RectangularLayout(_layout).width = _width;
+				IRectangularLayout(_layout).autoWidth = autoWidth;
+				IRectangularLayout(_layout).width = _width;
 			}
 			
-			if (_background && _background is RectangularBackground) {
-				RectangularBackground(_background).width = _width;
+			if (_background && _background is IRectangularBackground) {
+				IRectangularBackground(_background).width = _width;
 			}
 		}
 		
 		protected function setDependenciesHeight ( ):void {
-			if (_layout && _layout is RectangularLayout) {
+			if (_layout && _layout is IRectangularLayout) {
 				var autoHeight:Boolean = _preferredHeight.valueType == DisplayValueType.AUTO;
-				RectangularLayout(_layout).autoHeight = autoHeight;
-				RectangularLayout(_layout).height = _height;
+				IRectangularLayout(_layout).autoHeight = autoHeight;
+				IRectangularLayout(_layout).height = _height;
 			}
 			
-			if (_background && _background is RectangularBackground) {
-				RectangularBackground(_background).height = _height;
+			if (_background && _background is IRectangularBackground) {
+				IRectangularBackground(_background).height = _height;
 			}
 		}
 		
@@ -410,8 +410,8 @@ package fritz3.display.text {
 		}
 
 		protected function setLayoutPadding ( ):void {
-			if (_layout && _layout is PaddableLayout) {
-				var layout:PaddableLayout = PaddableLayout(_layout);
+			if (_layout && _layout is IPaddableLayout) {
+				var layout:IPaddableLayout = IPaddableLayout(_layout);
 				layout.paddingLeft = _paddingLeft.getComputedValue(_width);
 				layout.paddingTop = _paddingTop.getComputedValue(_height);
 				layout.paddingRight = _paddingRight.getComputedValue(_width);
@@ -736,15 +736,15 @@ package fritz3.display.text {
 			}
 		}
 		
-		public function get background ( ):Background { return _background; }
-		public function set background ( value:Background ):void {
+		public function get background ( ):IBackground { return _background; }
+		public function set background ( value:IBackground ):void {
 			if (_background != value) {
 				this.setBackground(value);
 			}
 		}
 		
-		public function get layout ( ):Layout { return _layout; }
-		public function set layout ( value:Layout ):void {
+		public function get layout ( ):ILayout { return _layout; }
+		public function set layout ( value:ILayout ):void {
 			if (_layout != value) {
 				this.setLayout(value);
 			}

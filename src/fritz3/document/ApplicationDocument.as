@@ -16,12 +16,12 @@ package fritz3.document  {
 	import fritz3.display.core.DisplayValue;
 	import fritz3.display.core.DisplayValueType;
 	import fritz3.invalidation.InvalidationManager;
-	import fritz3.style.invalidation.InvalidatableStyleSheetCollector;
+	import fritz3.style.invalidation.IInvalidatableStyleSheetCollector;
 	import fritz3.style.StyleManager;
 	import fritz3.utils.object.addClassAlias;
 	import fritz3.utils.object.hasClassAlias;
 	import fritz3.utils.tween.ftween.FTweenEngine;
-	import fritz3.utils.tween.TweenEngine;
+	import fritz3.utils.tween.ITweenEngine;
 	import fritz3.utils.tween.Tweener;
 	import ru.etcs.utils.getDefinitionNames;
 	/**
@@ -85,8 +85,8 @@ package fritz3.document  {
 		override public function onAdd():void {
 			super.onAdd();
 			if (_styleSheetCollector) {
-				if (_styleSheetCollector is InvalidatableStyleSheetCollector) {
-					InvalidatableStyleSheetCollector(_styleSheetCollector).invalidateCollector();
+				if (_styleSheetCollector is IInvalidatableStyleSheetCollector) {
+					IInvalidatableStyleSheetCollector(_styleSheetCollector).invalidateCollector();
 				}
 			}
 			_invalidationHelper.invalidateMethod(this.setDimensions);
@@ -191,7 +191,7 @@ package fritz3.document  {
 			return array;
 		}
 		
-		protected function getTweenEngine ( ):TweenEngine {
+		protected function getTweenEngine ( ):ITweenEngine {
 			return new FTweenEngine();
 		}
 		

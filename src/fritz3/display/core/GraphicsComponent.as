@@ -1,15 +1,15 @@
 package fritz3.display.core {
-	import fritz3.display.graphics.Background;
+	import fritz3.display.graphics.IBackground;
 	import fritz3.display.graphics.BoxBackground;
-	import fritz3.display.graphics.Drawable;
-	import fritz3.display.graphics.RectangularBackground;
+	import fritz3.display.graphics.IDrawable;
+	import fritz3.display.graphics.IRectangularBackground;
 	/**
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public class GraphicsComponent extends PositionableDisplayComponent implements Drawable {
+	public class GraphicsComponent extends PositionableDisplayComponent implements IDrawable {
 		
-		protected var _background:Background;
+		protected var _background:IBackground;
 		
 		public function GraphicsComponent ( properties:Object = null ) {
 			super(properties);
@@ -22,15 +22,15 @@ package fritz3.display.core {
 		
 		override protected function setCyclePhase ( cyclePhase:String ):void {
 			super.setCyclePhase(cyclePhase);
-			if (_background && _background is Cyclable) {
-				Cyclable(_background).cyclePhase = cyclePhase;
+			if (_background && _background is ICyclable) {
+				ICyclable(_background).cyclePhase = cyclePhase;
 			}
 		}
 		
 		override protected function setCycle ( cycle:int ):void {
 			super.setCycle(cycle);
-			if (_background && _background is Cyclable) {
-				Cyclable(_background).cycle = cycle;
+			if (_background && _background is ICyclable) {
+				ICyclable(_background).cycle = cycle;
 			}
 		}
 		
@@ -48,18 +48,18 @@ package fritz3.display.core {
 		}
 		
 		override protected function applyWidth ( ):void {
-			if (_background is RectangularBackground) {
-				RectangularBackground(_background).width = _width;
+			if (_background is IRectangularBackground) {
+				IRectangularBackground(_background).width = _width;
 			}
 		}
 		
 		override protected function applyHeight ( ):void {
-			if (_background is RectangularBackground) {
-				RectangularBackground(_background).height = _height;
+			if (_background is IRectangularBackground) {
+				IRectangularBackground(_background).height = _height;
 			}
 		}
 		
-		protected function setBackground ( background:Background ):void {
+		protected function setBackground ( background:IBackground ):void {
 			if (_background) {
 				_background.drawable = null;
 			}
@@ -69,13 +69,13 @@ package fritz3.display.core {
 			_background = background;
 			if (_background) {
 				_background.drawable = this;
-				if (_background is RectangularBackground) {
-					RectangularBackground(_background).width = _width;
-					RectangularBackground(_background).height = _height;
+				if (_background is IRectangularBackground) {
+					IRectangularBackground(_background).width = _width;
+					IRectangularBackground(_background).height = _height;
 				}
-				if (_background is Cyclable) {
-					Cyclable(_background).cyclePhase = _cyclePhase;
-					Cyclable(_background).cycle = _cycle;
+				if (_background is ICyclable) {
+					ICyclable(_background).cyclePhase = _cyclePhase;
+					ICyclable(_background).cycle = _cycle;
 				}
 			}
 		}
@@ -84,8 +84,8 @@ package fritz3.display.core {
 			_invalidationHelper.invalidateMethod(this.draw);
 		}
 		
-		public function get background ( ):Background { return _background; }
-		public function set background ( value:Background ):void {
+		public function get background ( ):IBackground { return _background; }
+		public function set background ( value:IBackground ):void {
 			if (_background != value) {
 				this.setBackground(value);
 			}

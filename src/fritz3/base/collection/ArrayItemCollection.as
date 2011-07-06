@@ -4,7 +4,7 @@ package fritz3.base.collection {
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public class ArrayItemCollection implements ItemCollection {
+	public class ArrayItemCollection implements IItemCollection {
 		
 		protected var _items:Array;
 		protected var _numItems:int;

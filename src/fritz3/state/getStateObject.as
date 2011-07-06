@@ -10,7 +10,7 @@ package fritz3.state  {
 	 * [Description]
 	*/
 	
-	public function getStateObject ( id:String ):State {
+	public function getStateObject ( id:String ):IState {
 		return StateManager.getStateObject(id);
 	}
 

@@ -1,5 +1,5 @@
 package fritz3.style.invalidation  {
-	import fritz3.style.Stylable;
+	import fritz3.style.IStylable;
 	/**
 
 	/**
@@ -13,7 +13,7 @@ package fritz3.style.invalidation  {
 	
 	public class StyleSheetCollectorNode {
 		
-		public var styleSheetCollector:InvalidatableStyleSheetCollector;
+		public var styleSheetCollector:IInvalidatableStyleSheetCollector;
 		public var prevNode:StyleSheetCollectorNode;
 		public var nextNode:StyleSheetCollectorNode;
 		public var remove:Boolean;

@@ -1,13 +1,13 @@
 package fritz3.utils.signals.fast {
 	import flash.utils.Dictionary;
-	import fritz3.utils.signals.SignalDispatcher;
+	import fritz3.utils.signals.ISignalDispatcher;
 	import org.osflash.signals.IDispatcher;
 	import org.osflash.signals.ISignal;
 	/**
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public class FastSignal implements SignalDispatcher {
+	public class FastSignal implements ISignalDispatcher {
 		
 		protected static var _listenerObjectPool:Array = [];
 		protected var _firstNode:FastSignalListenerData;

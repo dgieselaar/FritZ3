@@ -5,7 +5,7 @@ package fritz3.state {
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public interface ValueState extends State {
+	public interface IValueState extends IState {
 		
 		function get value ( ):*
 		function set value ( value:* ):void

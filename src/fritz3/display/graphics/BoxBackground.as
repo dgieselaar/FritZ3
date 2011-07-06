@@ -17,14 +17,14 @@
 	import flash.geom.Matrix;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
-	import fritz3.base.injection.Injectable;
-	import fritz3.base.parser.Parsable;
+	import fritz3.base.injection.IInjectable;
+	import fritz3.base.parser.IParsable;
 	import fritz3.base.parser.ParseHelper;
-	import fritz3.base.parser.PropertyParser;
-	import fritz3.base.transition.Transitionable;
+	import fritz3.base.parser.IPropertyParser;
+	import fritz3.base.transition.ITransitionable;
 	import fritz3.base.transition.TransitionData;
 	import fritz3.base.transition.TransitionType;
-	import fritz3.display.core.Cyclable;
+	import fritz3.display.core.ICyclable;
 	import fritz3.display.core.CyclePhase;
 	import fritz3.display.core.DisplayValue;
 	import fritz3.display.core.DisplayValueType;
@@ -44,7 +44,7 @@
 	import fritz3.display.parser.side.SideData;
 	import fritz3.display.parser.side.SideParser;
 	import fritz3.display.parser.size.SizeParser;
-	import fritz3.invalidation.Invalidatable;
+	import fritz3.invalidation.IInvalidatable;
 	import fritz3.style.PropertyData;
 	import fritz3.utils.assets.AssetLoader;
 	import fritz3.utils.assets.image.ImageAssetLoader;
@@ -60,9 +60,9 @@
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public class BoxBackground implements RectangularBackground, Parsable, Injectable, Transitionable, Cyclable {
+	public class BoxBackground implements IRectangularBackground, IParsable, IInjectable, ITransitionable, ICyclable {
 		
-		protected var _drawable:Drawable;
+		protected var _drawable:IDrawable;
 		protected var _parameters:Object;
 		
 		protected var _parseHelper:ParseHelper;
@@ -150,18 +150,18 @@
 			this.addParser("backgroundImageHeight", SizeParser.parser);
 		}
 		
-		protected function addParser ( propertyName:String, parser:PropertyParser ):void {
+		protected function addParser ( propertyName:String, parser:IPropertyParser ):void {
 			if (_parsers[propertyName]) {
-				this.removeParser(propertyName, PropertyParser(_parsers[propertyName]));
+				this.removeParser(propertyName, IPropertyParser(_parsers[propertyName]));
 			}
 			_parsers[propertyName] = parser;
 		}
 		
-		protected function removeParser ( propertyName:String, parser:PropertyParser ):void {
+		protected function removeParser ( propertyName:String, parser:IPropertyParser ):void {
 			delete _parsers[propertyName];
 		}
 		
-		protected function getParser ( propertyName:String ):PropertyParser {
+		protected function getParser ( propertyName:String ):IPropertyParser {
 			return _parsers[propertyName];
 		}
 		
@@ -1083,7 +1083,7 @@
 			}
 		}
 		
-		protected function setDrawable ( drawable:Drawable ):void {
+		protected function setDrawable ( drawable:IDrawable ):void {
 			_drawable = drawable;
 			if (_drawable) {
 				_drawable.invalidateGraphics();
@@ -1556,7 +1556,7 @@
 		}
 		
 		protected function parseBackgroundPosition ( value:String ):void {
-			var parser:PropertyParser = this.getParser("backgroundPosition");
+			var parser:IPropertyParser = this.getParser("backgroundPosition");
 			if (parser) {
 				var data:BackgroundPositionData = BackgroundPositionData(parser.parseValue(value));
 				this.cacheParsedProperty("backgroundImageHorizontalFloat", data.horizontalFloat);
@@ -1567,7 +1567,7 @@
 		}
 		
 		protected function parseBackgroundSize ( value:String ):void {
-			var parser:PropertyParser = this.getParser("backgroundSize");
+			var parser:IPropertyParser = this.getParser("backgroundSize");
 			if (parser) {
 				var data:BackgroundSizeData = BackgroundSizeData(parser.parseValue(value));
 				this.cacheParsedProperty("backgroundImageScaleMode", data.backgroundImageScaleMode);
@@ -1577,7 +1577,7 @@
 		}
 		
 		protected function parseBackgroundRepeat ( value:String ):void {
-			var parser:PropertyParser = this.getParser("backgroundRepeat");
+			var parser:IPropertyParser = this.getParser("backgroundRepeat");
 			if (parser) {
 				var data:BackgroundRepeatData = BackgroundRepeatData(parser.parseValue(value));
 				this.cacheParsedProperty("backgroundImageRepeatX", data.repeatX);
@@ -1586,7 +1586,7 @@
 		}
 		
 		protected function parseBackgroundGradient ( value:String ):void {
-			var parser:PropertyParser = this.getParser("backgroundGradient");
+			var parser:IPropertyParser = this.getParser("backgroundGradient");
 			if (parser) {
 				var data:GraphicsGradientData = GraphicsGradientData(parser.parseValue(value));
 				this.cacheParsedProperty("backgroundGradient", data ? data.clone() : null);
@@ -1594,7 +1594,7 @@
 		}
 		
 		protected function parseBorder ( propertyName:String, value:String ):void {
-			var parser:PropertyParser = this.getParser("border");
+			var parser:IPropertyParser = this.getParser("border");
 			if (parser) {
 				var data:BorderData = BorderData(parser.parseValue(value));
 				var border:Border;
@@ -1650,7 +1650,7 @@
 		}
 		
 		protected function parseBorderGradient ( propertyName:String, value:String ):void {
-			var parser:PropertyParser = this.getParser("borderGradient");
+			var parser:IPropertyParser = this.getParser("borderGradient");
 			if (parser) {
 				var data:GraphicsGradientData = GraphicsGradientData(parser.parseValue(value));
 				if (data) {
@@ -1668,7 +1668,7 @@
 		}
 		
 		protected function parseRoundedCorners ( value:String ):void {
-			var parser:PropertyParser = this.getParser("roundedCorners");
+			var parser:IPropertyParser = this.getParser("roundedCorners");
 			if (parser) {
 				var data:SideData = SideData(parser.parseValue(value));
 				if (data.all) {
@@ -1687,7 +1687,7 @@
 		}
 		
 		protected function parsePixelValue ( propertyName:String, value:String ):void {
-			var parser:PropertyParser = this.getParser(propertyName);
+			var parser:IPropertyParser = this.getParser(propertyName);
 			if (parser) {
 				var displayValue:DisplayValue = DisplayValue(parser.parseValue(value));
 				this.cacheParsedProperty(propertyName, displayValue.value);
@@ -2134,8 +2134,8 @@
 			}
 		}
 		
-		public function get drawable ( ):Drawable { return _drawable; }
-		public function set drawable ( value:Drawable ):void {
+		public function get drawable ( ):IDrawable { return _drawable; }
+		public function set drawable ( value:IDrawable ):void {
 			if (_drawable != value) {
 				this.setDrawable(value);
 			}

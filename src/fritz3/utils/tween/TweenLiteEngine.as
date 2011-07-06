@@ -5,7 +5,7 @@ package fritz3.utils.tween {
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public class TweenLiteEngine implements TweenEngine {
+	public class TweenLiteEngine implements ITweenEngine {
 		
 		public function TweenLiteEngine() {
 			

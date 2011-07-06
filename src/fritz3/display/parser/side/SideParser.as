@@ -1,12 +1,12 @@
 package fritz3.display.parser.side {
-	import fritz3.base.parser.PropertyParser;
+	import fritz3.base.parser.IPropertyParser;
 	import fritz3.display.core.DisplayValue;
 	import fritz3.display.parser.size.SizeParser;
 	/**
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public class SideParser implements PropertyParser {
+	public class SideParser implements IPropertyParser {
 		
 		protected static var _parser:SideParser;
 		protected static var _cachedData:Object;

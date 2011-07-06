@@ -14,7 +14,7 @@
 	 * @package casper.system.state
 	 */
 	
-	public class StateCollection implements State {
+	public class StateCollection implements IState {
 		
 		protected var _id:String;
 		protected var _states:Object;
@@ -27,16 +27,16 @@
 			_states = { };
 		}
 		
-		public function addState ( state:State ):State {
+		public function addState ( state:IState ):IState {
 			return _states[state.id] ||= state;
 		}
 		
-		public function removeState ( state:State ):void {
+		public function removeState ( state:IState ):void {
 			delete _states[state.id];
 		}
 		
-		public function getStateObject ( id:String ):State {
-			return _states[id] as State;
+		public function getStateObject ( id:String ):IState {
+			return _states[id] as IState;
 		}
 		
 		public function getState ( id:String ):* {

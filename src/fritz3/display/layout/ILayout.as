@@ -5,11 +5,11 @@
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public interface Layout {
+	public interface ILayout {
 		
 		function rearrange ( container:DisplayObjectContainer, items:Array ):void
 		
-		function set rearrangable ( value:Rearrangable ):void
+		function set rearrangable ( value:IRearrangable ):void
 		
 	}
 	

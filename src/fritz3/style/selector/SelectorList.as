@@ -1,6 +1,6 @@
 package fritz3.style.selector {
-	import fritz3.base.collection.ItemCollection;
-	import fritz3.display.core.Addable;
+	import fritz3.base.collection.IItemCollection;
+	import fritz3.display.core.IAddable;
 	/**
 	 * ...
 	 * @author Dario Gieselaar
@@ -79,15 +79,15 @@ package fritz3.style.selector {
 			var objectToMatch:Object = object;
 			
 			if (node.prevNode) {
-				if (!(objectToMatch is Addable)) {
+				if (!(objectToMatch is IAddable)) {
 					return false;
 				}
 			} else {
 				return node.match(objectToMatch);
 			}
 			
-			var addable:Addable = Addable(objectToMatch), currentAddable:Addable = addable;
-			var collection:ItemCollection, objectCache:ObjectCache = ObjectCache.getCache(objectToMatch);
+			var addable:IAddable = IAddable(objectToMatch), currentAddable:IAddable = addable;
+			var collection:IItemCollection, objectCache:ObjectCache = ObjectCache.getCache(objectToMatch);
 			
 			var relationship:String, match:Boolean;
 			while (node) {

@@ -1,6 +1,6 @@
 package fritz3.utils.object {
-	import fritz3.base.collection.ItemCollection;
-	import fritz3.base.injection.Injectable;
+	import fritz3.base.collection.IItemCollection;
+	import fritz3.base.injection.IInjectable;
 	/**
 	 * ...
 	 * @author Dario Gieselaar
@@ -19,8 +19,8 @@ package fritz3.utils.object {
 			for (i = 0, l = attributes.length(); i < l; ++i) {
 				child = attributes[i];
 				value = getSimpleValue(child.toString());
-				if (parent is Injectable) {
-					Injectable(parent).setProperty(child.name().toString(), value);
+				if (parent is IInjectable) {
+					IInjectable(parent).setProperty(child.name().toString(), value);
 				} else {
 					parent[child.name().toString()] = value;
 				}
@@ -30,8 +30,8 @@ package fritz3.utils.object {
 				child = children[i];
 				if (parent.hasOwnProperty(child.name().toString())) {
 					value = getSimpleValue(child.toString());
-					if (parent is Injectable) {
-						Injectable(parent).setProperty(child.name().toString(), value);
+					if (parent is IInjectable) {
+						IInjectable(parent).setProperty(child.name().toString(), value);
 					} else {
 						parent[child.name().toString()] = value;
 					}
@@ -41,7 +41,7 @@ package fritz3.utils.object {
 				}
 			}
 			
-			if (!(parent is ItemCollection || parent is Array)) {
+			if (!(parent is IItemCollection || parent is Array)) {
 				return parent;
 			}
 			
@@ -96,8 +96,8 @@ package fritz3.utils.object {
 				children.push(childObject);
 			}
 			
-			if (parent is ItemCollection) {
-				var itemCollection:ItemCollection = ItemCollection(parent);
+			if (parent is IItemCollection) {
+				var itemCollection:IItemCollection = IItemCollection(parent);
 				for (i = 0, l = children.length; i < l; ++i) {
 					itemCollection.add(children[i]);
 				}

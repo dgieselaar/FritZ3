@@ -1,7 +1,7 @@
 package fritz3.style.invalidation  {
 	import flash.utils.Dictionary;
-	import fritz3.style.Stylable;
-	import fritz3.style.StyleSheetCollector;
+	import fritz3.style.IStylable;
+	import fritz3.style.IStyleSheetCollector;
 	import org.osflash.signals.IDispatcher;
 	/**
 
@@ -30,7 +30,7 @@ package fritz3.style.invalidation  {
 			_nodesByCollector = new Dictionary();
 		}
 		
-		public function add ( collector:InvalidatableStyleSheetCollector ):void {
+		public function add ( collector:IInvalidatableStyleSheetCollector ):void {
 			var node:StyleSheetCollectorNode = getNodeObject();
 			if (!_firstNode) {
 				_firstNode = node;
@@ -47,7 +47,7 @@ package fritz3.style.invalidation  {
 			_nodesByCollector[collector] = node;
 		}
 		
-		public function remove ( collector:InvalidatableStyleSheetCollector ):void {
+		public function remove ( collector:IInvalidatableStyleSheetCollector ):void {
 			if (_dispatching) {
 				StyleSheetCollectorNode(_nodesByCollector[collector]).remove = true;
 				return;

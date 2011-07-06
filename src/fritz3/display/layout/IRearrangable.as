@@ -4,7 +4,7 @@ package fritz3.display.layout {
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public interface Rearrangable {
+	public interface IRearrangable {
 		
 		function invalidateLayout ( ):void
 		

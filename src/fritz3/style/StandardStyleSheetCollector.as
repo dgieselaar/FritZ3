@@ -1,12 +1,12 @@
 package fritz3.style {
 	import flash.utils.Dictionary;
-	import fritz3.base.parser.Parsable;
-	import fritz3.base.transition.Transitionable;
+	import fritz3.base.parser.IParsable;
+	import fritz3.base.transition.ITransitionable;
 	import fritz3.base.transition.TransitionData;
 	import fritz3.invalidation.InvalidationHelper;
-	import fritz3.style.invalidation.InvalidatableStyleSheetCollector;
+	import fritz3.style.invalidation.IInvalidatableStyleSheetCollector;
 	import fritz3.style.selector.ObjectCache;
-	import fritz3.style.Stylable;
+	import fritz3.style.IStylable;
 	import fritz3.utils.log.log;
 	import fritz3.utils.log.LogLevel;
 	import fritz3.utils.object.ObjectParser;
@@ -14,14 +14,14 @@ package fritz3.style {
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public class StandardStyleSheetCollector implements InvalidatableStyleSheetCollector {
+	public class StandardStyleSheetCollector implements IInvalidatableStyleSheetCollector {
 		
 		protected static var _propertyDataObjectPool:Array = [];
 		protected static var _transitionDataObjectPool:Array = [];
 		
 		protected var _disabled:Boolean = false;
 		
-		protected var _stylable:Stylable;
+		protected var _stylable:IStylable;
 		protected var _styleSheetIDs:Array;
 		protected var _hasOnChangeListener:Boolean;
 		
@@ -51,7 +51,7 @@ package fritz3.style {
 			this.setOnChangeListener();
 		}
 		
-		protected function setStylable ( stylable:Stylable ):void {
+		protected function setStylable ( stylable:IStylable ):void {
 			_stylable = stylable;
 			this.setOnChangeListener();
 			this.invalidate();
@@ -96,7 +96,7 @@ package fritz3.style {
 			
 			var numRules:int = 0;
 			var ids:Array = _styleSheetIDs, id:String;
-			var stylable:Stylable = _stylable;
+			var stylable:IStylable = _stylable;
 			if (!ids) {
 				node = StyleManager.getFirstRule(StyleManager.DEFAULT_STYLESHEET_ID);
 				while (node) {
@@ -174,8 +174,8 @@ package fritz3.style {
 		
 		protected function applyStyle ( ):void {
 			var node:PropertyData = _firstNode;
-			var object:Object, target:Object, parsable:Parsable, transitionable:Transitionable;
-			var stylable:Stylable = _stylable;
+			var object:Object, target:Object, parsable:IParsable, transitionable:ITransitionable;
+			var stylable:IStylable = _stylable;
 			var value:*;
 			var isParsable:Object = { }, toParse:Array = [], nextNode:PropertyData;;
 			while (node) {
@@ -190,12 +190,12 @@ package fritz3.style {
 				value = node.value;
 				try {
 					if (node is TransitionData) {
-						if (target is Transitionable) {
-							Transitionable(target).setTransition(node.propertyName, TransitionData(node.clone(getPropertyDataObject(node))));
+						if (target is ITransitionable) {
+							ITransitionable(target).setTransition(node.propertyName, TransitionData(node.clone(getPropertyDataObject(node))));
 						}
 					} else if (value != undefined) {
-						if (target is Parsable) {
-							Parsable(target).parseProperty(node.propertyName, value);
+						if (target is IParsable) {
+							IParsable(target).parseProperty(node.propertyName, value);
 							if (!isParsable[target]) {
 								isParsable[target] = true;
 								toParse[toParse.length] = target;
@@ -211,7 +211,7 @@ package fritz3.style {
 			}
 			
 			for each(target in toParse) {
-				Parsable(target).applyParsedProperties();
+				IParsable(target).applyParsedProperties();
 			}
 		}
 		
@@ -294,8 +294,8 @@ package fritz3.style {
 			}
 		}
 		
-		public function get stylable ( ):Stylable { return _stylable; }
-		public function set stylable ( value:Stylable ):void {
+		public function get stylable ( ):IStylable { return _stylable; }
+		public function set stylable ( value:IStylable ):void {
 			if (_stylable != value) {
 				this.setStylable(value);
 			}

@@ -27,15 +27,15 @@ package fritz3.state {
 			_collection.setState(stateID, value);
 		}
 		
-		public static function addState ( state:State ):State {
+		public static function addState ( state:IState ):IState {
 			return _collection.addState(state);
 		}
 		
-		public static function removeState ( state:State ):void {
+		public static function removeState ( state:IState ):void {
 			_collection.removeState(state);
 		}
 		
-		public static function getStateObject ( stateID:String ):State {
+		public static function getStateObject ( stateID:String ):IState {
 			return _collection.getStateObject(stateID);
 		}
 		

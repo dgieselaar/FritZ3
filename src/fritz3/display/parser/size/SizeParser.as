@@ -1,12 +1,12 @@
 package fritz3.display.parser.size {
-	import fritz3.base.parser.PropertyParser;
+	import fritz3.base.parser.IPropertyParser;
 	import fritz3.display.core.DisplayValue;
 	import fritz3.display.core.DisplayValueType;
 	/**
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public class SizeParser implements PropertyParser {
+	public class SizeParser implements IPropertyParser {
 		
 		protected static var _parser:SizeParser;
 		protected static var _cachedData:Object;

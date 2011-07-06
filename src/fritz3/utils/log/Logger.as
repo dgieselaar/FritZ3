@@ -5,10 +5,10 @@ package fritz3.utils.log {
 	 */
 	public class Logger {
 		
-		protected static var _instance:LogEngine;
+		protected static var _instance:ILogEngine;
 		
-		public static function get engine ( ):LogEngine { return _instance; }
-		public static function set engine ( value:LogEngine ):void {
+		public static function get engine ( ):ILogEngine { return _instance; }
+		public static function set engine ( value:ILogEngine ):void {
 			_instance = value;
 		}
 		

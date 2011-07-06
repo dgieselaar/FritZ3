@@ -5,7 +5,7 @@ package fritz3.display.layout {
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public interface Positionable {
+	public interface IPositionable {
 		
 		function get x ( ):Number
 		function set x ( value:Number ):void

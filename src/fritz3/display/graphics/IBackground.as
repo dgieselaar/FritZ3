@@ -14,7 +14,7 @@
 	 * 
 	 */
 	
-	public interface Background {
+	public interface IBackground {
 		
 		/**
 		 * This method signals the component to redraw.
@@ -24,7 +24,7 @@
 		
 		function draw ( displayObject:DisplayObject ):void
 		
-		function set drawable ( value:Drawable ):void
+		function set drawable ( value:IDrawable ):void
 		
 	}
 	

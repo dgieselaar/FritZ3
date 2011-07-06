@@ -3,18 +3,18 @@ package fritz3.display.text.layout {
 	import flash.display.DisplayObjectContainer;
 	import flash.text.TextField;
 	import fritz3.display.layout.Align;
-	import fritz3.display.layout.Layout;
-	import fritz3.display.layout.PaddableLayout;
-	import fritz3.display.layout.Rearrangable;
-	import fritz3.display.layout.RectangularLayout;
+	import fritz3.display.layout.ILayout;
+	import fritz3.display.layout.IPaddableLayout;
+	import fritz3.display.layout.IRearrangable;
+	import fritz3.display.layout.IRectangularLayout;
 	/**
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public class TextLayout implements PaddableLayout {
+	public class TextLayout implements IPaddableLayout {
 		
 		protected var _parameters:Object;
-		protected var _rearrangable:Rearrangable;
+		protected var _rearrangable:IRearrangable;
 		
 		protected var _width:Number = 0;
 		protected var _height:Number = 0;
@@ -38,7 +38,7 @@ package fritz3.display.text.layout {
 			}
 		}
 		
-		protected function setRearrangable ( value:Rearrangable ):void {
+		protected function setRearrangable ( value:IRearrangable ):void {
 			_rearrangable = value;
 			if (_rearrangable) {
 				_rearrangable.invalidateLayout();
@@ -90,7 +90,7 @@ package fritz3.display.text.layout {
 			textField.x = x, textField.y = y;
 		}
 		
-		public function set rearrangable ( value:Rearrangable ):void {
+		public function set rearrangable ( value:IRearrangable ):void {
 			if (_rearrangable != value) {
 				this.setRearrangable(value);			
 			}

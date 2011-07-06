@@ -1,10 +1,10 @@
 package fritz3.display.core  {
-	import fritz3.base.parser.PropertyParser;
+	import fritz3.base.parser.IPropertyParser;
 	import fritz3.base.transition.TransitionData;
-	import fritz3.display.layout.flexiblebox.Collapsable;
-	import fritz3.display.layout.flexiblebox.FlexibleBoxElement;
-	import fritz3.display.layout.InvalidatablePositionable;
-	import fritz3.display.layout.Positionable;
+	import fritz3.display.layout.flexiblebox.ICollapsable;
+	import fritz3.display.layout.flexiblebox.IFlexibleBoxElement;
+	import fritz3.display.layout.IInvalidatablePositionable;
+	import fritz3.display.layout.IPositionable;
 	import fritz3.display.parser.side.SideData;
 	import fritz3.display.parser.side.SideParser;
 	import fritz3.display.parser.size.SizeParser;
@@ -22,7 +22,7 @@ package fritz3.display.core  {
 	 * [Description]
 	*/
 	
-	public class PositionableDisplayComponent extends StylableDisplayComponent implements InvalidatablePositionable, Collapsable, FlexibleBoxElement {
+	public class PositionableDisplayComponent extends StylableDisplayComponent implements IInvalidatablePositionable, ICollapsable, IFlexibleBoxElement {
 		
 		protected var _width:Number = 0;
 		protected var _height:Number = 0;
@@ -141,7 +141,7 @@ package fritz3.display.core  {
 		}
 		
 		protected function parseSize ( propertyName:String, value:String ):void {
-			var parser:PropertyParser = this.getParser(propertyName);
+			var parser:IPropertyParser = this.getParser(propertyName);
 			if (parser) {
 				var displayValue:DisplayValue = DisplayValue(parser.parseValue(value)).clone();
 				if (displayValue.valueType == DisplayValueType.AUTO) {
@@ -156,7 +156,7 @@ package fritz3.display.core  {
 		}
 		
 		protected function parseMargin ( value:* ):void {
-			var parser:PropertyParser = this.getParser("margin");
+			var parser:IPropertyParser = this.getParser("margin");
 			if (parser) {
 				var sideData:SideData = SideData(parser.parseValue(value));
 				if (sideData.all) {

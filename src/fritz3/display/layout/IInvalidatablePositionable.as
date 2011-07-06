@@ -11,7 +11,7 @@ package fritz3.display.layout  {
 	 * [Description]
 	*/
 	
-	public interface InvalidatablePositionable extends Positionable {
+	public interface IInvalidatablePositionable extends IPositionable {
 		
 		function invalidateDisplay ( ):void
 		

@@ -1,5 +1,5 @@
 package fritz3.display.layout.flexiblebox  {
-	import fritz3.display.layout.Positionable;
+	import fritz3.display.layout.IPositionable;
 	/**
 
 	/**
@@ -11,7 +11,7 @@ package fritz3.display.layout.flexiblebox  {
 	 * [Description]
 	*/
 	
-	public interface FlexibleBoxElement extends Positionable {
+	public interface IFlexibleBoxElement extends IPositionable {
 		
 		function get boxOrdinalGroup ( ):int
 		function get boxFlex ( ):Number

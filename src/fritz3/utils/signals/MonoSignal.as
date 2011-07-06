@@ -5,7 +5,7 @@ package fritz3.utils.signals {
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public class MonoSignal implements SignalDispatcher {
+	public class MonoSignal implements ISignalDispatcher {
 		
 		public var listener:Function;
 		

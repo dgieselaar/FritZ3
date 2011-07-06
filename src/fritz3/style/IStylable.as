@@ -3,7 +3,7 @@
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public interface Stylable {
+	public interface IStylable {
 		
 		function invalidateStyle ( ):void
 		

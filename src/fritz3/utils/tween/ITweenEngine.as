@@ -4,7 +4,7 @@ package fritz3.utils.tween {
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public interface TweenEngine {
+	public interface ITweenEngine {
 		
 		function tween ( target:Object, propertyName:String, transitionData:TransitionData ):void
 		function hasTween ( target:Object, propertyName:String ):Boolean

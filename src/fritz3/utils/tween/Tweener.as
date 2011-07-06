@@ -5,13 +5,13 @@ package fritz3.utils.tween {
 	 */
 	public class Tweener {
 		
-		protected static var _engine:TweenEngine;
+		protected static var _engine:ITweenEngine;
 		
-		public static function get engine ( ):TweenEngine {
+		public static function get engine ( ):ITweenEngine {
 			return _engine;
 		}
 		
-		public static function set engine ( value:TweenEngine ):void {
+		public static function set engine ( value:ITweenEngine ):void {
 			_engine = value;
 		}
 		

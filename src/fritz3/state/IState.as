@@ -11,7 +11,7 @@
 	 * @package casper.system.state
 	 */
 	
-	public interface State {
+	public interface IState {
 		
 		function get id ( ):String
 		

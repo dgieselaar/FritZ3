@@ -10,7 +10,7 @@ package fritz3.state  {
 	 * [Description]
 	*/
 	
-	public function addState ( state:State ):State {
+	public function addState ( state:IState ):IState {
 		return StateManager.addState(state);
 	}
 

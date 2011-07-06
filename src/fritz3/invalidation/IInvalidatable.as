@@ -4,7 +4,7 @@
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public interface Invalidatable {
+	public interface IInvalidatable {
 		
 		function executeInvalidatedMethods ( ):void
 		

@@ -3,7 +3,7 @@ package fritz3.display.core {
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public interface InvalidatableDisplayChild {
+	public interface IInvalidatableDisplayChild {
 		
 		function invalidateChildState ( ):void
 		

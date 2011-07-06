@@ -5,7 +5,7 @@ package fritz3.base.collection {
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public class DisplayContainerCollection implements ItemCollection {
+	public class DisplayContainerCollection implements IItemCollection {
 		
 		private var _container:DisplayObjectContainer;
 		

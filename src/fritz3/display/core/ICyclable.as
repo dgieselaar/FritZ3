@@ -4,7 +4,7 @@ package fritz3.display.core {
 	 * ...
 	 * @author Dario Gieselaar
 	 */
-	public interface Cyclable {
+	public interface ICyclable {
 		
 		function get cyclePhase ( ):String
 		function set cyclePhase ( value:String ):void 
