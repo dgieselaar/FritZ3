@@ -14,6 +14,11 @@ package fritz3.display.core {
 			this.value = value, this.valueType = valueType;
 		}
 		
+		final public function reset ( ):void {
+			this.value = NaN;
+			this.valueType = DisplayValueType.PIXEL;
+		}
+		
 		final public function setValue ( value:Number ):void {
 			if (this.value != value && !(value != value && this.value != this.value)) {
 				this.value = value;
@@ -50,6 +55,29 @@ package fritz3.display.core {
 			return new DisplayValue(this.value, this.valueType);
 		}
 		
+		final public function invalidateWith ( source:DisplayValue ):Boolean {
+			if (source == this) {
+				return false;
+			}
+			var isDifferent:Boolean;
+			var value:Number = source.value;
+			if (this.value != value && !(!(value == value) && !(this.value == this.value))) {
+				this.value = source.value;
+				isDifferent = true;
+			}
+			if (this.valueType != source.valueType) {
+				this.valueType = source.valueType;
+				isDifferent = true;
+			}
+			return isDifferent;
+		}
+		
+		CONFIG::debug
+		public function toString ( ):String {
+			return "{ " + this.value + "" + this.valueType + " }";
+		}
+		
+		CONFIG::debug
 		final public function assertEquals ( to:DisplayValue ):Boolean {
 			if (this == to) {
 				return true;
@@ -62,10 +90,6 @@ package fritz3.display.core {
 				return false;
 			}
 			return true;
-		}
-		
-		public function toString ( ):String {
-			return "{ " + this.value + ", " + this.valueType + " }";
 		}
 		
 	}
