@@ -16,16 +16,20 @@ package test {
 			}
 		}
 		
-		protected function init ( e:Event= null ):void {		
-			setTimeout(this.startTest, 2500);
+		protected var _timeout:int
+		protected function init ( e:Event = null ):void {
+			_timeout = this.getTimeout();
+			_maxIterations = this.getMaxIterations();
+			setTimeout(this.startTest, _timeout);
 		}
 			
 		protected var _iteration:int;
-		protected var _maxIterations:int = 5;
+		protected var _maxIterations:int
 		
 		protected function startTest ( ):void {
 			function onTimeOut ( ):void {
 				runDesignatedTest();
+				_iteration++;
 				if (_iteration < _maxIterations) {
 					setTimeout(onTimeOut, 2500); 
 				}
@@ -36,6 +40,14 @@ package test {
 		
 		protected function runDesignatedTest ( ):void {
 			
+		}
+		
+		protected function getTimeout ( ):int {
+			return 1000;
+		}
+		
+		protected function getMaxIterations ( ):int {
+			return 5;
 		}
 		
 	}
