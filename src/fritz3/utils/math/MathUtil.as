@@ -56,6 +56,27 @@ package fritz3.utils.math {
 			return p0 + t * (p1 - p0);
 		}
 		
+		public static function fromHexToDec ( hex:String ):Number {
+			var t:Number = 0, i:int, l:int;
+			for (i = 0, l = hex.length; i < l; ++i) {
+				t += (parseInt("0x" + hex.charAt(i)) / Math.pow(16, i + 1));
+			}
+			return t;
+		}
+		
+		public static function correctRoundingErrors ( number:Number, precision:int = 8 ):Number {
+			var c:Number = Math.pow(10, precision);
+			return Math.round(number * c) / c;
+		}
+		
+		public static function wrapAngle ( angle:Number ):Number {
+			angle %= 360;
+			if (angle < 0) {
+				angle += 360;
+			}
+			return angle;
+		}
+		
 	}
 
 }
