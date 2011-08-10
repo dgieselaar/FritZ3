@@ -26,8 +26,15 @@ package fritz3.utils.object {
 		}
 		
 		public static function releaseObject ( object:Object ):void {
+			if (object is IReleasable) {
+				
+			}
 			var pool:Array = _pool[object.constructor];
 			pool.push(object);
+		}
+		
+		public static function flush ( ):void {
+			_pool = new Dictionary();
 		}
 		
 		
