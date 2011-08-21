@@ -61,9 +61,9 @@ package test {
 				{ id: "rgba(0, 0, 0, -7439.79)", value: "rgba(0, 0, 0, -7439.79)", expectedResult: { alpha: 0, color: 0x000000 } },
 				{ id: "rgba(0, 0, 0, 30)", value: "rgba(0, 0, 0, 30)", expectedResult: { alpha: 1, color: 0x000000 } },
 				{ id: "rgba(-30, 500, -1, 0.6)", value: "rgba(-30, 500, -1, 0.6)", expectedResult: { alpha: 0.6, color: ColorUtil.getUintFromRGB(0, 255, 0) } },
-				{ id: "rgba(-10%, 200%, -1%, 0.4)", value: "rgba(-10%, 200%, -1%, 0.4)", expectedResult: { alpha: 0.4, color: ColorUtil.getUintFromRGB(0, 255, 0) } },
+				{ id: "rgba(-10%, 200%, -1%, 0.4)", value: "rgba(-10%, 200%, -1%, .4)", expectedResult: { alpha: 0.4, color: ColorUtil.getUintFromRGB(0, 255, 0) } },
 				// TODO: add more hsla tests
-				{ id: "hsla(120, 100%, 25%,.4)", value: "hsla(120, 100%, 25%,.4)", expectedResult: { alpha: 0.04, color: 0x007F00 } },
+				{ id: "hsla(120, 100%, 25%,.4)", value: "hsla(120, 100%, 25%,.4)", expectedResult: { alpha: 0.4, color: 0x007F00 } },
 				{ id: "hsla(240, 100%, -100%, 0.09)", value: "hsla(240, 100%, -100%, 0.09)", expectedResult: { alpha: 0.09, color: 0x000000 } },
 				{ id: "hsla(240, 75%, 120%, 747473)", value: "hsla(240, 75%, 120%, 747473)", expectedResult: { alpha: 1, color: 0xFFFFFF } },
 				{ id: "hsla(264, 130%, 50%, -9393.1)", value: "hsla(264, 130%, 50%, -9393.1)", expectedResult: { alpha: 0, color: 0x6600FF } },
