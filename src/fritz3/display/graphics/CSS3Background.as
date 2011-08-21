@@ -23,7 +23,7 @@ package fritz3.display.graphics {
 	 * ...31
 	 * @author Dario Gieselaar
 	 */
-	public class CSS3Background implements IParsable, IInjectable, ITransitionable, ICyclable, IReleasable {
+	public class CSS3Background implements IRectangularBackground, IParsable, IInjectable, ITransitionable, ICyclable, IReleasable {
 		
 		protected var _drawable:IDrawable;
 		
@@ -35,15 +35,25 @@ package fritz3.display.graphics {
 		protected var _width:Number = 0;
 		protected var _height:Number = 0;
 		
-		protected var _transparent:Boolean;
-		protected var _backgroundAlpha:Number = 1;
-		protected var _backgroundColor:uint;
+		protected var _backgroundColor:ColorValue = new ColorValue();
 		
 		protected var _borderRadius:BorderRadiusValue = new BorderRadiusValue();
 		protected var _borderTopLeftRadius:BorderRadiusValue = new BorderRadiusValue();
 		protected var _borderTopRightRadius:BorderRadiusValue = new BorderRadiusValue();
 		protected var _borderBottomRightRadius:BorderRadiusValue = new BorderRadiusValue();
 		protected var _borderBottomLeftRadius:BorderRadiusValue = new BorderRadiusValue();
+		
+		protected var _borderWidth:DisplayValue = new DisplayValue();
+		protected var _borderTopWidth:DisplayValue = new DisplayValue();
+		protected var _borderLeftWidth:DisplayValue = new DisplayValue();
+		protected var _borderBottomWidth:DisplayValue = new DisplayValue();
+		protected var _borderRightWidth:DisplayValue = new DisplayValue();
+		
+		protected var _borderColor:ColorValue = new ColorValue();
+		protected var _borderTopColor:ColorValue = new ColorValue();
+		protected var _borderLeftColor:ColorValue = new ColorValue();
+		protected var _borderBottomColor:ColorValue = new ColorValue();
+		protected var _borderRightColor:ColorValue = new ColorValue();
 		
 		public function CSS3Background ( parameters:Object = null ) {
 			_parameters = parameters || { };
@@ -81,12 +91,13 @@ package fritz3.display.graphics {
 		}
 		
 		protected function setDefaultValues ( ):void {
-			this.backgroundColor = 0x000000;
-			this.backgroundAlpha = 1;
-			this.transparent = true;
+			this.backgroundColor = new ColorValue(0x000000, 1, true);
 			this.width = 0;
 			this.height = 0;
+			this.backgroundWidth = new DisplayValue(100, DisplayValueType.PERCENTAGE);
+			this.backgroundHeight = new DisplayValue(100, DisplayValueType.PERCENTAGE);
 			this.borderRadius = new BorderRadiusValue();
+			this.borderWidth = BorderWidth.MEDIUM.clone();
 		}
 		
 		protected function applyParameters ( ):void {
@@ -163,16 +174,8 @@ package fritz3.display.graphics {
 		}
 		
 		protected function parseBackgroundColor ( value:String ):void {
-			var colorData:ColorData = (this.getParser("backgroundColor") as IPropertyParser).parseValue(value) as ColorData);
-			if (!colorData) {
-				this.cacheProperty("transparent", true);
-				this.cacheProperty("backgroundAlpha", 1);
-				this.cacheProperty("backgroundColor", 0x000000);
-			} else {
-				this.cacheProperty("transparent", false);
-				this.cacheProperty("backgroundAlpha", colorData.alpha);
-				this.cacheProperty("backgroundColor", colorData.color);
-			}
+			var colorData:ColorValue = (this.getParser("backgroundColor") as IPropertyParser).parseValue(value) as ColorValue);
+			this.cacheProperty("backgroundColor", colorData.clone());
 		}
 		
 		protected function parseBorderRadius ( propertyName:String, value:String ):void {
@@ -325,6 +328,49 @@ package fritz3.display.graphics {
 			if (_borderBottomLeftRadius.invalidateWith(value)) {
 				_borderRadius.horizontalRadius.setValue(NaN, null);
 				_borderRadius.verticalRadius.setValue(NaN, null);
+				this.invalidateGraphics();
+			}
+		}
+		
+		public function get borderWidth ( ):DisplayValue { return _borderWidth; }
+		public function set borderWidth ( value:DisplayValue ):void {
+			if (_borderWidth.invalidateWith(value)) {
+				_borderTopWidth.invalidateWith(value);
+				_borderLeftWidth.invalidateWith(value);
+				_borderBottomWidth.invalidateWith(value);
+				_borderRightWidth.invalidateWith(value);
+				this.invalidateGraphics();
+			}
+		}
+		
+		public function get borderTopWidth ( ):DisplayValue { return _borderTopWidth; }
+		public function set borderTopWidth ( value:DisplayValue ):void {
+			if (_borderTopWidth.invalidateWith(value)) {
+				_borderWidth.setAll(NaN, null);
+				this.invalidateGraphics();
+			}
+		}
+		
+		public function get borderLeftWidth ( ):DisplayValue { return _borderLeftWidth; }
+		public function set borderLeftWidth ( value:DisplayValue ):void {
+			if (_borderLeftWidth.invalidateWith(value)) {
+				_borderWidth.setAll(NaN, null);
+				this.invalidateGraphics();
+			}
+		}
+		
+		public function get borderBottomWidth ( ):DisplayValue { return _borderBottomWidth; }
+		public function set borderBottomWidth ( value:DisplayValue ):void {
+			if (_borderBottomWidth.invalidateWidth(value)) {
+				_borderWidth.setAll(NaN, null);
+				this.invalidateGraphics();
+			}
+		}
+		
+		public function get borderRightWidth ( ):DisplayValue { return _borderRightWidth; }
+		public function set borderRightWidth ( value:DisplayValue ):void {
+			if (_borderRightWidth.invalidateWith(value)) {
+				_borderWidth.setAll(NaN, null);
 				this.invalidateGraphics();
 			}
 		}
