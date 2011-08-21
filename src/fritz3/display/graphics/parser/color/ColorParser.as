@@ -1,5 +1,6 @@
 package fritz3.display.graphics.parser.color {
 	import fritz3.base.parser.IPropertyParser;
+	import fritz3.display.graphics.ColorValue;
 	import fritz3.utils.color.ColorUtil;
 	import fritz3.utils.math.MathUtil;
 	/**
@@ -20,9 +21,9 @@ package fritz3.display.graphics.parser.color {
 		protected static const KEYWORD_REGEXP:RegExp = /^(aqua|teal|blue|navy|yellow|olive|lime|green|fuchsia|purple|red|maroon|white|gray|silver|black)$/i;
 		protected static const HEX_REGEXP:RegExp = /^(?:#(?:(?:([a-f0-9]{6})([a-f0-9]{2})?)|([a-f0-9]{3})))$/i;
 		protected static const RGB_REGEXP:RegExp = /^rgb\(\s*(-?\d{1,3})(%)?\s*,\s*(-?\d{1,3})(%)?\s*,\s*(-?\d{1,3})(%)?\s*\)$/i;	
-		protected static const RGBA_REGEXP:RegExp = /^rgba\(\s*(-?\d{1,3})(%)?\s*,\s*(-?\d{1,3})(%)?\s*,\s*(-?\d{1,3})(%)?\s*,\s*((-?\d+?(?:\.\d+)?)|(\d{1,3})(%))\)$/i;
+		protected static const RGBA_REGEXP:RegExp = /^rgba\(\s*(-?\d{1,3})(%)?\s*,\s*(-?\d{1,3})(%)?\s*,\s*(-?\d{1,3})(%)?\s*,\s*((-?\d*(?:\.\d+)?)|(\d{1,3})(%))\)$/i;
 		protected static const HSL_REGEXP:RegExp = /^hsl\s*\((-?\d+)\s*,\s*(-?\d{1,3})(?:%)\s*,\s*(-?\d{1,3})(?:%)\s*\)$/i;
-		protected static const HSLA_REGEXP:RegExp = /^hsla\s*\((-?\d+)\s*,\s*(-?\d{1,3})(?:%)\s*,\s*(-?\d{1,3})(?:%)\s*,\s*((-?\d+?(?:\.\d+)?)|(\d{1,3})(%))\)$/i;
+		protected static const HSLA_REGEXP:RegExp = /^hsla\s*\((-?\d+)\s*,\s*(-?\d{1,3})(?:%)\s*,\s*(-?\d{1,3})(?:%)\s*,\s*((-?\d*(?:\.\d+)?)|(\d{1,3})(%))\)$/i;
 		
 		public static var parser:ColorParser = new ColorParser();
 		protected static var regExp:RegExp;
@@ -37,16 +38,17 @@ package fritz3.display.graphics.parser.color {
 			return _cachedData[value] ||= this.getColorData(value);
 		}
 		
-		protected function getColorData ( value:String ):ColorData {
-			var colorData:ColorData;
+		protected function getColorData ( value:String ):ColorValue {
+			var colorData:ColorValue = new ColorValue();
+			colorData.transparent = true;
 			var match:Array;
 			var val:String, r:int, g:int, b:int;
 			if ((match = value.match(KEYWORD_REGEXP))) {
-				colorData = new ColorData();
+				colorData.transparent = false;
 				colorData.alpha = 1;
 				colorData.color = COLOR_KEYWORDS[match[1].toLowerCase()];
 			} else if ((match = value.match(HEX_REGEXP))) {
-				colorData = new ColorData();
+				colorData.transparent = false;
 				if (match[1] != undefined) {
 					colorData.color = uint("0x" + match[1]);
 					if (match[2] != undefined) {
@@ -62,8 +64,8 @@ package fritz3.display.graphics.parser.color {
 					colorData.color = ColorUtil.getUintFromRGB(r, g, b);
 					colorData.alpha = 1;
 				}
-			} else if ((match = value.match(RGB_REGEXP) || value.match(RGBA_REGEXP))) {
-				colorData = new ColorData();
+			} else if ((match = (value.match(RGB_REGEXP) || value.match(RGBA_REGEXP)))) {
+				colorData.transparent = false;
 				r = match[1];
 				if (match[2] != undefined) {
 					r = (r / 100) * 255;
@@ -91,8 +93,8 @@ package fritz3.display.graphics.parser.color {
 				} else {
 					colorData.alpha = 1;
 				}
-			} else if ((match = value.match(HSL_REGEXP) || value.match(HSLA_REGEXP))) {
-				colorData = new ColorData();
+			} else if ((match = (value.match(HSL_REGEXP) || value.match(HSLA_REGEXP)))) {
+				colorData.transparent = false;
 				var h:Number, s:Number, l:Number;
 				h = MathUtil.wrapAngle(match[1]);
 				s = (match[2] / 100);
